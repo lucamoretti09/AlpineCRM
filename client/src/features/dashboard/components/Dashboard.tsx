@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import api from '@/lib/api';
 import { cn, formatCurrency, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
@@ -204,13 +205,13 @@ function GlassCard({
 // ========== MAIN DASHBOARD COMPONENT ==========
 
 export default function Dashboard() {
-  const user = useAuthStore((s) => s.user);
+  const user = useAuthStore((s: any) => s.user);
 
   // Fetch dashboard stats
   const {
     data: stats,
     isLoading: statsLoading,
-    isError: statsError,
+    isError: _statsError,
   } = useQuery<DashboardStats>({
     queryKey: ['dashboard', 'stats'],
     queryFn: async () => {

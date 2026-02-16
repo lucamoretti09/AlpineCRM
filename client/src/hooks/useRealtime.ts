@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 export function useRealtime() {
   const queryClient = useQueryClient();
-  const addNotification = useNotificationStore((s) => s.addNotification);
+  const addNotification = useNotificationStore((s: any) => s.addNotification);
 
   useEffect(() => {
     const socket = getSocket();
