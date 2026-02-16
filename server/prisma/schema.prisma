@@ -1,0 +1,420 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User & Authentication
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  firstName     String    @map("first_name")
+  lastName      String    @map("last_name")
+  role          String    @default("user") // admin, manager, user
+  avatarUrl     String?   @map("avatar_url")
+  phone         String?
+  timezone      String    @default("UTC")
+  preferences   Json      @default("{}")
+  isActive      Boolean   @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  contacts           Contact[]
+  leadsAssigned      Lead[]           @relation("LeadAssignedTo")
+  leadsConverted     Lead[]           @relation("LeadConvertedBy")
+  deals              Deal[]
+  tasksAssigned      Task[]           @relation("TaskAssignedTo")
+  tasksCreated       Task[]           @relation("TaskCreatedBy")
+  ticketsAssigned    Ticket[]
+  ticketComments     TicketComment[]
+  appointments       Appointment[]    @relation("AppointmentCreator")
+  activities         Activity[]
+  emails             Email[]
+  notifications      Notification[]
+
+  @@map("users")
+}
+
+// ============================================
+// Contact & Lead Management
+// ============================================
+
+model Contact {
+  id           String    @id @default(uuid())
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  email        String?
+  phone        String?
+  mobile       String?
+  company      String?
+  jobTitle     String?   @map("job_title")
+  website      String?
+  linkedinUrl  String?   @map("linkedin_url")
+  address      Json?     @default("{}")
+  status       String    @default("active") // active, inactive, churned
+  source       String?   // website, referral, social, etc.
+  leadScore    Int       @default(0) @map("lead_score")
+  tags         String[]
+  ownerId      String?   @map("owner_id")
+  customFields Json      @default("{}") @map("custom_fields")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  owner        User?              @relation(fields: [ownerId], references: [id])
+  lead         Lead?
+  deals        Deal[]
+  tasks        Task[]
+  tickets      Ticket[]
+  appointments Appointment[]
+  invoices     Invoice[]
+  activities   Activity[]
+  emails       Email[]
+
+  @@index([email])
+  @@index([company])
+  @@index([status])
+  @@map("contacts")
+}
+
+model Lead {
+  id                String    @id @default(uuid())
+  contactId         String?   @unique @map("contact_id")
+  company           String?
+  estimatedValue    Decimal?  @map("estimated_value") @db.Decimal(15, 2)
+  status            String    @default("new") // new, contacted, qualified, unqualified, converted
+  source            String?
+  assignedToId      String?   @map("assigned_to")
+  notes             String?
+  convertedAt       DateTime? @map("converted_at")
+  convertedToId     String?   @map("converted_to_contact")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  contact           Contact?           @relation(fields: [contactId], references: [id])
+  assignedTo        User?              @relation("LeadAssignedTo", fields: [assignedToId], references: [id])
+  convertedTo       User?              @relation("LeadConvertedBy", fields: [convertedToId], references: [id])
+
+  @@index([status])
+  @@map("leads")
+}
+
+// ============================================
+// Sales Pipeline & Deals
+// ============================================
+
+model Deal {
+  id                String    @id @default(uuid())
+  name              String
+  contactId         String?   @map("contact_id")
+  company           String?
+  value             Decimal   @default(0) @db.Decimal(15, 2)
+  currency          String    @default("USD")
+  stage             String    @default("prospecting") // prospecting, qualification, proposal, negotiation, closed_won, closed_lost
+  probability       Int       @default(20)
+  expectedCloseDate DateTime? @map("expected_close_date")
+  actualCloseDate   DateTime? @map("actual_close_date")
+  status            String    @default("open") // open, won, lost
+  ownerId           String?   @map("owner_id")
+  description       String?
+  products          Json      @default("[]")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  contact           Contact?           @relation(fields: [contactId], references: [id])
+  owner             User?              @relation(fields: [ownerId], references: [id])
+  tasks             Task[]
+  appointments      Appointment[]
+  invoices          Invoice[]
+  activities        Activity[]
+  emails            Email[]
+
+  @@index([stage])
+  @@index([status])
+  @@map("deals")
+}
+
+// ============================================
+// Task Management
+// ============================================
+
+model Task {
+  id           String    @id @default(uuid())
+  title        String
+  description  String?
+  type         String    @default("task") // task, call, meeting, email, follow_up
+  priority     String    @default("medium") // low, medium, high, urgent
+  status       String    @default("pending") // pending, in_progress, completed, cancelled
+  dueDate      DateTime? @map("due_date")
+  completedAt  DateTime? @map("completed_at")
+  assignedToId String?   @map("assigned_to")
+  createdById  String?   @map("created_by")
+  contactId    String?   @map("contact_id")
+  dealId       String?   @map("deal_id")
+  reminder     Boolean   @default(false)
+  reminderAt   DateTime? @map("reminder_at")
+  recurrence   String?   // daily, weekly, monthly, yearly
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  assignedTo   User?     @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  createdBy    User?     @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  contact      Contact?  @relation(fields: [contactId], references: [id])
+  deal         Deal?     @relation(fields: [dealId], references: [id])
+  activities   Activity[]
+
+  @@index([status])
+  @@index([dueDate])
+  @@map("tasks")
+}
+
+// ============================================
+// Customer Support & Tickets
+// ============================================
+
+model Ticket {
+  id                String    @id @default(uuid())
+  ticketNumber      String    @unique @map("ticket_number")
+  subject           String
+  description       String?
+  status            String    @default("open") // open, pending, in_progress, resolved, closed
+  priority          String    @default("normal") // low, normal, high, urgent
+  category          String?
+  contactId         String?   @map("contact_id")
+  assignedToId      String?   @map("assigned_to")
+  slaDueAt          DateTime? @map("sla_due_at")
+  firstResponseAt   DateTime? @map("first_response_at")
+  resolvedAt        DateTime? @map("resolved_at")
+  closedAt          DateTime? @map("closed_at")
+  satisfactionRating Int?     @map("satisfaction_rating")
+  tags              String[]
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  contact           Contact?          @relation(fields: [contactId], references: [id])
+  assignedTo        User?             @relation(fields: [assignedToId], references: [id])
+  comments          TicketComment[]
+  activities        Activity[]
+
+  @@index([status])
+  @@index([priority])
+  @@map("tickets")
+}
+
+model TicketComment {
+  id          String   @id @default(uuid())
+  ticketId    String   @map("ticket_id")
+  userId      String   @map("user_id")
+  content     String
+  isInternal  Boolean  @default(false) @map("is_internal")
+  attachments Json     @default("[]")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("ticket_comments")
+}
+
+// ============================================
+// Calendar & Appointments
+// ============================================
+
+model Appointment {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  location    String?
+  startTime   DateTime  @map("start_time")
+  endTime     DateTime  @map("end_time")
+  timezone    String    @default("UTC")
+  allDay      Boolean   @default(false) @map("all_day")
+  status      String    @default("scheduled") // scheduled, confirmed, cancelled, completed
+  contactId   String?   @map("contact_id")
+  dealId      String?   @map("deal_id")
+  createdById String?   @map("created_by")
+  attendees   Json      @default("[]")
+  reminders   Json      @default("[]")
+  recurrence  String?
+  externalId  String?   @map("external_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+  deal        Deal?     @relation(fields: [dealId], references: [id])
+  createdBy   User?     @relation("AppointmentCreator", fields: [createdById], references: [id])
+
+  @@index([startTime])
+  @@index([status])
+  @@map("appointments")
+}
+
+// ============================================
+// Invoicing & Billing
+// ============================================
+
+model Invoice {
+  id             String    @id @default(uuid())
+  invoiceNumber  String    @unique @map("invoice_number")
+  contactId      String?   @map("contact_id")
+  dealId         String?   @map("deal_id")
+  status         String    @default("draft") // draft, sent, viewed, paid, overdue, cancelled
+  issueDate      DateTime  @map("issue_date")
+  dueDate        DateTime  @map("due_date")
+  subtotal       Decimal   @default(0) @db.Decimal(15, 2)
+  taxRate        Decimal   @default(0) @db.Decimal(5, 2) @map("tax_rate")
+  taxAmount      Decimal   @default(0) @db.Decimal(15, 2) @map("tax_amount")
+  total          Decimal   @default(0) @db.Decimal(15, 2)
+  currency       String    @default("USD")
+  notes          String?
+  terms          String?
+  items          Json      @default("[]")
+  paidAt         DateTime? @map("paid_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  contact        Contact?  @relation(fields: [contactId], references: [id])
+  deal           Deal?     @relation(fields: [dealId], references: [id])
+
+  @@index([status])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+// ============================================
+// Email Integration
+// ============================================
+
+model Email {
+  id          String    @id @default(uuid())
+  messageId   String?   @map("message_id")
+  threadId    String?   @map("thread_id")
+  fromEmail   String    @map("from_email")
+  toEmails    String[]  @map("to_emails")
+  ccEmails    String[]  @map("cc_emails")
+  bccEmails   String[]  @map("bcc_emails")
+  subject     String?
+  body        String?
+  bodyHtml    String?   @map("body_html")
+  status      String    @default("sent") // draft, sent, delivered, opened, clicked, bounced
+  direction   String    @default("outbound") // inbound, outbound
+  contactId   String?   @map("contact_id")
+  dealId      String?   @map("deal_id")
+  userId      String?   @map("user_id")
+  openedAt    DateTime? @map("opened_at")
+  clickedAt   DateTime? @map("clicked_at")
+  attachments Json      @default("[]")
+  sentAt      DateTime? @map("sent_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  contact     Contact?  @relation(fields: [contactId], references: [id])
+  deal        Deal?     @relation(fields: [dealId], references: [id])
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([fromEmail])
+  @@index([contactId])
+  @@map("emails")
+}
+
+// ============================================
+// Activity Log
+// ============================================
+
+model Activity {
+  id          String   @id @default(uuid())
+  type        String   // created, updated, deleted, viewed, emailed, called, etc.
+  title       String
+  description String?
+  contactId   String?  @map("contact_id")
+  dealId      String?  @map("deal_id")
+  taskId      String?  @map("task_id")
+  ticketId    String?  @map("ticket_id")
+  userId      String?  @map("user_id")
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  contact     Contact? @relation(fields: [contactId], references: [id])
+  deal        Deal?    @relation(fields: [dealId], references: [id])
+  task        Task?    @relation(fields: [taskId], references: [id])
+  ticket      Ticket?  @relation(fields: [ticketId], references: [id])
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@index([type])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+// ============================================
+// Notifications
+// ============================================
+
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  type      String    // task_due, deal_won, ticket_assigned, etc.
+  title     String
+  message   String
+  data      Json      @default("{}")
+  read      Boolean   @default(false)
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
+  @@map("notifications")
+}
+
+// ============================================
+// Settings & Configuration
+// ============================================
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+// ============================================
+// Email Templates
+// ============================================
+
+model EmailTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  subject   String
+  body      String
+  variables String[]
+  category  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("email_templates")
+}
