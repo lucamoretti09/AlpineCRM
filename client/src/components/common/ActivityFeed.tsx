@@ -102,13 +102,13 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
   if (displayActivities.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-tertiary)]">
-          <FileText className="h-7 w-7 text-[var(--text-tertiary)]" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--bg-tertiary)]">
+          <FileText className="h-8 w-8 text-[var(--text-tertiary)]" />
         </div>
-        <p className="mt-3 text-[15px] font-medium text-[var(--text-secondary)]">
+        <p className="mt-3 text-[17px] font-medium text-[var(--text-secondary)]">
           Nicio activitate recentă
         </p>
-        <p className="mt-1 text-[13px] text-[var(--text-tertiary)]">
+        <p className="mt-1 text-[15px] text-[var(--text-tertiary)]">
           Activitatea va apărea aici
         </p>
       </div>
@@ -146,7 +146,7 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                 {/* Activity icon */}
                 <div
                   className={cn(
-                    'relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
+                    'relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full',
                     bg,
                     'ring-4 ring-[var(--bg-primary)]',
                     'transition-transform duration-200',
@@ -158,16 +158,16 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                 {/* Content */}
                 <div className="min-w-0 flex-1 pt-0.5">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[15px] font-medium text-[var(--text-primary)]">
+                    <p className="text-[17px] font-medium text-[var(--text-primary)]">
                       {activity.title}
                     </p>
-                    <time className="shrink-0 text-[13px] text-[var(--text-tertiary)]">
+                    <time className="shrink-0 text-[15px] text-[var(--text-tertiary)]">
                       {formatRelativeTime(activity.createdAt)}
                     </time>
                   </div>
 
                   {activity.description && (
-                    <p className="mt-0.5 text-[15px] text-[var(--text-secondary)]">
+                    <p className="mt-0.5 text-[17px] text-[var(--text-secondary)]">
                       {activity.description}
                     </p>
                   )}
@@ -183,12 +183,12 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                         />
                       ) : (
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-[var(--text-tertiary)] to-[var(--text-secondary)]">
-                          <span className="text-[10px] font-semibold text-white">
+                          <span className="text-[12px] font-semibold text-white">
                             {getInitialsFromName(activity.userName)}
                           </span>
                         </div>
                       )}
-                      <span className="text-[13px] text-[var(--text-tertiary)]">
+                      <span className="text-[15px] text-[var(--text-tertiary)]">
                         {activity.userName}
                       </span>
                     </div>

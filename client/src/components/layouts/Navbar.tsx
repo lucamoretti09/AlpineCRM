@@ -49,21 +49,21 @@ export default function Navbar({ title }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[80px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-6 backdrop-blur-xl backdrop-saturate-150">
+    <header className="sticky top-0 z-30 flex h-[90px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-8 backdrop-blur-xl backdrop-saturate-150">
       {/* Left: Page Title */}
       <div>
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
           {title}
         </h1>
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-3">
         {/* Search */}
         <div className="relative hidden md:block">
           <Search
             className={cn(
-              'absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-300',
+              'absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors duration-300',
               searchFocused ? 'text-primary-500' : 'text-[var(--text-tertiary)]'
             )}
           />
@@ -73,17 +73,17 @@ export default function Navbar({ title }: NavbarProps) {
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
             className={cn(
-              'h-12 w-72 rounded-xl border border-[var(--border-color)]',
-              'bg-[var(--bg-secondary)]/60 pl-10 pr-4 text-[15px]',
+              'h-14 w-80 rounded-2xl border border-[var(--border-color)]',
+              'bg-[var(--bg-secondary)]/60 pl-12 pr-4 text-[17px]',
               'text-[var(--text-primary)] placeholder-[var(--text-tertiary)]',
               'outline-none transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-              'focus:w-96 focus:border-primary-500/40 focus:bg-[var(--bg-secondary)]',
+              'focus:w-[28rem] focus:border-primary-500/40 focus:bg-[var(--bg-secondary)]',
               'focus:shadow-[0_0_0_3px_rgba(99,102,241,0.1),0_0_20px_rgba(99,102,241,0.06)]'
             )}
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[var(--text-tertiary)]">
-            <kbd className="hidden lg:flex items-center gap-0.5 rounded-md border border-[var(--border-color)] bg-[var(--bg-tertiary)]/50 px-1.5 py-0.5 text-[10px] font-medium">
-              <Command className="h-2.5 w-2.5" />K
+            <kbd className="hidden lg:flex items-center gap-1 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)]/50 px-2 py-1 text-[13px] font-medium">
+              <Command className="h-3.5 w-3.5" />K
             </kbd>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function Navbar({ title }: NavbarProps) {
         <button
           onClick={handleThemeToggle}
           className={cn(
-            'relative flex h-10 w-10 items-center justify-center rounded-xl',
+            'relative flex h-12 w-12 items-center justify-center rounded-xl',
             'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]',
             'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
             themeBounce && 'animate-theme-bounce'
@@ -101,13 +101,13 @@ export default function Navbar({ title }: NavbarProps) {
         >
           <Sun
             className={cn(
-              'h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+              'h-6 w-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
               isDark ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'
             )}
           />
           <Moon
             className={cn(
-              'absolute h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+              'absolute h-6 w-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
               isDark ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
             )}
           />
@@ -121,19 +121,19 @@ export default function Navbar({ title }: NavbarProps) {
               setDropdownOpen(false);
             }}
             className={cn(
-              'relative flex h-10 w-10 items-center justify-center rounded-xl',
+              'relative flex h-12 w-12 items-center justify-center rounded-xl',
               'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]',
               'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
             )}
           >
             <Bell
               className={cn(
-                'h-5 w-5',
+                'h-6 w-6',
                 unreadCount > 0 && !notificationsOpen && 'animate-bell-wiggle'
               )}
             />
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-1 text-[10px] font-bold text-white shadow-md shadow-red-500/30 animate-notification-pulse">
+              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-1.5 text-[12px] font-bold text-white shadow-md shadow-red-500/30 animate-notification-pulse">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -143,7 +143,7 @@ export default function Navbar({ title }: NavbarProps) {
           {notificationsOpen && (
             <div
               className={cn(
-                'absolute right-0 top-full mt-2 w-80 rounded-2xl',
+                'absolute right-0 top-full mt-2 w-96 rounded-2xl',
                 'border border-[var(--border-color)] bg-[var(--bg-card)]',
                 'shadow-2xl shadow-black/12 dark:shadow-black/40',
                 'animate-dropdown-enter',
@@ -151,46 +151,46 @@ export default function Navbar({ title }: NavbarProps) {
               )}
             >
               <div className="flex items-center justify-between border-b border-[var(--border-color)]/50 px-4 py-3.5">
-                <h3 className="text-[15px] font-bold text-[var(--text-primary)]">
+                <h3 className="text-[17px] font-bold text-[var(--text-primary)]">
                   Notificări
                 </h3>
-                <span className="rounded-full bg-primary-500/10 px-2.5 py-0.5 text-[13px] font-semibold text-primary-500">
+                <span className="rounded-full bg-primary-500/10 px-3 py-1 text-[15px] font-semibold text-primary-500">
                   {unreadCount} noi
                 </span>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-primary-500">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary-500/10">
-                    <Bell className="h-3.5 w-3.5 text-primary-500" />
+                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-500/10">
+                    <Bell className="h-5 w-5 text-primary-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[15px] font-medium text-[var(--text-primary)]">Tranzacție nouă creată</p>
-                    <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">acum 2 minute</p>
+                    <p className="text-[17px] font-medium text-[var(--text-primary)]">Tranzacție nouă creată</p>
+                    <p className="text-[15px] text-[var(--text-tertiary)] mt-0.5">acum 2 minute</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-emerald-500">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
-                    <Bell className="h-3.5 w-3.5 text-emerald-500" />
+                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+                    <Bell className="h-5 w-5 text-emerald-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[15px] font-medium text-[var(--text-primary)]">Sarcină finalizată</p>
-                    <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">acum 15 minute</p>
+                    <p className="text-[17px] font-medium text-[var(--text-primary)]">Sarcină finalizată</p>
+                    <p className="text-[15px] text-[var(--text-tertiary)] mt-0.5">acum 15 minute</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-transparent">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
-                    <Bell className="h-3.5 w-3.5 text-amber-500" />
+                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
+                    <Bell className="h-5 w-5 text-amber-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[15px] font-medium text-[var(--text-primary)]">Factură restantă</p>
-                    <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">acum 1 oră</p>
+                    <p className="text-[17px] font-medium text-[var(--text-primary)]">Factură restantă</p>
+                    <p className="text-[15px] text-[var(--text-tertiary)] mt-0.5">acum 1 oră</p>
                   </div>
                 </div>
               </div>
               <div className="border-t border-[var(--border-color)]/50 px-4 py-3">
                 <a
                   href="/notifications"
-                  className="block text-center text-[12px] font-semibold text-primary-500 hover:text-primary-400 transition-colors duration-200"
+                  className="block text-center text-[15px] font-semibold text-primary-500 hover:text-primary-400 transition-colors duration-200"
                 >
                   Vezi toate notificările
                 </a>
@@ -200,7 +200,7 @@ export default function Navbar({ title }: NavbarProps) {
         </div>
 
         {/* Divider — gradient fade instead of solid line */}
-        <div className="mx-1.5 h-6 w-px bg-gradient-to-b from-transparent via-[var(--border-color)] to-transparent" />
+        <div className="mx-2 h-8 w-px bg-gradient-to-b from-transparent via-[var(--border-color)] to-transparent" />
 
         {/* User Dropdown */}
         <div ref={dropdownRef} className="relative">
@@ -218,18 +218,18 @@ export default function Navbar({ title }: NavbarProps) {
               <img
                 src={user.avatarUrl}
                 alt={`${user.firstName} ${user.lastName}`}
-                className="h-10 w-10 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
+                className="h-12 w-12 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
               />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[13px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[15px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
                 {user ? getInitials(user.firstName, user.lastName) : '??'}
               </div>
             )}
             <div className="hidden text-left md:block">
-              <p className="text-[15px] font-semibold text-[var(--text-primary)] leading-tight">
+              <p className="text-[17px] font-semibold text-[var(--text-primary)] leading-tight">
                 {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
               </p>
-              <p className="text-[13px] text-[var(--text-tertiary)] leading-tight">
+              <p className="text-[15px] text-[var(--text-tertiary)] leading-tight">
                 {user?.email ?? ''}
               </p>
             </div>
@@ -245,7 +245,7 @@ export default function Navbar({ title }: NavbarProps) {
           {dropdownOpen && (
             <div
               className={cn(
-                'absolute right-0 top-full mt-2 w-56 rounded-2xl',
+                'absolute right-0 top-full mt-2 w-72 rounded-2xl',
                 'border border-[var(--border-color)] bg-[var(--bg-card)]',
                 'shadow-2xl shadow-black/12 dark:shadow-black/40',
                 'animate-dropdown-enter',
@@ -253,10 +253,10 @@ export default function Navbar({ title }: NavbarProps) {
               )}
             >
               <div className="border-b border-[var(--border-color)]/50 px-4 py-3.5">
-                <p className="text-[15px] font-bold text-[var(--text-primary)]">
+                <p className="text-[17px] font-bold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
                 </p>
-                <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">
+                <p className="text-[15px] text-[var(--text-tertiary)] mt-0.5">
                   {user?.email ?? ''}
                 </p>
               </div>
@@ -264,16 +264,16 @@ export default function Navbar({ title }: NavbarProps) {
               <div className="py-1.5">
                 <a
                   href="/settings/profile"
-                  className="flex items-center gap-3 px-4 py-2.5 text-[15px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
+                  className="flex items-center gap-3 px-4 py-3 text-[17px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
-                  <User className="h-4 w-4" />
+                  <User className="h-5 w-5" />
                   Profil
                 </a>
                 <a
                   href="/settings"
-                  className="flex items-center gap-3 px-4 py-2.5 text-[15px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
+                  className="flex items-center gap-3 px-4 py-3 text-[17px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-5 w-5" />
                   Setări
                 </a>
               </div>

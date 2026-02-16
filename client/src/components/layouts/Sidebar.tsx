@@ -56,13 +56,13 @@ export default function Sidebar() {
         'bg-[var(--bg-sidebar)]',
         'border-r border-[var(--border-color)]/50',
         'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-        sidebarCollapsed ? 'w-[78px]' : 'w-[280px]'
+        sidebarCollapsed ? 'w-[90px]' : 'w-[340px]'
       )}
     >
       {/* Logo Section */}
       <div
         className={cn(
-          'flex h-[68px] items-center border-b border-[var(--border-color)]/50',
+          'flex h-[90px] items-center border-b border-[var(--border-color)]/50',
           'px-4 shrink-0',
           sidebarCollapsed ? 'justify-center' : 'gap-3'
         )}
@@ -73,7 +73,7 @@ export default function Sidebar() {
           {/* Logo icon with richer gradient + hover pulse-glow */}
           <div
             className={cn(
-              'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
+              'relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl',
               'bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-700',
               'shadow-lg shadow-indigo-500/25',
               'transition-all duration-500 ease-out',
@@ -90,7 +90,7 @@ export default function Sidebar() {
               e.currentTarget.style.animation = 'none';
             }}
           >
-            <Mountain className="h-5 w-5 text-white drop-shadow-sm" />
+            <Mountain className="h-7 w-7 text-white drop-shadow-sm" />
           </div>
         </div>
         <div
@@ -99,7 +99,7 @@ export default function Sidebar() {
             sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
           )}
         >
-          <span className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
+          <span className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
             Alpine<span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">CRM</span>
           </span>
         </div>
@@ -107,7 +107,7 @@ export default function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
-        <ul className="flex flex-col gap-0.5">
+        <ul className="flex flex-col gap-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -120,9 +120,9 @@ export default function Sidebar() {
                   onMouseEnter={() => setHoveredItem(item.path)}
                   onMouseLeave={() => setHoveredItem(null)}
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-xl px-3 py-3',
+                    'group relative flex items-center gap-4 rounded-2xl px-4 py-4',
                     'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-                    'text-[15px] font-medium',
+                    'text-[18px] font-medium',
                     sidebarCollapsed && 'justify-center px-0',
                     active
                       ? 'bg-primary-500/[0.08] text-primary-500 dark:bg-primary-500/[0.12]'
@@ -145,7 +145,7 @@ export default function Sidebar() {
                   {/* Active indicator bar with animated glow */}
                   {active && (
                     <span
-                      className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-primary-400 via-primary-500 to-primary-600"
+                      className="absolute left-0 top-1/2 h-9 w-[4px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-primary-400 via-primary-500 to-primary-600"
                       style={{
                         animation: 'active-bar-glow 2.5s ease-in-out infinite',
                       }}
@@ -154,7 +154,7 @@ export default function Sidebar() {
 
                   <Icon
                     className={cn(
-                      'relative h-5 w-5 shrink-0 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                      'relative h-6 w-6 shrink-0 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
                       active && 'drop-shadow-sm',
                       hovered && !active && 'scale-110',
                       active && 'scale-105'
@@ -208,10 +208,10 @@ export default function Sidebar() {
           )}
         >
           {sidebarCollapsed ? (
-            <ChevronsRight className="h-5 w-5 shrink-0 transition-transform duration-300" />
+            <ChevronsRight className="h-6 w-6 shrink-0 transition-transform duration-300" />
           ) : (
             <>
-              <ChevronsLeft className="h-5 w-5 shrink-0 transition-transform duration-300" />
+              <ChevronsLeft className="h-6 w-6 shrink-0 transition-transform duration-300" />
               <span className="truncate">Collapse</span>
             </>
           )}
@@ -241,10 +241,10 @@ export default function Sidebar() {
             <img
               src={user.avatarUrl}
               alt={`${user.firstName} ${user.lastName}`}
-              className="h-11 w-11 shrink-0 rounded-xl object-cover ring-2 ring-primary-500/15 transition-all duration-300 hover:ring-primary-500/30"
+              className="h-14 w-14 shrink-0 rounded-2xl object-cover ring-2 ring-primary-500/15 transition-all duration-300 hover:ring-primary-500/30"
             />
           ) : (
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[13px] font-bold text-white ring-2 ring-primary-500/15 shadow-md shadow-indigo-500/20 transition-all duration-300 hover:ring-primary-500/30 hover:shadow-lg hover:shadow-indigo-500/25">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[15px] font-bold text-white ring-2 ring-primary-500/15 shadow-md shadow-indigo-500/20 transition-all duration-300 hover:ring-primary-500/30 hover:shadow-lg hover:shadow-indigo-500/25">
               {user ? getInitials(user.firstName, user.lastName) : '??'}
             </div>
           )}
@@ -252,10 +252,10 @@ export default function Sidebar() {
           {!sidebarCollapsed && (
             <div className="flex flex-1 items-center overflow-hidden">
               <div className="min-w-0">
-                <p className="truncate text-[15px] font-semibold text-[var(--text-primary)]">
+                <p className="truncate text-[17px] font-semibold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
                 </p>
-                <p className="truncate text-[13px] text-[var(--text-tertiary)] capitalize">
+                <p className="truncate text-[15px] text-[var(--text-tertiary)] capitalize">
                   {user?.role ?? 'Unknown'}
                 </p>
               </div>
