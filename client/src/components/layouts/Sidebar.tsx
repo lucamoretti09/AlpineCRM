@@ -24,15 +24,15 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { label: 'Contacts', icon: Users, path: '/contacts' },
-  { label: 'Deals', icon: HandCoins, path: '/deals' },
-  { label: 'Tasks', icon: CheckSquare, path: '/tasks' },
-  { label: 'Tickets', icon: Ticket, path: '/tickets' },
+  { label: 'Panou Principal', icon: LayoutDashboard, path: '/dashboard' },
+  { label: 'Contacte', icon: Users, path: '/contacts' },
+  { label: 'Tranzacții', icon: HandCoins, path: '/deals' },
+  { label: 'Sarcini', icon: CheckSquare, path: '/tasks' },
+  { label: 'Tichete', icon: Ticket, path: '/tickets' },
   { label: 'Calendar', icon: Calendar, path: '/calendar' },
-  { label: 'Invoices', icon: FileText, path: '/invoices' },
-  { label: 'Emails', icon: Mail, path: '/emails' },
-  { label: 'Settings', icon: Settings, path: '/settings' },
+  { label: 'Facturi', icon: FileText, path: '/invoices' },
+  { label: 'Email-uri', icon: Mail, path: '/emails' },
+  { label: 'Setări', icon: Settings, path: '/settings' },
 ];
 
 export default function Sidebar() {
@@ -56,7 +56,7 @@ export default function Sidebar() {
         'bg-[var(--bg-sidebar)]',
         'border-r border-[var(--border-color)]/50',
         'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-        sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'
+        sidebarCollapsed ? 'w-[78px]' : 'w-[280px]'
       )}
     >
       {/* Logo Section */}
@@ -99,7 +99,7 @@ export default function Sidebar() {
             sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
           )}
         >
-          <span className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
+          <span className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
             Alpine<span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">CRM</span>
           </span>
         </div>
@@ -120,9 +120,9 @@ export default function Sidebar() {
                   onMouseEnter={() => setHoveredItem(item.path)}
                   onMouseLeave={() => setHoveredItem(null)}
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-xl px-3 py-2.5',
+                    'group relative flex items-center gap-3 rounded-xl px-3 py-3',
                     'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-                    'text-[13.5px] font-medium',
+                    'text-[15px] font-medium',
                     sidebarCollapsed && 'justify-center px-0',
                     active
                       ? 'bg-primary-500/[0.08] text-primary-500 dark:bg-primary-500/[0.12]'
@@ -154,7 +154,7 @@ export default function Sidebar() {
 
                   <Icon
                     className={cn(
-                      'relative h-[18px] w-[18px] shrink-0 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                      'relative h-5 w-5 shrink-0 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
                       active && 'drop-shadow-sm',
                       hovered && !active && 'scale-110',
                       active && 'scale-105'
@@ -203,15 +203,15 @@ export default function Sidebar() {
           className={cn(
             'flex w-full items-center gap-3 rounded-xl px-3 py-2',
             'text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)]/50 hover:text-[var(--text-secondary)]',
-            'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] text-[13px]',
+            'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] text-[14px]',
             sidebarCollapsed && 'justify-center px-0'
           )}
         >
           {sidebarCollapsed ? (
-            <ChevronsRight className="h-[18px] w-[18px] shrink-0 transition-transform duration-300" />
+            <ChevronsRight className="h-5 w-5 shrink-0 transition-transform duration-300" />
           ) : (
             <>
-              <ChevronsLeft className="h-[18px] w-[18px] shrink-0 transition-transform duration-300" />
+              <ChevronsLeft className="h-5 w-5 shrink-0 transition-transform duration-300" />
               <span className="truncate">Collapse</span>
             </>
           )}
@@ -241,10 +241,10 @@ export default function Sidebar() {
             <img
               src={user.avatarUrl}
               alt={`${user.firstName} ${user.lastName}`}
-              className="h-9 w-9 shrink-0 rounded-xl object-cover ring-2 ring-primary-500/15 transition-all duration-300 hover:ring-primary-500/30"
+              className="h-11 w-11 shrink-0 rounded-xl object-cover ring-2 ring-primary-500/15 transition-all duration-300 hover:ring-primary-500/30"
             />
           ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-primary-500/15 shadow-md shadow-indigo-500/20 transition-all duration-300 hover:ring-primary-500/30 hover:shadow-lg hover:shadow-indigo-500/25">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[13px] font-bold text-white ring-2 ring-primary-500/15 shadow-md shadow-indigo-500/20 transition-all duration-300 hover:ring-primary-500/30 hover:shadow-lg hover:shadow-indigo-500/25">
               {user ? getInitials(user.firstName, user.lastName) : '??'}
             </div>
           )}
@@ -252,10 +252,10 @@ export default function Sidebar() {
           {!sidebarCollapsed && (
             <div className="flex flex-1 items-center overflow-hidden">
               <div className="min-w-0">
-                <p className="truncate text-[13px] font-semibold text-[var(--text-primary)]">
+                <p className="truncate text-[15px] font-semibold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
                 </p>
-                <p className="truncate text-[11px] text-[var(--text-tertiary)] capitalize">
+                <p className="truncate text-[13px] text-[var(--text-tertiary)] capitalize">
                   {user?.role ?? 'Unknown'}
                 </p>
               </div>

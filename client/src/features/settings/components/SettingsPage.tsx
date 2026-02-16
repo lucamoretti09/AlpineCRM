@@ -52,16 +52,16 @@ interface NotificationPreferences {
 }
 
 const TABS: Tab[] = [
-  { id: 'profile', label: 'Profile', icon: User },
-  { id: 'account', label: 'Account', icon: Lock },
-  { id: 'appearance', label: 'Appearance', icon: Palette },
-  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'profile', label: 'Profil', icon: User },
+  { id: 'account', label: 'Cont', icon: Lock },
+  { id: 'appearance', label: 'Aspect', icon: Palette },
+  { id: 'notifications', label: 'Notificări', icon: Bell },
 ];
 
 const DENSITY_OPTIONS: { value: DisplayDensity; label: string; description: string; icon: React.ElementType }[] = [
-  { value: 'compact', label: 'Compact', description: 'Tighter spacing, more content visible', icon: Rows4 },
-  { value: 'comfortable', label: 'Comfortable', description: 'Balanced spacing for everyday use', icon: Rows3 },
-  { value: 'spacious', label: 'Spacious', description: 'Generous spacing, easier to scan', icon: SquareStack },
+  { value: 'compact', label: 'Compact', description: 'Spațiere redusă, mai mult conținut vizibil', icon: Rows4 },
+  { value: 'comfortable', label: 'Standard', description: 'Spațiere echilibrată pentru utilizare zilnică', icon: Rows3 },
+  { value: 'spacious', label: 'Confortabil', description: 'Spațiere generoasă, mai ușor de parcurs', icon: SquareStack },
 ];
 
 // ---------------------------------------------------------------------------
@@ -98,6 +98,12 @@ function saveDensity(d: DisplayDensity) {
   localStorage.setItem('alpine-display-density', d);
 }
 
+const DENSITY_LABEL_MAP: Record<string, string> = {
+  compact: 'Compact',
+  comfortable: 'Standard',
+  spacious: 'Confortabil',
+};
+
 // ---------------------------------------------------------------------------
 // Sub-components: shared
 // ---------------------------------------------------------------------------
@@ -106,7 +112,7 @@ function SectionCard({ children, className }: { children: React.ReactNode; class
   return (
     <div
       className={cn(
-        'relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6',
+        'relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-7',
         'hover:border-[var(--border-color)]/80 transition-all duration-300',
         'group/card',
         className,
@@ -120,16 +126,16 @@ function SectionCard({ children, className }: { children: React.ReactNode; class
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-[15px] font-bold tracking-tight text-[var(--text-primary)] mb-1">{children}</h3>;
+  return <h3 className="text-[17px] font-bold tracking-tight text-[var(--text-primary)] mb-1">{children}</h3>;
 }
 
 function SectionDescription({ children }: { children: React.ReactNode }) {
-  return <p className="text-[12px] text-[var(--text-secondary)] mb-6 leading-relaxed">{children}</p>;
+  return <p className="text-[14px] text-[var(--text-secondary)] mb-6 leading-relaxed">{children}</p>;
 }
 
 function FormLabel({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+    <label htmlFor={htmlFor} className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
       {children}
     </label>
   );
@@ -165,8 +171,8 @@ function FormInput({
         disabled={disabled}
         autoComplete={autoComplete}
         className={cn(
-          'w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl',
-          'text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]',
+          'w-full px-3.5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl',
+          'text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]',
           'focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10',
           'transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
           rightElement && 'pr-11',
@@ -196,7 +202,7 @@ function ToggleSwitch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent',
+        'relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent',
         'transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
         checked ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md shadow-indigo-500/20' : 'bg-[var(--border-color)]',
         disabled && 'opacity-50 cursor-not-allowed',
@@ -204,9 +210,9 @@ function ToggleSwitch({
     >
       <span
         className={cn(
-          'pointer-events-none inline-block h-5 w-5 rounded-full bg-white ring-0',
+          'pointer-events-none inline-block h-6 w-6 rounded-full bg-white ring-0',
           'transform transition-all duration-300 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]',
-          checked ? 'translate-x-5 shadow-lg shadow-indigo-500/30' : 'translate-x-0 shadow-md',
+          checked ? 'translate-x-7 shadow-lg shadow-indigo-500/30' : 'translate-x-0 shadow-md',
         )}
       />
     </button>
@@ -228,13 +234,13 @@ function SaveButton({
       onClick={onClick}
       disabled={loading || disabled}
       className={cn(
-        'flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl',
-        'text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/25',
+        'flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl',
+        'text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/25',
         'transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed',
       )}
     >
-      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-      {loading ? 'Saving...' : 'Save Changes'}
+      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+      {loading ? 'Se salvează...' : 'Salvează Modificările'}
     </button>
   );
 }
@@ -269,7 +275,7 @@ function ProfileTab() {
 
   const handleSave = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      toast.error('First name, last name, and email are required.');
+      toast.error('Prenumele, numele și emailul sunt obligatorii.');
       return;
     }
     setSaving(true);
@@ -278,9 +284,9 @@ function ProfileTab() {
       const { data } = await api.put('/auth/me', payload);
       const updated = data.data ?? { ...user, ...payload };
       setUser(updated);
-      toast.success('Profile updated successfully.');
+      toast.success('Profil actualizat cu succes.');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to update profile.');
+      toast.error(err?.response?.data?.message ?? 'Actualizarea profilului a eșuat.');
     } finally {
       setSaving(false);
     }
@@ -290,8 +296,8 @@ function ProfileTab() {
     <div className="space-y-6 animate-fadeInUp">
       {/* Avatar section */}
       <SectionCard>
-        <SectionTitle>Profile Photo</SectionTitle>
-        <SectionDescription>This is displayed across the CRM alongside your name.</SectionDescription>
+        <SectionTitle>Fotografie Profil</SectionTitle>
+        <SectionDescription>Aceasta este afișată în tot CRM-ul alături de numele tău.</SectionDescription>
 
         <div className="flex items-center gap-6">
           {/* Avatar with animated gradient ring */}
@@ -313,20 +319,20 @@ function ProfileTab() {
             </div>
             {/* Camera overlay */}
             <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover/avatar:bg-black/30 transition-all duration-300 flex items-center justify-center z-20 cursor-pointer">
-              <Camera className="w-5 h-5 text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
+              <Camera className="w-6 h-6 text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
             </div>
           </div>
 
           <div className="flex-1 space-y-2">
-            <FormLabel htmlFor="avatarUrl">Image URL</FormLabel>
+            <FormLabel htmlFor="avatarUrl">URL Imagine</FormLabel>
             <FormInput
               id="avatarUrl"
               value={avatarUrl}
               onChange={setAvatarUrl}
-              placeholder="https://example.com/avatar.jpg"
+              placeholder="https://exemplu.com/avatar.jpg"
             />
-            <p className="text-[11px] text-[var(--text-tertiary)]">
-              Paste a direct link to your profile image. Recommended size: 256 x 256px.
+            <p className="text-[13px] text-[var(--text-tertiary)]">
+              Lipește un link direct către imaginea de profil. Dimensiune recomandată: 256 x 256px.
             </p>
           </div>
         </div>
@@ -334,25 +340,25 @@ function ProfileTab() {
 
       {/* Personal info */}
       <SectionCard>
-        <SectionTitle>Personal Information</SectionTitle>
-        <SectionDescription>Update your name, email, and phone number.</SectionDescription>
+        <SectionTitle>Informații Personale</SectionTitle>
+        <SectionDescription>Actualizează numele, emailul și telefonul.</SectionDescription>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <FormLabel htmlFor="firstName">First Name</FormLabel>
-            <FormInput id="firstName" value={firstName} onChange={setFirstName} placeholder="Jane" />
+            <FormLabel htmlFor="firstName">Prenume</FormLabel>
+            <FormInput id="firstName" value={firstName} onChange={setFirstName} placeholder="Ion" />
           </div>
           <div>
-            <FormLabel htmlFor="lastName">Last Name</FormLabel>
-            <FormInput id="lastName" value={lastName} onChange={setLastName} placeholder="Doe" />
+            <FormLabel htmlFor="lastName">Nume</FormLabel>
+            <FormInput id="lastName" value={lastName} onChange={setLastName} placeholder="Popescu" />
           </div>
           <div>
-            <FormLabel htmlFor="email">Email Address</FormLabel>
-            <FormInput id="email" type="email" value={email} onChange={setEmail} placeholder="jane@company.com" />
+            <FormLabel htmlFor="email">Adresă Email</FormLabel>
+            <FormInput id="email" type="email" value={email} onChange={setEmail} placeholder="ion@companie.ro" />
           </div>
           <div>
-            <FormLabel htmlFor="phone">Phone Number</FormLabel>
-            <FormInput id="phone" type="tel" value={phone} onChange={setPhone} placeholder="+1 (555) 000-0000" />
+            <FormLabel htmlFor="phone">Număr Telefon</FormLabel>
+            <FormInput id="phone" type="tel" value={phone} onChange={setPhone} placeholder="+40 (700) 000-000" />
           </div>
         </div>
 
@@ -383,21 +389,21 @@ function AccountTab() {
   const handleSave = async () => {
     if (!isValid) {
       if (!passwordsMatch) {
-        toast.error('New passwords do not match.');
+        toast.error('Parolele nu se potrivesc.');
       } else if (newPassword.length < 8) {
-        toast.error('New password must be at least 8 characters.');
+        toast.error('Parola trebuie să aibă minim 8 caractere.');
       }
       return;
     }
     setSaving(true);
     try {
       await api.put('/auth/password', { currentPassword, newPassword, confirmNewPassword });
-      toast.success('Password changed successfully.');
+      toast.success('Parola a fost schimbată cu succes.');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to change password.');
+      toast.error(err?.response?.data?.message ?? 'Schimbarea parolei a eșuat.');
     } finally {
       setSaving(false);
     }
@@ -410,27 +416,27 @@ function AccountTab() {
       className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors duration-200"
       tabIndex={-1}
     >
-      {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
     </button>
   );
 
   return (
     <div className="space-y-6 animate-fadeInUp">
       <SectionCard>
-        <SectionTitle>Change Password</SectionTitle>
+        <SectionTitle>Schimbă Parola</SectionTitle>
         <SectionDescription>
-          Ensure your account stays secure by using a strong, unique password.
+          Asigură-te că contul tău rămâne securizat folosind o parolă puternică și unică.
         </SectionDescription>
 
         <div className="max-w-md space-y-5">
           <div>
-            <FormLabel htmlFor="currentPassword">Current Password</FormLabel>
+            <FormLabel htmlFor="currentPassword">Parola Curentă</FormLabel>
             <FormInput
               id="currentPassword"
               type={showCurrent ? 'text' : 'password'}
               value={currentPassword}
               onChange={setCurrentPassword}
-              placeholder="Enter current password"
+              placeholder="Introdu parola curentă"
               autoComplete="current-password"
               rightElement={visibilityToggle(showCurrent, () => setShowCurrent(!showCurrent))}
             />
@@ -439,44 +445,44 @@ function AccountTab() {
           <div className="relative">
             <hr className="border-[var(--border-color)]" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-white dark:bg-[var(--bg-primary)] px-2 text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] font-medium">New Password</span>
+              <span className="bg-white dark:bg-[var(--bg-primary)] px-2 text-[12px] uppercase tracking-widest text-[var(--text-tertiary)] font-medium">Parolă Nouă</span>
             </div>
           </div>
 
           <div>
-            <FormLabel htmlFor="newPassword">New Password</FormLabel>
+            <FormLabel htmlFor="newPassword">Parolă Nouă</FormLabel>
             <FormInput
               id="newPassword"
               type={showNew ? 'text' : 'password'}
               value={newPassword}
               onChange={setNewPassword}
-              placeholder="At least 8 characters"
+              placeholder="Minim 8 caractere"
               autoComplete="new-password"
               rightElement={visibilityToggle(showNew, () => setShowNew(!showNew))}
             />
             {newPassword.length > 0 && newPassword.length < 8 && (
-              <p className="text-[11px] text-red-500 mt-1.5 flex items-center gap-1">
+              <p className="text-[13px] text-red-500 mt-1.5 flex items-center gap-1">
                 <span className="w-1 h-1 rounded-full bg-red-500 inline-block" />
-                Password must be at least 8 characters.
+                Parola trebuie să aibă minim 8 caractere.
               </p>
             )}
           </div>
 
           <div>
-            <FormLabel htmlFor="confirmNewPassword">Confirm New Password</FormLabel>
+            <FormLabel htmlFor="confirmNewPassword">Confirmă Parola Nouă</FormLabel>
             <FormInput
               id="confirmNewPassword"
               type={showConfirm ? 'text' : 'password'}
               value={confirmNewPassword}
               onChange={setConfirmNewPassword}
-              placeholder="Re-enter new password"
+              placeholder="Re-introdu parola nouă"
               autoComplete="new-password"
               rightElement={visibilityToggle(showConfirm, () => setShowConfirm(!showConfirm))}
             />
             {confirmNewPassword.length > 0 && !passwordsMatch && (
-              <p className="text-[11px] text-red-500 mt-1.5 flex items-center gap-1">
+              <p className="text-[13px] text-red-500 mt-1.5 flex items-center gap-1">
                 <span className="w-1 h-1 rounded-full bg-red-500 inline-block" />
-                Passwords do not match.
+                Parolele nu se potrivesc.
               </p>
             )}
           </div>
@@ -501,36 +507,36 @@ function AppearanceTab() {
   const handleDensityChange = useCallback((d: DisplayDensity) => {
     setDensity(d);
     saveDensity(d);
-    toast.success(`Display density set to ${d}.`);
+    toast.success(`Densitatea afișării setată la ${DENSITY_LABEL_MAP[d] ?? d}.`);
   }, []);
 
   return (
     <div className="space-y-6 animate-fadeInUp">
       {/* Theme */}
       <SectionCard>
-        <SectionTitle>Theme</SectionTitle>
-        <SectionDescription>Choose between light and dark appearance for the interface.</SectionDescription>
+        <SectionTitle>Temă</SectionTitle>
+        <SectionDescription>Alege între aspect luminos și întunecat pentru interfață.</SectionDescription>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
               className={cn(
-                'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500',
+                'w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500',
                 isDark ? 'bg-indigo-500/10' : 'bg-amber-500/10',
               )}
             >
               {isDark ? (
-                <Moon className="w-5 h-5 text-indigo-400 transition-transform duration-500" />
+                <Moon className="w-6 h-6 text-indigo-400 transition-transform duration-500" />
               ) : (
-                <Sun className="w-5 h-5 text-amber-500 transition-transform duration-500" />
+                <Sun className="w-6 h-6 text-amber-500 transition-transform duration-500" />
               )}
             </div>
             <div>
-              <p className="text-[13px] font-medium text-[var(--text-primary)]">
-                {isDark ? 'Dark Mode' : 'Light Mode'}
+              <p className="text-[15px] font-medium text-[var(--text-primary)]">
+                {isDark ? 'Mod Întunecat' : 'Mod Luminos'}
               </p>
-              <p className="text-[11px] text-[var(--text-tertiary)]">
-                {isDark ? 'Easier on the eyes in low-light environments' : 'Classic bright interface'}
+              <p className="text-[13px] text-[var(--text-tertiary)]">
+                {isDark ? 'Mai ușor pentru ochi în medii cu lumină slabă' : 'Interfață clasică luminoasă'}
               </p>
             </div>
           </div>
@@ -540,26 +546,26 @@ function AppearanceTab() {
 
       {/* Sidebar */}
       <SectionCard>
-        <SectionTitle>Sidebar</SectionTitle>
-        <SectionDescription>Control the navigation sidebar layout.</SectionDescription>
+        <SectionTitle>Bară Laterală</SectionTitle>
+        <SectionDescription>Controlează bara de navigare laterală.</SectionDescription>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--bg-secondary)]/60 flex items-center justify-center transition-all duration-300">
+            <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)]/60 flex items-center justify-center transition-all duration-300">
               {sidebarCollapsed ? (
-                <PanelLeftClose className="w-5 h-5 text-[var(--text-secondary)] transition-transform duration-300" />
+                <PanelLeftClose className="w-6 h-6 text-[var(--text-secondary)] transition-transform duration-300" />
               ) : (
-                <PanelLeft className="w-5 h-5 text-[var(--text-secondary)] transition-transform duration-300" />
+                <PanelLeft className="w-6 h-6 text-[var(--text-secondary)] transition-transform duration-300" />
               )}
             </div>
             <div>
-              <p className="text-[13px] font-medium text-[var(--text-primary)]">
-                {sidebarCollapsed ? 'Sidebar Collapsed' : 'Sidebar Expanded'}
+              <p className="text-[15px] font-medium text-[var(--text-primary)]">
+                {sidebarCollapsed ? 'Bară Laterală Restrânsă' : 'Bară Laterală Extinsă'}
               </p>
-              <p className="text-[11px] text-[var(--text-tertiary)]">
+              <p className="text-[13px] text-[var(--text-tertiary)]">
                 {sidebarCollapsed
-                  ? 'Sidebar shows icons only for more workspace'
-                  : 'Sidebar shows full navigation labels'}
+                  ? 'Bara laterală afișează doar pictograme'
+                  : 'Bara laterală afișează etichete complete de navigare'}
               </p>
             </div>
           </div>
@@ -569,8 +575,8 @@ function AppearanceTab() {
 
       {/* Display Density */}
       <SectionCard>
-        <SectionTitle>Display Density</SectionTitle>
-        <SectionDescription>Adjust the spacing of elements throughout the interface.</SectionDescription>
+        <SectionTitle>Densitate Afișare</SectionTitle>
+        <SectionDescription>Ajustează spațierea elementelor din interfață.</SectionDescription>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {DENSITY_OPTIONS.map((opt) => {
@@ -582,7 +588,7 @@ function AppearanceTab() {
                 type="button"
                 onClick={() => handleDensityChange(opt.value)}
                 className={cn(
-                  'relative flex flex-col items-center gap-2.5 p-4 rounded-2xl border-2 transition-all duration-300 text-center group/density',
+                  'relative flex flex-col items-center gap-2.5 p-5 rounded-2xl border-2 transition-all duration-300 text-center group/density',
                   selected
                     ? 'border-indigo-500 bg-indigo-500/5 shadow-lg shadow-indigo-500/10'
                     : 'border-[var(--border-color)] bg-[var(--bg-secondary)]/40 hover:border-[var(--text-tertiary)]/50 hover:bg-[var(--bg-secondary)]/60',
@@ -594,26 +600,26 @@ function AppearanceTab() {
                 )}
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300',
+                    'w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300',
                     selected ? 'bg-indigo-500/10 scale-110' : 'bg-[var(--bg-primary)] group-hover/density:scale-105',
                   )}
                 >
                   <Icon
                     className={cn(
-                      'w-5 h-5 transition-colors duration-300',
+                      'w-6 h-6 transition-colors duration-300',
                       selected ? 'text-indigo-500' : 'text-[var(--text-tertiary)]',
                     )}
                   />
                 </div>
                 <p
                   className={cn(
-                    'text-[13px] font-semibold transition-colors duration-300',
+                    'text-[15px] font-semibold transition-colors duration-300',
                     selected ? 'text-indigo-500' : 'text-[var(--text-primary)]',
                   )}
                 >
                   {opt.label}
                 </p>
-                <p className="text-[11px] text-[var(--text-tertiary)] leading-snug">{opt.description}</p>
+                <p className="text-[13px] text-[var(--text-tertiary)] leading-snug">{opt.description}</p>
               </button>
             );
           })}
@@ -637,32 +643,32 @@ interface NotificationOptionConfig {
 const NOTIFICATION_OPTIONS: NotificationOptionConfig[] = [
   {
     key: 'emailNotifications',
-    label: 'Email Notifications',
-    description: 'Receive important updates and activity summaries via email',
+    label: 'Notificări Email',
+    description: 'Primește actualizări importante și rezumate ale activității prin email',
     icon: Mail,
   },
   {
     key: 'pushNotifications',
-    label: 'Push Notifications',
-    description: 'Get real-time browser notifications for critical events',
+    label: 'Notificări Push',
+    description: 'Primește notificări în timp real în browser pentru evenimente critice',
     icon: BellRing,
   },
   {
     key: 'taskReminders',
-    label: 'Task Reminders',
-    description: 'Reminders for upcoming and overdue tasks assigned to you',
+    label: 'Memento-uri Sarcini',
+    description: 'Memento-uri pentru sarcinile viitoare și întârziate atribuite ție',
     icon: CheckSquare,
   },
   {
     key: 'dealUpdates',
-    label: 'Deal Updates',
-    description: 'Notifications when deals you own change stage or status',
+    label: 'Actualizări Tranzacții',
+    description: 'Notificări când tranzacțiile tale schimbă etapa sau statusul',
     icon: Handshake,
   },
   {
     key: 'ticketAssignments',
-    label: 'Ticket Assignments',
-    description: 'Alerts when a support ticket is assigned to you',
+    label: 'Atribuiri Tichete',
+    description: 'Alerte când un tichet de suport ți se atribuie',
     icon: Ticket,
   },
 ];
@@ -684,9 +690,9 @@ function NotificationsTab() {
   return (
     <div className="space-y-6 animate-fadeInUp">
       <SectionCard>
-        <SectionTitle>Notification Preferences</SectionTitle>
+        <SectionTitle>Preferințe Notificări</SectionTitle>
         <SectionDescription>
-          Choose which notifications you would like to receive. Changes are saved automatically.
+          Alege ce notificări dorești să primești. Modificările sunt salvate automat.
         </SectionDescription>
 
         <div className="divide-y divide-[var(--border-color)]/60">
@@ -702,20 +708,20 @@ function NotificationsTab() {
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={cn(
-                      'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300',
+                      'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300',
                       isOn ? 'bg-indigo-500/10 shadow-sm shadow-indigo-500/10' : 'bg-[var(--bg-secondary)]/60',
                     )}
                   >
                     <Icon
                       className={cn(
-                        'w-5 h-5 transition-all duration-300',
+                        'w-6 h-6 transition-all duration-300',
                         isOn ? 'text-indigo-500 scale-100' : 'text-[var(--text-tertiary)] scale-90',
                       )}
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[var(--text-primary)]">{opt.label}</p>
-                    <p className="text-[11px] text-[var(--text-tertiary)] truncate">{opt.description}</p>
+                    <p className="text-[15px] font-medium text-[var(--text-primary)]">{opt.label}</p>
+                    <p className="text-[13px] text-[var(--text-tertiary)] truncate">{opt.description}</p>
                   </div>
                 </div>
                 <div className="ml-4 flex-shrink-0">
@@ -794,13 +800,13 @@ export function SettingsPage() {
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center">
-            <Settings className="w-5 h-5 text-indigo-500" />
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center">
+            <Settings className="w-6 h-6 text-indigo-500" />
           </div>
           <div>
-            <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Settings</h1>
-            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-              Manage your account, preferences, and notifications
+            <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Setări</h1>
+            <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+              Gestionează contul, preferințele și notificările
             </p>
           </div>
         </div>
@@ -809,7 +815,7 @@ export function SettingsPage() {
       {/* Layout: sidebar tabs + content */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tab Navigation with animated indicator */}
-        <nav className="lg:w-56 flex-shrink-0">
+        <nav className="lg:w-60 flex-shrink-0">
           <div
             ref={navRef}
             className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-1.5 flex lg:flex-col gap-1"
@@ -842,13 +848,13 @@ export function SettingsPage() {
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'relative z-10 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 w-full',
+                    'relative z-10 flex items-center gap-2.5 px-4 py-3 rounded-xl text-[15px] font-medium transition-all duration-200 w-full',
                     isActive
                       ? 'text-white'
                       : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)]',
                   )}
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="w-5 h-5 flex-shrink-0" />
                   <span className="whitespace-nowrap">{tab.label}</span>
                 </button>
               );

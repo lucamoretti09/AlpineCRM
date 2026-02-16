@@ -52,39 +52,39 @@ interface TicketData {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'open', label: 'Open' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'resolved', label: 'Resolved' },
-  { value: 'closed', label: 'Closed' },
+  { value: 'open', label: 'Deschis' },
+  { value: 'in_progress', label: 'În Progres' },
+  { value: 'resolved', label: 'Rezolvat' },
+  { value: 'closed', label: 'Închis' },
 ] as const;
 
 const PRIORITY_OPTIONS = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' },
+  { value: 'low', label: 'Scăzută' },
+  { value: 'medium', label: 'Medie' },
+  { value: 'high', label: 'Ridicată' },
+  { value: 'urgent', label: 'Urgentă' },
 ] as const;
 
 const CATEGORY_OPTIONS = [
-  { value: 'bug', label: 'Bug' },
-  { value: 'feature', label: 'Feature Request' },
-  { value: 'support', label: 'Support' },
-  { value: 'question', label: 'Question' },
-  { value: 'other', label: 'Other' },
+  { value: 'bug', label: 'Eroare' },
+  { value: 'feature', label: 'Funcționalitate' },
+  { value: 'support', label: 'Suport' },
+  { value: 'question', label: 'Întrebare' },
+  { value: 'other', label: 'Altul' },
 ] as const;
 
 function getStatusIcon(status: string) {
   switch (status) {
     case 'open':
-      return <AlertCircle className="w-4 h-4" />;
+      return <AlertCircle className="w-5 h-5" />;
     case 'in_progress':
-      return <Clock className="w-4 h-4" />;
+      return <Clock className="w-5 h-5" />;
     case 'resolved':
-      return <CheckCircle2 className="w-4 h-4" />;
+      return <CheckCircle2 className="w-5 h-5" />;
     case 'closed':
-      return <XCircle className="w-4 h-4" />;
+      return <XCircle className="w-5 h-5" />;
     default:
-      return <AlertCircle className="w-4 h-4" />;
+      return <AlertCircle className="w-5 h-5" />;
   }
 }
 
@@ -124,10 +124,16 @@ function getCategoryLabel(category: string): string {
 }
 
 function formatStatusLabel(status: string): string {
-  return status
+  const found = STATUS_OPTIONS.find((s) => s.value === status);
+  return found ? found.label : status
     .split('_')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
+}
+
+function formatPriorityLabel(priority: string): string {
+  const found = PRIORITY_OPTIONS.find((p) => p.value === priority);
+  return found ? found.label : priority;
 }
 
 export function TicketsPage() {
@@ -173,11 +179,11 @@ export function TicketsPage() {
         : api.post('/tickets', ticket),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      toast.success(editingTicket ? 'Ticket updated' : 'Ticket created');
+      toast.success(editingTicket ? 'Tichet actualizat' : 'Tichet creat');
       setShowForm(false);
       setEditingTicket(null);
     },
-    onError: () => toast.error('Failed to save ticket'),
+    onError: () => toast.error('Nu s-a putut salva tichetul'),
   });
 
   // ── Update ticket status inline ────────────────────────────────────
@@ -186,9 +192,9 @@ export function TicketsPage() {
       api.put(`/tickets/${id}`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      toast.success('Status updated');
+      toast.success('Status actualizat');
     },
-    onError: () => toast.error('Failed to update status'),
+    onError: () => toast.error('Nu s-a putut actualiza statusul'),
   });
 
   // ── Delete ticket ──────────────────────────────────────────────────
@@ -196,10 +202,10 @@ export function TicketsPage() {
     mutationFn: (id: string) => api.delete(`/tickets/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
-      toast.success('Ticket deleted');
+      toast.success('Tichet șters');
       if (selectedTicket) setSelectedTicket(null);
     },
-    onError: () => toast.error('Failed to delete ticket'),
+    onError: () => toast.error('Nu s-a putut șterge tichetul'),
   });
 
   // ── Add comment ────────────────────────────────────────────────────
@@ -208,10 +214,10 @@ export function TicketsPage() {
       api.post(`/tickets/${ticketId}/comments`, { content, isInternal }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets', selectedTicket?.id] });
-      toast.success('Comment added');
+      toast.success('Comentariu adăugat');
       setCommentText('');
     },
-    onError: () => toast.error('Failed to add comment'),
+    onError: () => toast.error('Nu s-a putut adăuga comentariul'),
   });
 
   // ── Form submit handler ────────────────────────────────────────────
@@ -246,18 +252,18 @@ export function TicketsPage() {
     const comments = ticket.comments || [];
 
     return (
-      <div className="space-y-6 animate-fadeIn">
+      <div className="space-y-7 animate-fadeIn">
         {/* Back navigation */}
         <button
           onClick={() => setSelectedTicket(null)}
-          className="group flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+          className="group flex items-center gap-2.5 text-[15px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
-          <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-          Back to tickets
+          <ChevronLeft className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
+          Înapoi la tichete
         </button>
 
         {/* Ticket header card */}
-        <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 animate-fadeInUp overflow-hidden">
+        <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-7 animate-fadeInUp overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
           {isDetailLoading ? (
             <div className="space-y-4">
@@ -270,18 +276,18 @@ export function TicketsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-[12px] font-mono text-[var(--text-tertiary)]">
+                    <span className="text-[14px] font-mono text-[var(--text-tertiary)]">
                       #{ticket.ticketNumber}
                     </span>
-                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border', getStatusDetailColor(ticket.status))}>
+                    <span className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold border', getStatusDetailColor(ticket.status))}>
                       <span className={getStatusIconColor(ticket.status)}>{getStatusIcon(ticket.status)}</span>
                       {formatStatusLabel(ticket.status)}
                     </span>
-                    <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold', getPriorityColor(ticket.priority))}>
-                      {ticket.priority}
+                    <span className={cn('px-3 py-1.5 rounded-lg text-[13px] font-semibold', getPriorityColor(ticket.priority))}>
+                      {formatPriorityLabel(ticket.priority)}
                     </span>
                   </div>
-                  <h1 className="text-xl font-bold text-[var(--text-primary)]">{ticket.subject}</h1>
+                  <h1 className="text-2xl font-bold text-[var(--text-primary)]">{ticket.subject}</h1>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
@@ -289,48 +295,48 @@ export function TicketsPage() {
                       setEditingTicket(ticket);
                       setShowForm(true);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--text-tertiary)] transition-all"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--text-tertiary)] transition-all"
                   >
-                    <Edit className="w-4 h-4" />
-                    Edit
+                    <Edit className="w-5 h-5" />
+                    Editează
                   </button>
                   <button
                     onClick={() => {
-                      if (confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) {
+                      if (confirm('Ești sigur că vrei să ștergi acest tichet? Această acțiune nu poate fi anulată.')) {
                         deleteMutation.mutate(ticket.id);
                       }
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-secondary)] hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 transition-all"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-secondary)] hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 transition-all"
                   >
-                    <Trash2 className="w-4 h-4" />
-                    Delete
+                    <Trash2 className="w-5 h-5" />
+                    Șterge
                   </button>
                 </div>
               </div>
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-4 mt-4 text-[13px] text-[var(--text-secondary)]">
+              <div className="flex flex-wrap items-center gap-4 mt-4 text-[15px] text-[var(--text-secondary)]">
                 <div className="flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5" />
+                  <Tag className="w-4.5 h-4.5" />
                   <span>{getCategoryLabel(ticket.category)}</span>
                 </div>
                 {ticket.contact && (
                   <div className="flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5" />
+                    <User className="w-4.5 h-4.5" />
                     <span>{ticket.contact.firstName} {ticket.contact.lastName}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Created {formatDateTime(ticket.createdAt)}</span>
+                  <Clock className="w-4.5 h-4.5" />
+                  <span>Creat {formatDateTime(ticket.createdAt)}</span>
                 </div>
               </div>
 
               {/* Description */}
               {ticket.description && (
                 <div className="mt-5 pt-5 border-t border-[var(--border-color)]">
-                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Description</h3>
-                  <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+                  <h3 className="text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Descriere</h3>
+                  <p className="text-[15px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
                     {ticket.description}
                   </p>
                 </div>
@@ -338,7 +344,7 @@ export function TicketsPage() {
 
               {/* Inline status update */}
               <div className="mt-5 pt-5 border-t border-[var(--border-color)]">
-                <label className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mr-3">Update Status:</label>
+                <label className="text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mr-3">Actualizează Status:</label>
                 <div className="inline-flex gap-2 mt-2">
                   {STATUS_OPTIONS.map((s) => (
                     <button
@@ -350,7 +356,7 @@ export function TicketsPage() {
                         }
                       }}
                       className={cn(
-                        'px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition-all',
+                        'px-4 py-2 rounded-xl text-[13px] font-semibold border transition-all',
                         ticket.status === s.value
                           ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white border-indigo-600 shadow-md shadow-indigo-500/20'
                           : 'bg-[var(--bg-secondary)]/60 border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500 hover:text-[var(--text-primary)]'
@@ -368,13 +374,13 @@ export function TicketsPage() {
         {/* Comments section */}
         <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl animate-fadeInUp overflow-hidden" style={{ animationDelay: '60ms' }}>
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
-          <div className="px-6 py-4 border-b border-[var(--border-color)]">
+          <div className="px-7 py-5 border-b border-[var(--border-color)]">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-[var(--text-secondary)]" />
-              <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">
-                Comments
+              <MessageSquare className="w-6 h-6 text-[var(--text-secondary)]" />
+              <h2 className="text-[17px] font-semibold text-[var(--text-primary)]">
+                Comentarii
               </h2>
-              <span className="text-[12px] text-[var(--text-tertiary)]">
+              <span className="text-[14px] text-[var(--text-tertiary)]">
                 ({comments.length})
               </span>
             </div>
@@ -384,57 +390,57 @@ export function TicketsPage() {
           <div className="divide-y divide-[var(--border-color)]">
             {isDetailLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="px-6 py-4">
+                <div key={i} className="px-7 py-5">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="skeleton w-8 h-8 rounded-full" />
+                    <div className="skeleton w-10 h-10 rounded-full" />
                     <div className="skeleton h-4 w-32 rounded-lg" />
                   </div>
-                  <div className="skeleton h-12 w-full rounded-xl ml-11" />
+                  <div className="skeleton h-12 w-full rounded-xl ml-13" />
                 </div>
               ))
             ) : comments.length === 0 ? (
-              <div className="px-6 py-12 text-center text-[var(--text-tertiary)]">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 opacity-50" />
+              <div className="px-7 py-14 text-center text-[var(--text-tertiary)]">
+                <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                  <MessageSquare className="w-7 h-7 opacity-50" />
                 </div>
-                <p className="text-[13px] font-medium text-[var(--text-secondary)]">No comments yet</p>
-                <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">Start the conversation below.</p>
+                <p className="text-[15px] font-medium text-[var(--text-secondary)]">Niciun comentariu încă</p>
+                <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">Începe conversația mai jos.</p>
               </div>
             ) : (
               comments.map((comment: Comment, index: number) => (
                 <div
                   key={comment.id}
                   className={cn(
-                    'px-6 py-4 hover:bg-[var(--bg-secondary)]/40 transition-all duration-300 animate-fadeInUp',
+                    'px-7 py-5 hover:bg-[var(--bg-secondary)]/40 transition-all duration-300 animate-fadeInUp',
                     comment.isInternal && 'bg-amber-50/30 dark:bg-amber-900/[0.06] border-l-2 border-l-amber-400/40'
                   )}
                   style={{ animationDelay: `${index * 40}ms` }}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0 mt-0.5 shadow-md shadow-indigo-500/20 ring-2 ring-white/20">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-[13px] font-semibold flex-shrink-0 mt-0.5 shadow-md shadow-indigo-500/20 ring-2 ring-white/20">
                       {comment.author
                         ? `${comment.author.firstName.charAt(0)}${comment.author.lastName.charAt(0)}`
                         : '??'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[13px] font-semibold text-[var(--text-primary)]">
+                        <span className="text-[15px] font-semibold text-[var(--text-primary)]">
                           {comment.author
                             ? `${comment.author.firstName} ${comment.author.lastName}`
-                            : 'Unknown'}
+                            : 'Necunoscut'}
                         </span>
-                        <span className="text-[11px] text-[var(--text-tertiary)]">
+                        <span className="text-[13px] text-[var(--text-tertiary)]">
                           {formatRelativeTime(comment.createdAt)}
                         </span>
                         {comment.isInternal && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-amber-100/80 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/30">
-                            <Lock className="w-3 h-3" />
-                            Internal
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[12px] font-semibold bg-amber-100/80 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/30">
+                            <Lock className="w-3.5 h-3.5" />
+                            Intern
                           </span>
                         )}
                       </div>
                       <div className={cn(
-                        'text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap rounded-xl px-3.5 py-2.5',
+                        'text-[15px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap rounded-xl px-4 py-3',
                         comment.isInternal
                           ? 'bg-amber-50/50 dark:bg-amber-900/[0.08] border border-amber-100/60 dark:border-amber-900/20'
                           : 'bg-[var(--bg-secondary)]/30'
@@ -449,21 +455,21 @@ export function TicketsPage() {
           </div>
 
           {/* Add comment form */}
-          <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/20">
+          <div className="px-7 py-5 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/20">
             <form onSubmit={handleCommentSubmit} className="space-y-3">
               <textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
+                placeholder="Adaugă un comentariu..."
                 rows={3}
-                className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
+                className="w-full px-5 py-3.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
               />
               <div className="flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setIsInternalComment(!isInternalComment)}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition-all',
+                    'flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold border transition-all',
                     isInternalComment
                       ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/40 shadow-sm'
                       : 'bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] border-[var(--border-color)] hover:border-indigo-500'
@@ -471,23 +477,23 @@ export function TicketsPage() {
                 >
                   {isInternalComment ? (
                     <>
-                      <Lock className="w-3.5 h-3.5" />
-                      Internal Note
+                      <Lock className="w-4.5 h-4.5" />
+                      Notă Internă
                     </>
                   ) : (
                     <>
-                      <Globe className="w-3.5 h-3.5" />
-                      Public Reply
+                      <Globe className="w-4.5 h-4.5" />
+                      Răspuns Public
                     </>
                   )}
                 </button>
                 <button
                   type="submit"
                   disabled={!commentText.trim() || commentMutation.isPending}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" />
-                  {commentMutation.isPending ? 'Sending...' : 'Send'}
+                  <Send className="w-5 h-5" />
+                  {commentMutation.isPending ? 'Se trimite...' : 'Trimite'}
                 </button>
               </div>
             </form>
@@ -499,13 +505,13 @@ export function TicketsPage() {
 
   // ── List View ──────────────────────────────────────────────────────
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-7 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Tickets</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-            {data?.total || 0} total tickets
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Tichete</h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+            {data?.total || 0} total tichete
           </p>
         </div>
         <button
@@ -513,30 +519,30 @@ export function TicketsPage() {
             setEditingTicket(null);
             setShowForm(true);
           }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
-          <Plus className="w-4 h-4" /> New Ticket
+          <Plus className="w-5 h-5" /> Tichet Nou
         </button>
       </div>
 
       {/* Search & Filters */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
           <input
             type="text"
-            placeholder="Search tickets by subject or number..."
+            placeholder="Caută tichete după subiect sau număr..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+          className="px-5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
         >
-          <option value="">All Status</option>
+          <option value="">Toate Statusurile</option>
           {STATUS_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
@@ -546,9 +552,9 @@ export function TicketsPage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+          className="px-5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
         >
-          <option value="">All Priority</option>
+          <option value="">Toate Prioritățile</option>
           {PRIORITY_OPTIONS.map((p) => (
             <option key={p.value} value={p.value}>
               {p.label}
@@ -562,36 +568,36 @@ export function TicketsPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Ticket</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Priority</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Category</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Created</th>
-              <th className="text-right px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Actions</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Tichet</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Prioritate</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Categorie</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Creat</th>
+              <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Acțiuni</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i} className="border-b border-[var(--border-color)]">
-                  <td colSpan={6} className="px-6 py-4">
-                    <div className="skeleton h-6 w-full rounded-lg" />
+                  <td colSpan={6} className="px-6 py-5">
+                    <div className="skeleton h-7 w-full rounded-lg" />
                   </td>
                 </tr>
               ))
             ) : data?.tickets?.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-16 text-center">
+                <td colSpan={6} className="px-6 py-20 text-center">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                      <Ticket className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                      <Ticket className="w-7 h-7 text-[var(--text-tertiary)] opacity-50" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-medium text-[var(--text-secondary)]">No tickets found</p>
-                      <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
+                      <p className="text-[15px] font-medium text-[var(--text-secondary)]">Niciun tichet găsit</p>
+                      <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">
                         {search || statusFilter || priorityFilter
-                          ? 'Try adjusting your search or filters'
-                          : 'Create your first ticket to get started'}
+                          ? 'Încearcă să ajustezi căutarea sau filtrele'
+                          : 'Creează primul tichet pentru a începe'}
                       </p>
                     </div>
                   </div>
@@ -605,44 +611,44 @@ export function TicketsPage() {
                   style={{ animationDelay: `${index * 30}ms` }}
                   onClick={() => setSelectedTicket(ticket)}
                 >
-                  <td className="px-6 py-3.5">
+                  <td className="px-6 py-4.5">
                     <div className="flex items-center gap-3">
                       <div className={cn(
-                        'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
+                        'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
                         'bg-indigo-600/10 group-hover:bg-indigo-600/15'
                       )}>
-                        <Ticket className="w-4 h-4 text-indigo-600" />
+                        <Ticket className="w-5 h-5 text-indigo-600" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-[13px] text-[var(--text-primary)] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{ticket.subject}</p>
-                        <p className="text-[11px] text-[var(--text-tertiary)] font-mono mt-0.5">
-                          <Hash className="w-3 h-3 inline-block mr-0.5" />
+                        <p className="font-semibold text-[15px] text-[var(--text-primary)] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{ticket.subject}</p>
+                        <p className="text-[13px] text-[var(--text-tertiary)] font-mono mt-0.5">
+                          <Hash className="w-3.5 h-3.5 inline-block mr-0.5" />
                           {ticket.ticketNumber}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5">
-                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(ticket.status))}>
+                  <td className="px-6 py-4.5">
+                    <span className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold', getStatusColor(ticket.status))}>
                       <span className={getStatusIconColor(ticket.status)}>{getStatusIcon(ticket.status)}</span>
                       {formatStatusLabel(ticket.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5">
-                    <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize', getPriorityColor(ticket.priority))}>
-                      {ticket.priority}
+                  <td className="px-6 py-4.5">
+                    <span className={cn('px-3 py-1.5 rounded-lg text-[13px] font-semibold capitalize', getPriorityColor(ticket.priority))}>
+                      {formatPriorityLabel(ticket.priority)}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5">
-                    <div className="flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
-                      <Tag className="w-3.5 h-3.5" />
+                  <td className="px-6 py-4.5">
+                    <div className="flex items-center gap-1.5 text-[15px] text-[var(--text-secondary)]">
+                      <Tag className="w-4.5 h-4.5" />
                       <span>{getCategoryLabel(ticket.category)}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5 text-[13px] text-[var(--text-secondary)]">
+                  <td className="px-6 py-4.5 text-[15px] text-[var(--text-secondary)]">
                     {formatDate(ticket.createdAt)}
                   </td>
-                  <td className="px-6 py-3.5 text-right">
+                  <td className="px-6 py-4.5 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                       <button
                         onClick={(e) => {
@@ -650,20 +656,20 @@ export function TicketsPage() {
                           setEditingTicket(ticket);
                           setShowForm(true);
                         }}
-                        className="p-2 rounded-xl hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-indigo-600 transition-colors"
+                        className="p-2.5 rounded-xl hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-indigo-600 transition-colors"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-5 h-5" />
                       </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm('Are you sure you want to delete this ticket?')) {
+                          if (confirm('Ești sigur că vrei să ștergi acest tichet?')) {
                             deleteMutation.mutate(ticket.id);
                           }
                         }}
-                        className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
+                        className="p-2.5 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </td>
@@ -677,53 +683,53 @@ export function TicketsPage() {
       {/* Create / Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fadeIn">
-          <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-7 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] overflow-y-auto">
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1">
-              {editingTicket ? 'Edit Ticket' : 'New Ticket'}
+            <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">
+              {editingTicket ? 'Editează Tichet' : 'Tichet Nou'}
             </h2>
-            <p className="text-[13px] text-[var(--text-secondary)] mb-5">
-              {editingTicket ? `Editing ticket #${editingTicket.ticketNumber}` : 'Fill in the details below to create a new ticket'}
+            <p className="text-[15px] text-[var(--text-secondary)] mb-5">
+              {editingTicket ? `Editare tichet #${editingTicket.ticketNumber}` : 'Completează detaliile pentru a crea un tichet nou'}
             </p>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Subject */}
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                  Subject *
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                  Subiect *
                 </label>
                 <input
                   name="subject"
                   defaultValue={editingTicket?.subject}
                   required
-                  placeholder="Brief summary of the issue"
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                  placeholder="Rezumat scurt al problemei"
+                  className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                  Description
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                  Descriere
                 </label>
                 <textarea
                   name="description"
                   rows={4}
                   defaultValue={editingTicket?.description}
-                  placeholder="Detailed description of the ticket..."
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
+                  placeholder="Descriere detaliată a tichetului..."
+                  className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
                 />
               </div>
 
               {/* Category & Priority */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Category
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    Categorie
                   </label>
                   <select
                     name="category"
                     defaultValue={editingTicket?.category || 'support'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   >
                     {CATEGORY_OPTIONS.map((c) => (
                       <option key={c.value} value={c.value}>
@@ -733,13 +739,13 @@ export function TicketsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Priority
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    Prioritate
                   </label>
                   <select
                     name="priority"
                     defaultValue={editingTicket?.priority || 'medium'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   >
                     {PRIORITY_OPTIONS.map((p) => (
                       <option key={p.value} value={p.value}>
@@ -754,13 +760,13 @@ export function TicketsPage() {
               <div className="grid grid-cols-2 gap-4">
                 {editingTicket && (
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       Status
                     </label>
                     <select
                       name="status"
                       defaultValue={editingTicket.status}
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s.value} value={s.value}>
@@ -771,15 +777,15 @@ export function TicketsPage() {
                   </div>
                 )}
                 <div className={editingTicket ? '' : 'col-span-2'}>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Contact ID
-                    <span className="text-[var(--text-tertiary)] font-normal ml-1 normal-case tracking-normal">(optional)</span>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    ID Contact
+                    <span className="text-[var(--text-tertiary)] font-normal ml-1 normal-case tracking-normal">(opțional)</span>
                   </label>
                   <input
                     name="contactId"
                     defaultValue={editingTicket?.contactId}
-                    placeholder="Link to a contact"
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                    placeholder="Asociază cu un contact"
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   />
                 </div>
               </div>
@@ -789,13 +795,13 @@ export function TicketsPage() {
                 <button
                   type="submit"
                   disabled={saveMutation.isPending}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+                  className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
                 >
                   {saveMutation.isPending
-                    ? 'Saving...'
+                    ? 'Se salvează...'
                     : editingTicket
-                    ? 'Update Ticket'
-                    : 'Create Ticket'}
+                    ? 'Actualizează Tichet'
+                    : 'Creează Tichet'}
                 </button>
                 <button
                   type="button"
@@ -803,9 +809,9 @@ export function TicketsPage() {
                     setShowForm(false);
                     setEditingTicket(null);
                   }}
-                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-secondary)] transition-all"
+                  className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-secondary)] transition-all"
                 >
-                  Cancel
+                  Anulează
                 </button>
               </div>
             </form>

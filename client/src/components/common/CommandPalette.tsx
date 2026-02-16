@@ -44,22 +44,22 @@ export default function CommandPalette() {
   }, []);
 
   const commands: CommandItem[] = [
-    // Navigation
-    { id: 'nav-dashboard', label: 'Go to Dashboard', icon: LayoutDashboard, action: () => navigate('/dashboard'), category: 'navigation', keywords: ['home', 'overview'] },
-    { id: 'nav-contacts', label: 'Go to Contacts', icon: Users, action: () => navigate('/contacts'), category: 'navigation', keywords: ['people', 'clients'] },
-    { id: 'nav-deals', label: 'Go to Deals', icon: HandCoins, action: () => navigate('/deals'), category: 'navigation', keywords: ['pipeline', 'sales', 'kanban'] },
-    { id: 'nav-tasks', label: 'Go to Tasks', icon: CheckSquare, action: () => navigate('/tasks'), category: 'navigation', keywords: ['todo', 'work'] },
-    { id: 'nav-tickets', label: 'Go to Tickets', icon: Ticket, action: () => navigate('/tickets'), category: 'navigation', keywords: ['support', 'issues'] },
-    { id: 'nav-calendar', label: 'Go to Calendar', icon: Calendar, action: () => navigate('/calendar'), category: 'navigation', keywords: ['appointments', 'schedule'] },
-    { id: 'nav-invoices', label: 'Go to Invoices', icon: FileText, action: () => navigate('/invoices'), category: 'navigation', keywords: ['billing', 'payments'] },
-    { id: 'nav-emails', label: 'Go to Emails', icon: Mail, action: () => navigate('/emails'), category: 'navigation', keywords: ['messages'] },
-    { id: 'nav-settings', label: 'Go to Settings', icon: Settings, action: () => navigate('/settings'), category: 'navigation', keywords: ['preferences', 'config'] },
-    // Actions
-    { id: 'act-new-contact', label: 'Create New Contact', description: 'Add a new contact to the CRM', icon: Plus, action: () => navigate('/contacts'), category: 'actions', keywords: ['add', 'person'] },
-    { id: 'act-new-deal', label: 'Create New Deal', description: 'Start a new sales deal', icon: Plus, action: () => navigate('/deals'), category: 'actions', keywords: ['add', 'sale'] },
-    { id: 'act-new-task', label: 'Create New Task', description: 'Add a task to your list', icon: Plus, action: () => navigate('/tasks'), category: 'actions', keywords: ['add', 'todo'] },
-    // Settings
-    { id: 'set-theme', label: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode', icon: isDark ? Sun : Moon, action: () => { toggleTheme(); setIsOpen(false); }, category: 'settings', keywords: ['theme', 'dark', 'light', 'appearance'] },
+    // Navigare
+    { id: 'nav-dashboard', label: 'Navighează la Panou Principal', icon: LayoutDashboard, action: () => navigate('/dashboard'), category: 'navigation', keywords: ['home', 'acasă', 'prezentare'] },
+    { id: 'nav-contacts', label: 'Navighează la Contacte', icon: Users, action: () => navigate('/contacts'), category: 'navigation', keywords: ['persoane', 'clienți'] },
+    { id: 'nav-deals', label: 'Navighează la Tranzacții', icon: HandCoins, action: () => navigate('/deals'), category: 'navigation', keywords: ['pipeline', 'vânzări', 'kanban'] },
+    { id: 'nav-tasks', label: 'Navighează la Sarcini', icon: CheckSquare, action: () => navigate('/tasks'), category: 'navigation', keywords: ['todo', 'muncă'] },
+    { id: 'nav-tickets', label: 'Navighează la Tichete', icon: Ticket, action: () => navigate('/tickets'), category: 'navigation', keywords: ['suport', 'probleme'] },
+    { id: 'nav-calendar', label: 'Navighează la Calendar', icon: Calendar, action: () => navigate('/calendar'), category: 'navigation', keywords: ['programări', 'program'] },
+    { id: 'nav-invoices', label: 'Navighează la Facturi', icon: FileText, action: () => navigate('/invoices'), category: 'navigation', keywords: ['facturare', 'plăți'] },
+    { id: 'nav-emails', label: 'Navighează la Emailuri', icon: Mail, action: () => navigate('/emails'), category: 'navigation', keywords: ['mesaje'] },
+    { id: 'nav-settings', label: 'Navighează la Setări', icon: Settings, action: () => navigate('/settings'), category: 'navigation', keywords: ['preferințe', 'configurare'] },
+    // Acțiuni
+    { id: 'act-new-contact', label: 'Creează Contact', description: 'Adaugă un contact nou în CRM', icon: Plus, action: () => navigate('/contacts'), category: 'actions', keywords: ['adaugă', 'persoană'] },
+    { id: 'act-new-deal', label: 'Creează Tranzacție', description: 'Începe o tranzacție nouă de vânzare', icon: Plus, action: () => navigate('/deals'), category: 'actions', keywords: ['adaugă', 'vânzare'] },
+    { id: 'act-new-task', label: 'Creează Sarcină', description: 'Adaugă o sarcină în lista ta', icon: Plus, action: () => navigate('/tasks'), category: 'actions', keywords: ['adaugă', 'todo'] },
+    // Setări
+    { id: 'set-theme', label: isDark ? 'Comută la Modul Luminos' : 'Comută la Modul Întunecat', icon: isDark ? Sun : Moon, action: () => { toggleTheme(); setIsOpen(false); }, category: 'settings', keywords: ['temă', 'întunecat', 'luminos', 'aspect'] },
   ];
 
   const filtered = query
@@ -144,7 +144,7 @@ export default function CommandPalette() {
       <div key={label}>
         <div className="flex items-center gap-2 px-4 py-2.5">
           <Hash className="w-3 h-3 text-[var(--text-tertiary)] opacity-50" />
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+          <span className="text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
             {label}
           </span>
         </div>
@@ -175,9 +175,9 @@ export default function CommandPalette() {
                 <Icon className="h-4 w-4 shrink-0" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium truncate">{cmd.label}</p>
+                <p className="text-[15px] font-medium truncate">{cmd.label}</p>
                 {cmd.description && (
-                  <p className="text-[11px] text-[var(--text-tertiary)] truncate mt-0.5">{cmd.description}</p>
+                  <p className="text-[13px] text-[var(--text-tertiary)] truncate mt-0.5">{cmd.description}</p>
                 )}
               </div>
               {idx === selectedIndex && (
@@ -209,13 +209,13 @@ export default function CommandPalette() {
           <input
             ref={inputRef}
             type="text"
-            placeholder="Type a command or search..."
+            placeholder="Căutare..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleInputKeyDown}
-            className="flex-1 bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-[14px] outline-none"
+            className="flex-1 bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-[16px] outline-none"
           />
-          <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-secondary)]/60 border border-[var(--border-color)]">
+          <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-[12px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-secondary)]/60 border border-[var(--border-color)]">
             ESC
           </kbd>
         </div>
@@ -225,18 +225,18 @@ export default function CommandPalette() {
           {flatFiltered.length === 0 ? (
             <div className="py-12 text-center">
               <Search className="w-8 h-8 mx-auto mb-3 text-[var(--text-tertiary)] opacity-30" />
-              <p className="text-[13px] text-[var(--text-tertiary)]">
-                No results found for "<span className="text-[var(--text-secondary)]">{query}</span>"
+              <p className="text-[15px] text-[var(--text-tertiary)]">
+                Niciun rezultat găsit pentru „<span className="text-[var(--text-secondary)]">{query}</span>"
               </p>
-              <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
-                Try a different search term
+              <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
+                Încearcă un alt termen de căutare
               </p>
             </div>
           ) : (
             <>
-              {renderGroup('Navigation', grouped.navigation)}
-              {renderGroup('Actions', grouped.actions)}
-              {renderGroup('Settings', grouped.settings)}
+              {renderGroup('Navigare', grouped.navigation)}
+              {renderGroup('Acțiuni Rapide', grouped.actions)}
+              {renderGroup('Setări', grouped.settings)}
             </>
           )}
         </div>
@@ -244,17 +244,17 @@ export default function CommandPalette() {
         {/* Footer */}
         <div className="flex items-center justify-between px-5 py-2.5 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-tertiary)]">
-              <kbd className="px-1.5 py-0.5 rounded-md bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[10px] font-semibold">&uarr;&darr;</kbd>
-              Navigate
+            <span className="flex items-center gap-1.5 text-[12px] text-[var(--text-tertiary)]">
+              <kbd className="px-1.5 py-0.5 rounded-md bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[12px] font-semibold">&uarr;&darr;</kbd>
+              Navighează
             </span>
-            <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-tertiary)]">
-              <kbd className="px-1.5 py-0.5 rounded-md bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[10px] font-semibold">&crarr;</kbd>
-              Select
+            <span className="flex items-center gap-1.5 text-[12px] text-[var(--text-tertiary)]">
+              <kbd className="px-1.5 py-0.5 rounded-md bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[12px] font-semibold">&crarr;</kbd>
+              Selectează
             </span>
           </div>
-          <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-tertiary)]">
-            <Command className="h-3 w-3" />K to toggle
+          <span className="flex items-center gap-1.5 text-[12px] text-[var(--text-tertiary)]">
+            <Command className="h-3 w-3" />K pentru comutare
           </span>
         </div>
       </div>

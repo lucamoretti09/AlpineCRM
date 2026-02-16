@@ -48,16 +48,16 @@ function Router() {
 
   // Page title map
   const pageTitles: Record<string, string> = {
-    '/': 'Dashboard',
-    '/dashboard': 'Dashboard',
-    '/contacts': 'Contacts',
-    '/deals': 'Deals',
-    '/tasks': 'Tasks',
-    '/tickets': 'Tickets',
+    '/': 'Panou Principal',
+    '/dashboard': 'Panou Principal',
+    '/contacts': 'Contacte',
+    '/deals': 'Tranzacții',
+    '/tasks': 'Sarcini',
+    '/tickets': 'Tichete',
     '/calendar': 'Calendar',
-    '/invoices': 'Invoices',
-    '/emails': 'Emails',
-    '/settings': 'Settings',
+    '/invoices': 'Facturi',
+    '/emails': 'Email-uri',
+    '/settings': 'Setări',
   };
 
   const getPage = () => {
@@ -88,7 +88,7 @@ function Router() {
 
   return (
     <>
-      <AppLayout title={pageTitles[path] || 'Dashboard'}>
+      <AppLayout title={pageTitles[path] || 'Panou Principal'}>
         {getPage()}
       </AppLayout>
       <CommandPalette />
@@ -119,7 +119,7 @@ export default function App() {
             color: isDark ? '#eef0fa' : '#0f0d23',
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e0e4ef'}`,
             borderRadius: '14px',
-            fontSize: '13px',
+            fontSize: '15px',
             fontWeight: 500,
             boxShadow: isDark
               ? '0 8px 30px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3)'

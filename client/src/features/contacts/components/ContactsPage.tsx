@@ -40,9 +40,15 @@ function getAvatarGradient(firstName: string): string {
 }
 
 const STATUS_CONFIG: Record<string, { icon: string; label: string }> = {
-  active: { icon: '\u2022', label: 'Active' },
-  inactive: { icon: '\u25CB', label: 'Inactive' },
-  churned: { icon: '\u2716', label: 'Churned' },
+  active: { icon: '\u2022', label: 'Activ' },
+  inactive: { icon: '\u25CB', label: 'Inactiv' },
+  churned: { icon: '\u2716', label: 'Pierdut' },
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  active: 'activ',
+  inactive: 'inactiv',
+  churned: 'pierdut',
 };
 
 export function ContactsPage() {
@@ -68,7 +74,7 @@ export function ContactsPage() {
     mutationFn: (id: string) => api.delete(`/contacts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
-      toast.success('Contact deleted');
+      toast.success('Contact \u0219ters');
     },
   });
 
@@ -78,11 +84,11 @@ export function ContactsPage() {
       : api.post('/contacts', contact),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
-      toast.success(editingContact ? 'Contact updated' : 'Contact created');
+      toast.success(editingContact ? 'Contact actualizat' : 'Contact creat');
       setShowForm(false);
       setEditingContact(null);
     },
-    onError: () => toast.error('Failed to save contact'),
+    onError: () => toast.error('Salvarea contactului a e\u0219uat'),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,32 +107,32 @@ export function ContactsPage() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight">Contacts</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">{data?.total || 0} total contacts</p>
+          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Contacte</h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afi\u0219eaz\u0103 {data?.contacts?.length || 0} din {data?.total || 0} contacte</p>
         </div>
         <button onClick={() => { setEditingContact(null); setShowForm(true); }}
-          className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-          <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" /> Add Contact
+          className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Adaug\u0103 Contact
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3">
         <div className="relative flex-1 group/search">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
-          <input type="text" placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
+          <input type="text" placeholder="Caut\u0103 contacte..." value={search} onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-          <option value="churned">Churned</option>
+          className="px-5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
+          <option value="">Toate Statusurile</option>
+          <option value="active">Activ</option>
+          <option value="inactive">Inactiv</option>
+          <option value="churned">Pierdut</option>
         </select>
       </div>
 
@@ -135,44 +141,44 @@ export function ContactsPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Contact</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Company</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Score</th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Created</th>
-              <th className="text-right px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Actions</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Contact</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Companie</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Scor Lead</th>
+              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Creat</th>
+              <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Ac\u021Biuni</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="border-b border-[var(--border-color)]">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="skeleton w-9 h-9 rounded-xl animate-skeletonPulse" />
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3.5">
+                      <div className="skeleton w-11 h-11 rounded-xl animate-skeletonPulse" />
                       <div className="space-y-1.5">
-                        <div className="skeleton h-4 w-32 rounded-lg" />
-                        <div className="skeleton h-3 w-44 rounded-lg" style={{ animationDelay: '0.1s' }} />
+                        <div className="skeleton h-5 w-36 rounded-lg" />
+                        <div className="skeleton h-4 w-48 rounded-lg" style={{ animationDelay: '0.1s' }} />
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4"><div className="skeleton h-4 w-24 rounded-lg" style={{ animationDelay: '0.15s' }} /></td>
-                  <td className="px-6 py-4"><div className="skeleton h-6 w-16 rounded-lg" style={{ animationDelay: '0.2s' }} /></td>
-                  <td className="px-6 py-4"><div className="skeleton h-4 w-12 rounded-lg" style={{ animationDelay: '0.25s' }} /></td>
-                  <td className="px-6 py-4"><div className="skeleton h-4 w-20 rounded-lg" style={{ animationDelay: '0.3s' }} /></td>
-                  <td className="px-6 py-4"><div className="skeleton h-4 w-16 rounded-lg ml-auto" style={{ animationDelay: '0.35s' }} /></td>
+                  <td className="px-6 py-5"><div className="skeleton h-5 w-28 rounded-lg" style={{ animationDelay: '0.15s' }} /></td>
+                  <td className="px-6 py-5"><div className="skeleton h-7 w-20 rounded-lg" style={{ animationDelay: '0.2s' }} /></td>
+                  <td className="px-6 py-5"><div className="skeleton h-5 w-14 rounded-lg" style={{ animationDelay: '0.25s' }} /></td>
+                  <td className="px-6 py-5"><div className="skeleton h-5 w-24 rounded-lg" style={{ animationDelay: '0.3s' }} /></td>
+                  <td className="px-6 py-5"><div className="skeleton h-5 w-20 rounded-lg ml-auto" style={{ animationDelay: '0.35s' }} /></td>
                 </tr>
               ))
             ) : data?.contacts?.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-20 text-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500/10 via-primary-500/5 to-violet-500/10 flex items-center justify-center border border-primary-500/10">
-                      <UserPlus className="w-6 h-6 text-primary-500/60" />
+                <td colSpan={6} className="px-6 py-24 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="w-18 h-18 rounded-2xl bg-gradient-to-br from-primary-500/10 via-primary-500/5 to-violet-500/10 flex items-center justify-center border border-primary-500/10">
+                      <UserPlus className="w-8 h-8 text-primary-500/60" />
                     </div>
                     <div>
-                      <p className="text-[13px] font-semibold text-[var(--text-primary)]">No contacts found</p>
-                      <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">Try adjusting your search or add a new contact</p>
+                      <p className="text-[15px] font-semibold text-[var(--text-primary)]">Niciun contact g\u0103sit</p>
+                      <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">\u00CEncearc\u0103 s\u0103 ajustezi filtrele sau adaug\u0103 un contact nou</p>
                     </div>
                   </div>
                 </td>
@@ -182,49 +188,49 @@ export function ContactsPage() {
                 <tr key={contact.id}
                   className="border-b border-[var(--border-color)] hover:bg-primary-500/[0.03] dark:hover:bg-primary-500/[0.04] transition-all duration-200 group/row animate-rowSlideIn relative"
                   style={{ animationDelay: `${index * 35}ms` }}>
-                  <td className="px-6 py-3.5 relative">
+                  <td className="px-6 py-4.5 relative">
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 bg-gradient-to-b from-primary-400 to-primary-600 rounded-r-full transition-all duration-300 group-hover/row:h-8 opacity-0 group-hover/row:opacity-100" />
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <div className={cn(
-                        'w-9 h-9 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-[11px] font-bold shadow-sm transition-transform duration-200 group-hover/row:scale-105',
+                        'w-11 h-11 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-[13px] font-bold shadow-sm transition-transform duration-200 group-hover/row:scale-105',
                         getAvatarGradient(contact.firstName)
                       )}>
                         {getInitials(contact.firstName, contact.lastName)}
                       </div>
                       <div>
-                        <p className="text-[13px] font-semibold text-[var(--text-primary)]">{contact.firstName} {contact.lastName}</p>
-                        <p className="text-[11px] text-[var(--text-tertiary)]">{contact.email}</p>
+                        <p className="text-[15px] font-semibold text-[var(--text-primary)]">{contact.firstName} {contact.lastName}</p>
+                        <p className="text-[13px] text-[var(--text-tertiary)]">{contact.email}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5">
-                    <div className="flex items-center gap-2 text-[var(--text-secondary)] text-[13px]">
-                      <Building2 className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
+                  <td className="px-6 py-4.5">
+                    <div className="flex items-center gap-2 text-[var(--text-secondary)] text-[15px]">
+                      <Building2 className="w-4.5 h-4.5 text-[var(--text-tertiary)]" />
                       <span>{contact.company || '\u2014'}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5">
-                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(contact.status))}>
-                      <span className="text-[8px]">{STATUS_CONFIG[contact.status]?.icon || '\u2022'}</span>
-                      {contact.status}
+                  <td className="px-6 py-4.5">
+                    <span className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold', getStatusColor(contact.status))}>
+                      <span className="text-[10px]">{STATUS_CONFIG[contact.status]?.icon || '\u2022'}</span>
+                      {STATUS_LABELS[contact.status] || contact.status}
                     </span>
                   </td>
-                  <td className="px-6 py-3.5">
+                  <td className="px-6 py-4.5">
                     <div className="flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-starGlow" />
-                      <span className="text-[13px] font-medium text-[var(--text-primary)]">{contact.leadScore}</span>
+                      <Star className="w-4.5 h-4.5 text-amber-500 fill-amber-500 animate-starGlow" />
+                      <span className="text-[15px] font-medium text-[var(--text-primary)]">{contact.leadScore}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-3.5 text-[12px] text-[var(--text-secondary)]">{formatDate(contact.createdAt)}</td>
-                  <td className="px-6 py-3.5 text-right">
+                  <td className="px-6 py-4.5 text-[14px] text-[var(--text-secondary)]">{formatDate(contact.createdAt)}</td>
+                  <td className="px-6 py-4.5 text-right">
                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover/row:opacity-100 transition-all duration-200">
                       <button onClick={() => { setEditingContact(contact); setShowForm(true); }}
-                        className="p-2 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
-                        <Edit className="w-3.5 h-3.5" />
+                        className="p-2.5 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
+                        <Edit className="w-4.5 h-4.5" />
                       </button>
-                      <button onClick={() => { if (confirm('Delete this contact?')) deleteMutation.mutate(contact.id); }}
-                        className="p-2 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
-                        <Trash2 className="w-3.5 h-3.5" />
+                      <button onClick={() => { if (confirm('\u0218tergi acest contact?')) deleteMutation.mutate(contact.id); }}
+                        className="p-2.5 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
+                        <Trash2 className="w-4.5 h-4.5" />
                       </button>
                     </div>
                   </td>
@@ -238,80 +244,80 @@ export function ContactsPage() {
       {/* Create/Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-md transition-all duration-300" onClick={() => { setShowForm(false); setEditingContact(null); }}>
-          <div className="relative bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-8 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl dark:shadow-black/40 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-10 w-full max-w-xl mx-4 animate-fadeInScale shadow-2xl dark:shadow-black/40 overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Top gradient accent */}
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 via-primary-500 to-violet-500 rounded-t-2xl" />
             {/* Subtle background glow */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-            <h2 className="text-[18px] font-bold text-[var(--text-primary)] mb-6 tracking-tight">
-              {editingContact ? 'Edit Contact' : 'New Contact'}
+            <h2 className="text-[22px] font-bold text-[var(--text-primary)] mb-7 tracking-tight">
+              {editingContact ? 'Editeaz\u0103 Contact' : 'Contact Nou'}
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">First Name *</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Prenume *</label>
                   <input name="firstName" defaultValue={editingContact?.firstName} required
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Last Name *</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Nume *</label>
                   <input name="lastName" defaultValue={editingContact?.lastName} required
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Email</label>
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Email</label>
                 <input name="email" type="email" defaultValue={editingContact?.email}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+                  className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Phone</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Telefon</label>
                   <input name="phone" defaultValue={editingContact?.phone}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Company</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Companie</label>
                   <input name="company" defaultValue={editingContact?.company}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Job Title</label>
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Func\u021Bie</label>
                 <input name="jobTitle" defaultValue={editingContact?.jobTitle}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+                  className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Status</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Status</label>
                   <select name="status" defaultValue={editingContact?.status || 'active'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="churned">Churned</option>
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
+                    <option value="active">Activ</option>
+                    <option value="inactive">Inactiv</option>
+                    <option value="churned">Pierdut</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Source</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Surs\u0103</label>
                   <select name="source" defaultValue={editingContact?.source || 'other'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     <option value="website">Website</option>
-                    <option value="referral">Referral</option>
+                    <option value="referral">Recomandare</option>
                     <option value="social">Social</option>
                     <option value="email">Email</option>
-                    <option value="event">Event</option>
-                    <option value="other">Other</option>
+                    <option value="event">Eveniment</option>
+                    <option value="other">Altele</option>
                   </select>
                 </div>
               </div>
-              <div className="flex gap-3 pt-3">
+              <div className="flex gap-3 pt-4">
                 <button type="submit" disabled={createMutation.isPending}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
-                  {createMutation.isPending ? 'Saving...' : editingContact ? 'Update' : 'Create'}
+                  className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
+                  {createMutation.isPending ? 'Se salveaz\u0103...' : editingContact ? 'Actualizeaz\u0103 Contact' : 'Creeaz\u0103 Contact'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingContact(null); }}
-                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200">
-                  Cancel
+                  className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200">
+                  Anuleaz\u0103
                 </button>
               </div>
             </form>

@@ -32,6 +32,7 @@ import {
   subMonths,
   parseISO,
 } from 'date-fns';
+import { ro } from 'date-fns/locale';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -51,41 +52,50 @@ interface Appointment {
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+const WEEKDAYS = ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm'] as const;
+
+const MONTH_NAMES = [
+  'Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie',
+  'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie',
+] as const;
 
 const TYPE_CONFIG: Record<
   Appointment['type'],
   { label: string; color: string; dotColor: string; chipColor: string; icon: typeof CalendarIcon }
 > = {
   meeting: {
-    label: 'Meeting',
+    label: 'Întâlnire',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
     dotColor: 'bg-blue-500',
     chipColor: 'bg-blue-100/80 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/30',
     icon: Users,
   },
   call: {
-    label: 'Call',
+    label: 'Apel',
     color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
     dotColor: 'bg-green-500',
     chipColor: 'bg-green-100/80 text-green-700 dark:bg-green-900/40 dark:text-green-300 border border-green-200/50 dark:border-green-800/30',
     icon: Phone,
   },
   video_call: {
-    label: 'Video Call',
+    label: 'Apel Video',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
     dotColor: 'bg-purple-500',
     chipColor: 'bg-purple-100/80 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/30',
     icon: Video,
   },
   other: {
-    label: 'Other',
+    label: 'Altul',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
     dotColor: 'bg-gray-500',
     chipColor: 'bg-gray-100/80 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300 border border-gray-200/50 dark:border-gray-800/30',
     icon: CalendarIcon,
   },
 };
+
+function getMonthYearLabel(date: Date): string {
+  return `${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+}
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
@@ -128,12 +138,12 @@ export function CalendarPage() {
         : api.post('/appointments', appointment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      toast.success(editingAppointment ? 'Appointment updated' : 'Appointment created');
+      toast.success(editingAppointment ? 'Programare actualizată' : 'Programare creată');
       setShowForm(false);
       setEditingAppointment(null);
     },
     onError: () => {
-      toast.error(editingAppointment ? 'Failed to update appointment' : 'Failed to create appointment');
+      toast.error(editingAppointment ? 'Nu s-a putut actualiza programarea' : 'Nu s-a putut crea programarea');
     },
   });
 
@@ -141,11 +151,11 @@ export function CalendarPage() {
     mutationFn: (id: string) => api.delete(`/appointments/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      toast.success('Appointment deleted');
+      toast.success('Programare ștearsă');
       setShowDeleteConfirm(null);
     },
     onError: () => {
-      toast.error('Failed to delete appointment');
+      toast.error('Nu s-a putut șterge programarea');
     },
   });
 
@@ -252,20 +262,20 @@ export function CalendarPage() {
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-7 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Calendar</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-            {data?.total ?? 0} appointments this month
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Calendar</h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+            {data?.total ?? 0} programări luna aceasta
           </p>
         </div>
         <button
           onClick={() => openCreateForm(selectedDate || new Date())}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
-          <Plus className="w-4 h-4" /> New Appointment
+          <Plus className="w-5 h-5" /> Programare Nouă
         </button>
       </div>
 
@@ -274,32 +284,32 @@ export function CalendarPage() {
         {/* Calendar Grid */}
         <div className="flex-1 bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
+          <div className="flex items-center justify-between px-7 py-5 border-b border-[var(--border-color)]">
             <div className="flex items-center gap-4">
-              <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">
-                {format(currentMonth, 'MMMM yyyy')}
+              <h2 className="text-[17px] font-semibold text-[var(--text-primary)]">
+                {getMonthYearLabel(currentMonth)}
               </h2>
               <button
                 onClick={handleToday}
-                className="px-3 py-1 text-[11px] font-semibold rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:border-indigo-500/30 transition-all"
+                className="px-4 py-1.5 text-[13px] font-semibold rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:border-indigo-500/30 transition-all"
               >
-                Today
+                Astăzi
               </button>
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={handlePrevMonth}
-                className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-all"
-                aria-label="Previous month"
+                className="p-2.5 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-all"
+                aria-label="Luna anterioară"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={handleNextMonth}
-                className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-all"
-                aria-label="Next month"
+                className="p-2.5 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-all"
+                aria-label="Luna următoare"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-6 h-6" />
               </button>
             </div>
           </div>
@@ -309,7 +319,7 @@ export function CalendarPage() {
             {WEEKDAYS.map((day) => (
               <div
                 key={day}
-                className="px-2 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]"
+                className="px-2 py-3.5 text-center text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]"
               >
                 {day}
               </div>
@@ -322,11 +332,11 @@ export function CalendarPage() {
               {Array.from({ length: 35 }).map((_, i) => (
                 <div
                   key={i}
-                  className="min-h-[100px] p-2 border-b border-r border-[var(--border-color)]"
+                  className="min-h-[110px] p-2.5 border-b border-r border-[var(--border-color)]"
                 >
-                  <div className="skeleton h-5 w-5 rounded-full mb-2" />
+                  <div className="skeleton h-6 w-6 rounded-full mb-2" />
                   <div className="space-y-1">
-                    <div className="skeleton h-3 w-3/4 rounded" />
+                    <div className="skeleton h-3.5 w-3/4 rounded" />
                   </div>
                 </div>
               ))}
@@ -346,7 +356,7 @@ export function CalendarPage() {
                     type="button"
                     onClick={() => handleDayClick(day)}
                     className={cn(
-                      'min-h-[100px] p-2 border-b border-r border-[var(--border-color)] text-left transition-all duration-200 relative group',
+                      'min-h-[110px] p-2.5 border-b border-r border-[var(--border-color)] text-left transition-all duration-200 relative group',
                       inCurrentMonth
                         ? 'bg-transparent'
                         : 'bg-[var(--bg-secondary)]/30',
@@ -358,7 +368,7 @@ export function CalendarPage() {
                     <div className="flex items-center justify-between mb-1">
                       <span
                         className={cn(
-                          'relative inline-flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-medium transition-colors',
+                          'relative inline-flex items-center justify-center w-8 h-8 rounded-full text-[15px] font-medium transition-colors',
                           today && 'bg-gradient-to-br from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20',
                           !today && inCurrentMonth && 'text-[var(--text-primary)]',
                           !today && !inCurrentMonth && 'text-[var(--text-tertiary)]'
@@ -371,7 +381,7 @@ export function CalendarPage() {
                         )}
                       </span>
                       {dayAppointments.length > 0 && (
-                        <span className="text-[10px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-secondary)]/60 px-1.5 py-0.5 rounded-md">
+                        <span className="text-[12px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-secondary)]/60 px-2 py-0.5 rounded-md">
                           {dayAppointments.length}
                         </span>
                       )}
@@ -385,7 +395,7 @@ export function CalendarPage() {
                           <div
                             key={apt.id}
                             className={cn(
-                              'flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] leading-tight truncate',
+                              'flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] leading-tight truncate',
                               config.chipColor
                             )}
                             title={apt.title}
@@ -401,8 +411,8 @@ export function CalendarPage() {
                         );
                       })}
                       {dayAppointments.length > 3 && (
-                        <div className="text-[10px] font-semibold text-[var(--text-tertiary)] px-1.5">
-                          +{dayAppointments.length - 3} more
+                        <div className="text-[11px] font-semibold text-[var(--text-tertiary)] px-2">
+                          +{dayAppointments.length - 3} mai mult
                         </div>
                       )}
                     </div>
@@ -413,11 +423,11 @@ export function CalendarPage() {
           )}
 
           {/* Legend */}
-          <div className="flex items-center gap-4 px-6 py-3 border-t border-[var(--border-color)]">
+          <div className="flex items-center gap-5 px-7 py-4 border-t border-[var(--border-color)]">
             {Object.entries(TYPE_CONFIG).map(([key, config]) => (
               <div key={key} className="flex items-center gap-1.5">
-                <span className={cn('w-2 h-2 rounded-full', config.dotColor)} />
-                <span className="text-[11px] text-[var(--text-tertiary)]">{config.label}</span>
+                <span className={cn('w-2.5 h-2.5 rounded-full', config.dotColor)} />
+                <span className="text-[13px] text-[var(--text-tertiary)]">{config.label}</span>
               </div>
             ))}
           </div>
@@ -427,24 +437,24 @@ export function CalendarPage() {
         <div className="w-80 flex-shrink-0">
           <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden sticky top-6">
             {/* Panel Header */}
-            <div className="px-5 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
+            <div className="px-6 py-5 border-b border-[var(--border-color)] flex items-center justify-between">
               <div>
-                <h3 className="text-[13px] font-semibold text-[var(--text-primary)]">
-                  {selectedDate ? format(selectedDate, 'EEEE, MMM d') : 'Select a day'}
+                <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">
+                  {selectedDate ? format(selectedDate, 'EEEE, d MMM', { locale: ro }) : 'Selectează o zi'}
                 </h3>
-                <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
+                <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">
                   {selectedDate
-                    ? `${selectedDateAppointments.length} appointment${selectedDateAppointments.length !== 1 ? 's' : ''}`
-                    : 'Click a day to view details'}
+                    ? `${selectedDateAppointments.length} programar${selectedDateAppointments.length !== 1 ? 'e' : 'i'}`
+                    : 'Apasă pe o zi pentru detalii'}
                 </p>
               </div>
               {selectedDate && (
                 <button
                   onClick={() => openCreateForm(selectedDate)}
-                  className="p-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95"
-                  title="Add appointment"
+                  className="p-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95"
+                  title="Adaugă programare"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-5 h-5" />
                 </button>
               )}
             </div>
@@ -452,29 +462,29 @@ export function CalendarPage() {
             {/* Panel Content */}
             <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
               {!selectedDate ? (
-                <div className="px-5 py-12 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                    <CalendarIcon className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                <div className="px-6 py-14 text-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                    <CalendarIcon className="w-7 h-7 text-[var(--text-tertiary)] opacity-50" />
                   </div>
-                  <p className="text-[13px] font-medium text-[var(--text-secondary)]">No day selected</p>
-                  <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
-                    Select a day on the calendar to view its appointments
+                  <p className="text-[15px] font-medium text-[var(--text-secondary)]">Nicio zi selectată</p>
+                  <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">
+                    Selectează o zi din calendar pentru a vedea programările
                   </p>
                 </div>
               ) : selectedDateAppointments.length === 0 ? (
-                <div className="px-5 py-12 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                    <CalendarIcon className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                <div className="px-6 py-14 text-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                    <CalendarIcon className="w-7 h-7 text-[var(--text-tertiary)] opacity-50" />
                   </div>
-                  <p className="text-[13px] font-medium text-[var(--text-secondary)]">No appointments scheduled</p>
-                  <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5 mb-3">
-                    This day is free for new activities
+                  <p className="text-[15px] font-medium text-[var(--text-secondary)]">Nicio programare</p>
+                  <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5 mb-3">
+                    Această zi este liberă pentru activități noi
                   </p>
                   <button
                     onClick={() => openCreateForm(selectedDate)}
-                    className="text-[13px] font-semibold text-indigo-500 hover:text-indigo-400 transition-colors"
+                    className="text-[15px] font-semibold text-indigo-500 hover:text-indigo-400 transition-colors"
                   >
-                    + Add one
+                    + Adaugă una
                   </button>
                 </div>
               ) : (
@@ -487,25 +497,25 @@ export function CalendarPage() {
                     return (
                       <div
                         key={apt.id}
-                        className="px-5 py-4 hover:bg-[var(--bg-secondary)]/40 transition-all duration-200 group relative animate-fadeInUp"
+                        className="px-6 py-5 hover:bg-[var(--bg-secondary)]/40 transition-all duration-200 group relative animate-fadeInUp"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                         {/* Delete Confirmation Overlay */}
                         {isDeleting && (
                           <div className="absolute inset-0 bg-white/90 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center gap-2 z-10 px-4 rounded-xl animate-fadeIn">
-                            <span className="text-[13px] text-[var(--text-secondary)]">Delete?</span>
+                            <span className="text-[15px] text-[var(--text-secondary)]">Ștergi?</span>
                             <button
                               onClick={() => deleteMutation.mutate(apt.id)}
                               disabled={deleteMutation.isPending}
-                              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-[11px] font-semibold rounded-xl transition-all disabled:opacity-50"
+                              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-[13px] font-semibold rounded-xl transition-all disabled:opacity-50"
                             >
-                              {deleteMutation.isPending ? 'Deleting...' : 'Confirm'}
+                              {deleteMutation.isPending ? 'Se șterge...' : 'Confirmă'}
                             </button>
                             <button
                               onClick={() => setShowDeleteConfirm(null)}
-                              className="px-3 py-1.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] text-[11px] font-semibold rounded-xl hover:bg-[var(--bg-secondary)] transition-all"
+                              className="px-4 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] text-[13px] font-semibold rounded-xl hover:bg-[var(--bg-secondary)] transition-all"
                             >
-                              Cancel
+                              Anulează
                             </button>
                           </div>
                         )}
@@ -514,15 +524,15 @@ export function CalendarPage() {
                         <div className="flex items-start gap-3">
                           <div
                             className={cn(
-                              'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 transition-transform group-hover:scale-105',
+                              'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 transition-transform group-hover:scale-105',
                               config.color
                             )}
                           >
-                            <TypeIcon className="w-4 h-4" />
+                            <TypeIcon className="w-5 h-5" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
-                              <h4 className="text-[13px] font-semibold text-[var(--text-primary)] leading-tight">
+                              <h4 className="text-[15px] font-semibold text-[var(--text-primary)] leading-tight">
                                 {apt.title}
                               </h4>
                               <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 flex-shrink-0">
@@ -531,20 +541,20 @@ export function CalendarPage() {
                                     e.stopPropagation();
                                     openEditForm(apt);
                                   }}
-                                  className="p-1 rounded-lg hover:bg-[var(--bg-secondary)]/60 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all"
-                                  title="Edit"
+                                  className="p-1.5 rounded-lg hover:bg-[var(--bg-secondary)]/60 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all"
+                                  title="Editează"
                                 >
-                                  <Edit className="w-3.5 h-3.5" />
+                                  <Edit className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setShowDeleteConfirm(apt.id);
                                   }}
-                                  className="p-1 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-tertiary)] hover:text-red-600 transition-all"
-                                  title="Delete"
+                                  className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-tertiary)] hover:text-red-600 transition-all"
+                                  title="Șterge"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
                             </div>
@@ -552,7 +562,7 @@ export function CalendarPage() {
                             {/* Type Badge */}
                             <span
                               className={cn(
-                                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold mt-1',
+                                'inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-semibold mt-1',
                                 config.chipColor
                               )}
                             >
@@ -560,10 +570,10 @@ export function CalendarPage() {
                             </span>
 
                             {/* Time */}
-                            <div className="flex items-center gap-1.5 mt-2 text-[11px] text-[var(--text-secondary)]">
-                              <Clock className="w-3 h-3 flex-shrink-0" />
+                            <div className="flex items-center gap-1.5 mt-2 text-[13px] text-[var(--text-secondary)]">
+                              <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                               {apt.allDay ? (
-                                <span>All day</span>
+                                <span>Toată ziua</span>
                               ) : (
                                 <span>
                                   {formatTime(apt.startDate)} &ndash; {formatTime(apt.endDate)}
@@ -573,25 +583,25 @@ export function CalendarPage() {
 
                             {/* Location */}
                             {apt.location && (
-                              <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--text-secondary)]">
-                                <MapPin className="w-3 h-3 flex-shrink-0" />
+                              <div className="flex items-center gap-1.5 mt-1 text-[13px] text-[var(--text-secondary)]">
+                                <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
                                 <span className="truncate">{apt.location}</span>
                               </div>
                             )}
 
                             {/* Attendees */}
                             {apt.attendees && apt.attendees.length > 0 && (
-                              <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--text-secondary)]">
-                                <Users className="w-3 h-3 flex-shrink-0" />
+                              <div className="flex items-center gap-1.5 mt-1 text-[13px] text-[var(--text-secondary)]">
+                                <Users className="w-3.5 h-3.5 flex-shrink-0" />
                                 <span className="truncate">
-                                  {apt.attendees.length} attendee{apt.attendees.length !== 1 ? 's' : ''}
+                                  {apt.attendees.length} participant{apt.attendees.length !== 1 ? 'i' : ''}
                                 </span>
                               </div>
                             )}
 
                             {/* Description */}
                             {apt.description && (
-                              <p className="mt-2 text-[11px] text-[var(--text-tertiary)] line-clamp-2 leading-relaxed">
+                              <p className="mt-2 text-[13px] text-[var(--text-tertiary)] line-clamp-2 leading-relaxed">
                                 {apt.description}
                               </p>
                             )}
@@ -613,13 +623,13 @@ export function CalendarPage() {
           <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] flex flex-col overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 pt-6 pb-4">
+            <div className="flex items-center justify-between px-7 pt-7 pb-5">
               <div>
-                <h2 className="text-xl font-bold text-[var(--text-primary)]">
-                  {editingAppointment ? 'Edit Appointment' : 'New Appointment'}
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">
+                  {editingAppointment ? 'Editează Programare' : 'Programare Nouă'}
                 </h2>
-                <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-                  {editingAppointment ? 'Update the appointment details' : 'Schedule a new appointment'}
+                <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+                  {editingAppointment ? 'Actualizează detaliile programării' : 'Planifică o programare nouă'}
                 </p>
               </div>
               <button
@@ -627,58 +637,58 @@ export function CalendarPage() {
                   setShowForm(false);
                   setEditingAppointment(null);
                 }}
-                className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-tertiary)] transition-all"
+                className="p-2.5 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-tertiary)] transition-all"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 pb-6">
-              <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-7 pb-7">
+              <div className="space-y-5">
                 {/* Title */}
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Title *
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    Titlu *
                   </label>
                   <input
                     name="title"
                     defaultValue={editingAppointment?.title}
                     required
-                    placeholder="e.g., Client check-in call"
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                    placeholder="ex., Apel verificare client"
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Description
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    Descriere
                   </label>
                   <textarea
                     name="description"
                     rows={3}
                     defaultValue={editingAppointment?.description}
-                    placeholder="Add notes or agenda items..."
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all resize-none"
+                    placeholder="Adaugă note sau puncte pe agendă..."
+                    className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all resize-none"
                   />
                 </div>
 
                 {/* Type + All Day */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                      Type
+                    <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                      Tip
                     </label>
                     <select
                       name="type"
                       defaultValue={editingAppointment?.type || 'meeting'}
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     >
-                      <option value="meeting">Meeting</option>
-                      <option value="call">Call</option>
-                      <option value="video_call">Video Call</option>
-                      <option value="other">Other</option>
+                      <option value="meeting">Întâlnire</option>
+                      <option value="call">Apel</option>
+                      <option value="video_call">Apel Video</option>
+                      <option value="other">Altul</option>
                     </select>
                   </div>
                   <div className="flex items-end pb-1">
@@ -687,10 +697,10 @@ export function CalendarPage() {
                         type="checkbox"
                         name="allDay"
                         defaultChecked={editingAppointment?.allDay}
-                        className="w-4 h-4 rounded border-[var(--border-color)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0"
+                        className="w-5 h-5 rounded border-[var(--border-color)] text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0"
                       />
-                      <span className="text-[13px] font-medium text-[var(--text-secondary)]">
-                        All day event
+                      <span className="text-[15px] font-medium text-[var(--text-secondary)]">
+                        Toată Ziua
                       </span>
                     </label>
                   </div>
@@ -699,8 +709,8 @@ export function CalendarPage() {
                 {/* Start Date + Time */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                      Start Date *
+                    <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                      Data Început *
                     </label>
                     <input
                       name="startDate"
@@ -713,12 +723,12 @@ export function CalendarPage() {
                           ? format(selectedDate, 'yyyy-MM-dd')
                           : format(new Date(), 'yyyy-MM-dd')
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                      Start Time
+                    <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                      Ora Început
                     </label>
                     <input
                       name="startTime"
@@ -728,7 +738,7 @@ export function CalendarPage() {
                           ? format(parseISO(editingAppointment.startDate), 'HH:mm')
                           : '09:00'
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                 </div>
@@ -736,8 +746,8 @@ export function CalendarPage() {
                 {/* End Date + Time */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                      End Date
+                    <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                      Data Sfârșit
                     </label>
                     <input
                       name="endDate"
@@ -749,12 +759,12 @@ export function CalendarPage() {
                           ? format(selectedDate, 'yyyy-MM-dd')
                           : format(new Date(), 'yyyy-MM-dd')
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                      End Time
+                    <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                      Ora Sfârșit
                     </label>
                     <input
                       name="endTime"
@@ -764,43 +774,43 @@ export function CalendarPage() {
                           ? format(parseISO(editingAppointment.endDate), 'HH:mm')
                           : '10:00'
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Location */}
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Location
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    Locație
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
                     <input
                       name="location"
                       defaultValue={editingAppointment?.location}
-                      placeholder="Office, Zoom link, address..."
-                      className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      placeholder="Birou, link Zoom, adresă..."
+                      className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Attendees */}
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                    Attendees
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                    Participanți
                   </label>
                   <div className="relative">
-                    <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
                     <input
                       name="attendees"
                       defaultValue={editingAppointment?.attendees?.join(', ')}
-                      placeholder="Comma-separated names or emails"
-                      className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      placeholder="Nume sau emailuri separate prin virgulă"
+                      className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
-                  <p className="mt-1 text-[11px] text-[var(--text-tertiary)]">
-                    Separate multiple attendees with commas
+                  <p className="mt-1 text-[13px] text-[var(--text-tertiary)]">
+                    Separă participanții multipli prin virgulă
                   </p>
                 </div>
 
@@ -809,17 +819,17 @@ export function CalendarPage() {
                   <button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
                   >
                     {createMutation.isPending ? (
                       <>
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Saving...
+                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Se salvează...
                       </>
                     ) : (
                       <>
-                        <Check className="w-4 h-4" />
-                        {editingAppointment ? 'Update Appointment' : 'Create Appointment'}
+                        <Check className="w-5 h-5" />
+                        {editingAppointment ? 'Actualizează Programare' : 'Creează Programare'}
                       </>
                     )}
                   </button>
@@ -829,9 +839,9 @@ export function CalendarPage() {
                       setShowForm(false);
                       setEditingAppointment(null);
                     }}
-                    className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-secondary)] transition-all"
+                    className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-secondary)] transition-all"
                   >
-                    Cancel
+                    Anulează
                   </button>
                 </div>
               </div>

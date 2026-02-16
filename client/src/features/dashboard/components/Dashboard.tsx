@@ -75,7 +75,16 @@ const PIPELINE_COLORS = [
   { solid: '#10b981', light: '#34d399' }, // emerald
 ];
 
+const STAGE_NAMES_RO: Record<string, string> = {
+  prospecting: 'Prospectare',
+  qualification: 'Calificare',
+  proposal: 'Propunere',
+  negotiation: 'Negociere',
+  closed_won: 'Câștigat',
+};
+
 function formatStageName(stage: string): string {
+  if (STAGE_NAMES_RO[stage]) return STAGE_NAMES_RO[stage];
   return stage
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (c) => c.toUpperCase());
@@ -107,16 +116,16 @@ function PipelineTooltip({
         boxShadow: '0 20px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05)',
       }}
     >
-      <p className="text-[13px] font-bold text-[var(--text-primary)]">
+      <p className="text-[15px] font-bold text-[var(--text-primary)]">
         {formatStageName(label || '')}
       </p>
       <div className="mt-2 flex items-baseline gap-2">
-        <p className="text-[20px] font-bold text-emerald-500 dark:text-emerald-400">
+        <p className="text-[24px] font-bold text-emerald-500 dark:text-emerald-400">
           {formatCurrency(data.totalValue)}
         </p>
       </div>
-      <p className="mt-1 text-[12px] text-[var(--text-tertiary)]">
-        {data.count} deal{data.count !== 1 ? 's' : ''} in stage
+      <p className="mt-1 text-[14px] text-[var(--text-tertiary)]">
+        {data.count} {data.count !== 1 ? 'tranzacții' : 'tranzacție'} în etapă
       </p>
     </div>
   );
@@ -128,26 +137,26 @@ function PriorityBadge({ priority }: { priority: string }) {
   const config: Record<string, { classes: string; label: string }> = {
     low: {
       classes: 'bg-slate-100 text-slate-600 dark:bg-slate-800/60 dark:text-slate-400',
-      label: 'Low',
+      label: 'Scăzută',
     },
     medium: {
       classes: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-      label: 'Medium',
+      label: 'Medie',
     },
     high: {
       classes: 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
-      label: 'High',
+      label: 'Ridicată',
     },
     urgent: {
       classes: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-      label: 'Urgent',
+      label: 'Urgentă',
     },
   };
 
   const { classes, label } = config[priority] || config.medium;
 
   return (
-    <span className={cn('rounded-lg px-2 py-0.5 text-[11px] font-semibold', classes)}>
+    <span className={cn('rounded-lg px-2.5 py-1 text-[13px] font-semibold', classes)}>
       {label}
     </span>
   );
@@ -282,30 +291,30 @@ export default function Dashboard() {
         />
 
         <div className="relative">
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">
             {greeting}, <span className="gradient-text">{firstName}</span>
           </h1>
-          <p className="mt-1 text-[14px] text-[var(--text-secondary)]">
-            Here's what's happening with your CRM today.
+          <p className="mt-1 text-[16px] text-[var(--text-secondary)]">
+            Iată ce se întâmplă astăzi.
           </p>
         </div>
 
         <div className="relative flex flex-wrap gap-2">
           <QuickActionButton
             icon={UserPlus}
-            label="New Contact"
+            label="Contact Nou"
             href="/contacts/new"
             color="indigo"
           />
           <QuickActionButton
             icon={Handshake}
-            label="New Deal"
+            label="Tranzacție Nouă"
             href="/deals/new"
             color="emerald"
           />
           <QuickActionButton
             icon={Plus}
-            label="New Task"
+            label="Sarcină Nouă"
             href="/tasks/new"
             color="violet"
           />
@@ -317,39 +326,39 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <div className="animate-fadeInUp stagger-1">
             <StatsCard
-              title="Total Contacts"
+              title="Total Contacte"
               value={stats.contacts.total.toLocaleString()}
-              subtitle={`${stats.contacts.active} active`}
+              subtitle={`${stats.contacts.active} active/activi`}
               icon={Users}
               color="blue"
             />
           </div>
           <div className="animate-fadeInUp stagger-2">
             <StatsCard
-              title="Open Deals"
+              title="Total Tranzacții"
               value={stats.deals.open}
-              subtitle={`${stats.deals.winRate}% win rate`}
+              subtitle={`${stats.deals.winRate}% rată de câștig`}
               icon={Handshake}
               color="emerald"
             />
           </div>
           <div className="animate-fadeInUp stagger-3">
             <StatsCard
-              title="Pipeline Value"
+              title="Valoare Pipeline"
               value={formatCurrency(stats.deals.pipelineValue)}
-              subtitle={`${stats.deals.total} total deals`}
+              subtitle={`${stats.deals.total} tranzacții deschise`}
               icon={TrendingUp}
               color="purple"
             />
           </div>
           <div className="animate-fadeInUp stagger-4">
             <StatsCard
-              title="Tasks Due"
+              title="Sarcini Scadente"
               value={stats.tasks.pending}
               subtitle={
                 stats.tasks.overdue > 0
-                  ? `${stats.tasks.overdue} overdue`
-                  : 'All on track'
+                  ? `${stats.tasks.overdue} întârziate`
+                  : 'Totul la zi'
               }
               icon={ClipboardList}
               color={stats.tasks.overdue > 0 ? 'orange' : 'cyan'}
@@ -357,9 +366,9 @@ export default function Dashboard() {
           </div>
           <div className="animate-fadeInUp stagger-5">
             <StatsCard
-              title="Revenue"
+              title="Venituri"
               value={formatCurrency(stats.invoices.totalRevenue)}
-              subtitle={`${stats.invoices.paid} invoices paid`}
+              subtitle={`${stats.invoices.paid} facturi plătite`}
               icon={DollarSign}
               color="green"
             />
@@ -371,22 +380,22 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Sales Pipeline Chart */}
         <GlassCard className="col-span-1 lg:col-span-2 animate-fadeInUp stagger-6">
-          <div className="border-b border-[var(--border-color)] px-6 py-4">
-            <h2 className="text-[15px] font-bold text-[var(--text-primary)]">
-              Sales Pipeline
+          <div className="border-b border-[var(--border-color)] px-7 py-5">
+            <h2 className="text-[18px] font-bold text-[var(--text-primary)]">
+              Pipeline Vânzări
             </h2>
-            <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
-              Deal distribution by stage
+            <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">
+              Distribuția tranzacțiilor pe etape
             </p>
           </div>
 
-          <div className="p-6">
+          <div className="p-7">
             {pipelineLoading ? (
-              <div className="flex h-72 items-center justify-center">
-                <Loader2 className="h-5 w-5 animate-spin text-[var(--text-tertiary)]" />
+              <div className="flex h-80 items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-[var(--text-tertiary)]" />
               </div>
             ) : pipeline && pipeline.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={360}>
                 <BarChart
                   data={pipeline.map((s) => ({
                     ...s,
@@ -412,13 +421,13 @@ export default function Dashboard() {
                     dataKey="name"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'var(--text-tertiary)', fontSize: 11, fontWeight: 500 }}
+                    tick={{ fill: 'var(--text-tertiary)', fontSize: 13, fontWeight: 500 }}
                     dy={8}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: 'var(--text-tertiary)', fontSize: 11 }}
+                    tick={{ fill: 'var(--text-tertiary)', fontSize: 13 }}
                     tickFormatter={(v: number) =>
                       v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`
                     }
@@ -444,12 +453,12 @@ export default function Dashboard() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-72 flex-col items-center justify-center text-[var(--text-tertiary)]">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] mb-3">
-                  <TrendingUp className="h-7 w-7 opacity-50" />
+              <div className="flex h-80 flex-col items-center justify-center text-[var(--text-tertiary)]">
+                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] mb-3">
+                  <TrendingUp className="h-9 w-9 opacity-50" />
                 </div>
-                <p className="text-[14px] font-medium">No pipeline data available</p>
-                <p className="text-[12px] mt-1 opacity-60">Create your first deal to see the pipeline</p>
+                <p className="text-[16px] font-medium">Nu există date pipeline</p>
+                <p className="text-[14px] mt-1 opacity-60">Creează prima tranzacție pentru a vedea pipeline-ul</p>
               </div>
             )}
           </div>
@@ -457,21 +466,21 @@ export default function Dashboard() {
 
         {/* Recent Activity */}
         <GlassCard className="col-span-1 flex flex-col animate-fadeInUp stagger-7">
-          <div className="border-b border-[var(--border-color)] px-6 py-4">
-            <h2 className="text-[15px] font-bold text-[var(--text-primary)]">
-              Recent Activity
+          <div className="border-b border-[var(--border-color)] px-7 py-5">
+            <h2 className="text-[18px] font-bold text-[var(--text-primary)]">
+              Activitate Recentă
             </h2>
-            <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
-              Latest updates across your CRM
+            <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">
+              Ultimele actualizări din CRM
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="flex-1 overflow-y-auto px-7 py-5">
             {stats?.recentActivities ? (
               <ActivityFeed activities={stats.recentActivities} maxItems={8} />
             ) : (
               <div className="flex h-full items-center justify-center">
-                <Loader2 className="h-5 w-5 animate-spin text-[var(--text-tertiary)]" />
+                <Loader2 className="h-6 w-6 animate-spin text-[var(--text-tertiary)]" />
               </div>
             )}
           </div>
@@ -480,32 +489,32 @@ export default function Dashboard() {
 
       {/* ===== Upcoming Tasks ===== */}
       <GlassCard className="animate-fadeInUp stagger-8">
-        <div className="flex items-center justify-between border-b border-[var(--border-color)] px-6 py-4">
+        <div className="flex items-center justify-between border-b border-[var(--border-color)] px-7 py-5">
           <div>
-            <h2 className="text-[15px] font-bold text-[var(--text-primary)]">
-              Upcoming Tasks
+            <h2 className="text-[18px] font-bold text-[var(--text-primary)]">
+              Sarcini Viitoare
             </h2>
-            <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
-              Your tasks due soon
+            <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">
+              Sarcinile tale scadente în curând
             </p>
           </div>
           <a
             href="/tasks"
             className={cn(
-              'flex items-center gap-1 text-[12px] font-semibold',
+              'flex items-center gap-1 text-[14px] font-semibold',
               'text-primary-500 hover:text-primary-400',
               'transition-colors duration-200',
             )}
           >
-            View all
-            <ArrowRight className="h-3.5 w-3.5" />
+            Vezi toate
+            <ArrowRight className="h-4 w-4" />
           </a>
         </div>
 
-        <div className="p-4">
+        <div className="p-6">
           {tasksLoading ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-[var(--text-tertiary)]" />
+              <Loader2 className="h-6 w-6 animate-spin text-[var(--text-tertiary)]" />
             </div>
           ) : upcomingTasks && upcomingTasks.length > 0 ? (
             <div className="space-y-1">
@@ -515,11 +524,11 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-[var(--text-tertiary)]">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] mb-3">
-                <Sparkles className="h-7 w-7 opacity-50" />
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] mb-3">
+                <Sparkles className="h-9 w-9 opacity-50" />
               </div>
-              <p className="text-[14px] font-medium text-[var(--text-secondary)]">All caught up!</p>
-              <p className="text-[12px] mt-1 opacity-60">No upcoming tasks. Enjoy your day.</p>
+              <p className="text-[16px] font-medium text-[var(--text-secondary)]">Totul la zi!</p>
+              <p className="text-[14px] mt-1 opacity-60">Nicio sarcină viitoare. Bucură-te de ziua ta.</p>
             </div>
           )}
         </div>
@@ -551,8 +560,8 @@ function QuickActionButton({
     <a
       href={href}
       className={cn(
-        'group/btn inline-flex items-center gap-2 rounded-xl px-4 py-2.5',
-        'text-[13px] font-semibold text-white',
+        'group/btn inline-flex items-center gap-2.5 rounded-xl px-5 py-3',
+        'text-[14px] font-semibold text-white',
         'bg-gradient-to-r shadow-md',
         'transition-all duration-300 ease-spring',
         'hover:-translate-y-0.5 hover:shadow-lg',
@@ -560,7 +569,7 @@ function QuickActionButton({
         colorClasses[color],
       )}
     >
-      <Icon className="h-4 w-4 transition-transform duration-300 group-hover/btn:rotate-12" />
+      <Icon className="h-5 w-5 transition-transform duration-300 group-hover/btn:rotate-12" />
       {label}
     </a>
   );
@@ -582,7 +591,7 @@ function TaskRow({ task }: { task: UpcomingTask }) {
     >
       <div
         className={cn(
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl',
           'transition-all duration-200',
           isOverdue
             ? 'bg-red-500/10 dark:bg-red-500/[0.12]'
@@ -590,16 +599,16 @@ function TaskRow({ task }: { task: UpcomingTask }) {
         )}
       >
         {isOverdue ? (
-          <AlertTriangle className="h-4 w-4 text-red-500 dark:text-red-400" />
+          <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400" />
         ) : (
-          <Clock className="h-4 w-4 text-[var(--text-tertiary)]" />
+          <Clock className="h-5 w-5 text-[var(--text-tertiary)]" />
         )}
       </div>
 
       <div className="min-w-0 flex-1">
         <p
           className={cn(
-            'truncate text-[13px] font-medium',
+            'truncate text-[15px] font-medium',
             isOverdue
               ? 'text-red-700 dark:text-red-400'
               : 'text-[var(--text-primary)]',
@@ -607,7 +616,7 @@ function TaskRow({ task }: { task: UpcomingTask }) {
         >
           {task.title}
         </p>
-        <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[var(--text-tertiary)]">
+        <div className="mt-0.5 flex items-center gap-2 text-[13px] text-[var(--text-tertiary)]">
           {task.contactName && <span>{task.contactName}</span>}
           {task.contactName && task.dealName && (
             <span className="text-[var(--border-color)]">/</span>
@@ -620,13 +629,13 @@ function TaskRow({ task }: { task: UpcomingTask }) {
         <PriorityBadge priority={task.priority} />
         <span
           className={cn(
-            'text-[11px] font-semibold',
+            'text-[13px] font-semibold',
             isOverdue
               ? 'text-red-500 dark:text-red-400'
               : 'text-[var(--text-tertiary)]',
           )}
         >
-          {isOverdue ? 'Overdue' : formatRelativeTime(task.dueDate)}
+          {isOverdue ? 'Întârziat' : formatRelativeTime(task.dueDate)}
         </span>
       </div>
     </div>
@@ -635,7 +644,7 @@ function TaskRow({ task }: { task: UpcomingTask }) {
 
 function getGreeting(): string {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return 'Bună dimineața';
+  if (hour < 17) return 'Bună ziua';
+  return 'Bună seara';
 }

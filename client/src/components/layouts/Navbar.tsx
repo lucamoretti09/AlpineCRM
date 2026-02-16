@@ -49,10 +49,10 @@ export default function Navbar({ title }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-6 backdrop-blur-xl backdrop-saturate-150">
+    <header className="sticky top-0 z-30 flex h-[80px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-6 backdrop-blur-xl backdrop-saturate-150">
       {/* Left: Page Title */}
       <div>
-        <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
+        <h1 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
           {title}
         </h1>
       </div>
@@ -69,15 +69,15 @@ export default function Navbar({ title }: NavbarProps) {
           />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Căutare..."
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
             className={cn(
-              'h-10 w-60 rounded-xl border border-[var(--border-color)]',
-              'bg-[var(--bg-secondary)]/60 pl-10 pr-4 text-[13px]',
+              'h-12 w-72 rounded-xl border border-[var(--border-color)]',
+              'bg-[var(--bg-secondary)]/60 pl-10 pr-4 text-[15px]',
               'text-[var(--text-primary)] placeholder-[var(--text-tertiary)]',
               'outline-none transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-              'focus:w-80 focus:border-primary-500/40 focus:bg-[var(--bg-secondary)]',
+              'focus:w-96 focus:border-primary-500/40 focus:bg-[var(--bg-secondary)]',
               'focus:shadow-[0_0_0_3px_rgba(99,102,241,0.1),0_0_20px_rgba(99,102,241,0.06)]'
             )}
           />
@@ -97,17 +97,17 @@ export default function Navbar({ title }: NavbarProps) {
             'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
             themeBounce && 'animate-theme-bounce'
           )}
-          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={isDark ? 'Comută la modul luminos' : 'Comută la modul întunecat'}
         >
           <Sun
             className={cn(
-              'h-[18px] w-[18px] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+              'h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
               isDark ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'
             )}
           />
           <Moon
             className={cn(
-              'absolute h-[18px] w-[18px] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+              'absolute h-5 w-5 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
               isDark ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
             )}
           />
@@ -128,7 +128,7 @@ export default function Navbar({ title }: NavbarProps) {
           >
             <Bell
               className={cn(
-                'h-[18px] w-[18px]',
+                'h-5 w-5',
                 unreadCount > 0 && !notificationsOpen && 'animate-bell-wiggle'
               )}
             />
@@ -151,11 +151,11 @@ export default function Navbar({ title }: NavbarProps) {
               )}
             >
               <div className="flex items-center justify-between border-b border-[var(--border-color)]/50 px-4 py-3.5">
-                <h3 className="text-[13px] font-bold text-[var(--text-primary)]">
-                  Notifications
+                <h3 className="text-[15px] font-bold text-[var(--text-primary)]">
+                  Notificări
                 </h3>
-                <span className="rounded-full bg-primary-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary-500">
-                  {unreadCount} new
+                <span className="rounded-full bg-primary-500/10 px-2.5 py-0.5 text-[13px] font-semibold text-primary-500">
+                  {unreadCount} noi
                 </span>
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -164,8 +164,8 @@ export default function Navbar({ title }: NavbarProps) {
                     <Bell className="h-3.5 w-3.5 text-primary-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[var(--text-primary)]">New deal created</p>
-                    <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">2 minutes ago</p>
+                    <p className="text-[15px] font-medium text-[var(--text-primary)]">Tranzacție nouă creată</p>
+                    <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">acum 2 minute</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-emerald-500">
@@ -173,8 +173,8 @@ export default function Navbar({ title }: NavbarProps) {
                     <Bell className="h-3.5 w-3.5 text-emerald-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[var(--text-primary)]">Task completed</p>
-                    <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">15 minutes ago</p>
+                    <p className="text-[15px] font-medium text-[var(--text-primary)]">Sarcină finalizată</p>
+                    <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">acum 15 minute</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-transparent">
@@ -182,8 +182,8 @@ export default function Navbar({ title }: NavbarProps) {
                     <Bell className="h-3.5 w-3.5 text-amber-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[var(--text-primary)]">Invoice overdue</p>
-                    <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">1 hour ago</p>
+                    <p className="text-[15px] font-medium text-[var(--text-primary)]">Factură restantă</p>
+                    <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">acum 1 oră</p>
                   </div>
                 </div>
               </div>
@@ -192,7 +192,7 @@ export default function Navbar({ title }: NavbarProps) {
                   href="/notifications"
                   className="block text-center text-[12px] font-semibold text-primary-500 hover:text-primary-400 transition-colors duration-200"
                 >
-                  View all notifications
+                  Vezi toate notificările
                 </a>
               </div>
             </div>
@@ -218,18 +218,18 @@ export default function Navbar({ title }: NavbarProps) {
               <img
                 src={user.avatarUrl}
                 alt={`${user.firstName} ${user.lastName}`}
-                className="h-8 w-8 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
+                className="h-10 w-10 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
               />
             ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[13px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
                 {user ? getInitials(user.firstName, user.lastName) : '??'}
               </div>
             )}
             <div className="hidden text-left md:block">
-              <p className="text-[13px] font-semibold text-[var(--text-primary)] leading-tight">
+              <p className="text-[15px] font-semibold text-[var(--text-primary)] leading-tight">
                 {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
               </p>
-              <p className="text-[11px] text-[var(--text-tertiary)] leading-tight">
+              <p className="text-[13px] text-[var(--text-tertiary)] leading-tight">
                 {user?.email ?? ''}
               </p>
             </div>
@@ -253,10 +253,10 @@ export default function Navbar({ title }: NavbarProps) {
               )}
             >
               <div className="border-b border-[var(--border-color)]/50 px-4 py-3.5">
-                <p className="text-[13px] font-bold text-[var(--text-primary)]">
+                <p className="text-[15px] font-bold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
                 </p>
-                <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
+                <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">
                   {user?.email ?? ''}
                 </p>
               </div>
@@ -264,17 +264,17 @@ export default function Navbar({ title }: NavbarProps) {
               <div className="py-1.5">
                 <a
                   href="/settings/profile"
-                  className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
+                  className="flex items-center gap-3 px-4 py-2.5 text-[15px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
                   <User className="h-4 w-4" />
-                  Profile
+                  Profil
                 </a>
                 <a
                   href="/settings"
-                  className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
+                  className="flex items-center gap-3 px-4 py-2.5 text-[15px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
                   <Settings className="h-4 w-4" />
-                  Settings
+                  Setări
                 </a>
               </div>
 

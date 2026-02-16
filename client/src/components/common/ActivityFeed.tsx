@@ -102,11 +102,14 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
   if (displayActivities.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-tertiary)]">
-          <FileText className="h-6 w-6 text-[var(--text-tertiary)]" />
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-tertiary)]">
+          <FileText className="h-7 w-7 text-[var(--text-tertiary)]" />
         </div>
-        <p className="mt-3 text-sm text-[var(--text-secondary)]">
-          No recent activity
+        <p className="mt-3 text-[15px] font-medium text-[var(--text-secondary)]">
+          Nicio activitate recentă
+        </p>
+        <p className="mt-1 text-[13px] text-[var(--text-tertiary)]">
+          Activitatea va apărea aici
         </p>
       </div>
     );
@@ -121,11 +124,11 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
             activityIconMap[activity.type] || defaultActivityIcon;
 
           return (
-            <li key={activity.id} className="relative pb-4">
+            <li key={activity.id} className="relative pb-5">
               {/* Timeline connector line with gradient fade */}
               {!isLast && (
                 <span
-                  className="absolute left-5 top-11 -ml-px h-[calc(100%-1.5rem)] w-0.5"
+                  className="absolute left-6 top-12 -ml-px h-[calc(100%-1.75rem)] w-0.5"
                   aria-hidden="true"
                   style={{
                     background: 'linear-gradient(to bottom, var(--border-color) 0%, var(--border-color) 70%, transparent 100%)',
@@ -135,7 +138,7 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
 
               <div
                 className={cn(
-                  'relative flex items-start gap-4 rounded-xl px-2 py-1.5 -mx-2',
+                  'relative flex items-start gap-4 rounded-xl px-2 py-2 -mx-2',
                   'transition-all duration-200 ease-spring',
                   'hover:bg-[var(--bg-secondary)]/50',
                 )}
@@ -143,28 +146,28 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                 {/* Activity icon */}
                 <div
                   className={cn(
-                    'relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+                    'relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full',
                     bg,
                     'ring-4 ring-[var(--bg-primary)]',
                     'transition-transform duration-200',
                   )}
                 >
-                  <ActivityIcon className={cn('h-4.5 w-4.5', color)} />
+                  <ActivityIcon className={cn('h-5.5 w-5.5', color)} />
                 </div>
 
                 {/* Content */}
                 <div className="min-w-0 flex-1 pt-0.5">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                    <p className="text-[15px] font-medium text-[var(--text-primary)]">
                       {activity.title}
                     </p>
-                    <time className="shrink-0 text-xs text-[var(--text-tertiary)]">
+                    <time className="shrink-0 text-[13px] text-[var(--text-tertiary)]">
                       {formatRelativeTime(activity.createdAt)}
                     </time>
                   </div>
 
                   {activity.description && (
-                    <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
+                    <p className="mt-0.5 text-[15px] text-[var(--text-secondary)]">
                       {activity.description}
                     </p>
                   )}
@@ -176,16 +179,16 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                         <img
                           src={activity.userAvatar}
                           alt={activity.userName}
-                          className="h-5 w-5 rounded-full object-cover ring-1 ring-[var(--border-color)]"
+                          className="h-6 w-6 rounded-full object-cover ring-1 ring-[var(--border-color)]"
                         />
                       ) : (
-                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[var(--text-tertiary)] to-[var(--text-secondary)]">
-                          <span className="text-[9px] font-semibold text-white">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-[var(--text-tertiary)] to-[var(--text-secondary)]">
+                          <span className="text-[10px] font-semibold text-white">
                             {getInitialsFromName(activity.userName)}
                           </span>
                         </div>
                       )}
-                      <span className="text-xs text-[var(--text-tertiary)]">
+                      <span className="text-[13px] text-[var(--text-tertiary)]">
                         {activity.userName}
                       </span>
                     </div>

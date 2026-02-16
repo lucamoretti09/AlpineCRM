@@ -65,22 +65,27 @@ interface InvoiceFormData {
 // ---------------------------------------------------------------------------
 
 const STATUSES: { id: InvoiceStatus; label: string }[] = [
-  { id: 'draft', label: 'Draft' },
-  { id: 'sent', label: 'Sent' },
-  { id: 'viewed', label: 'Viewed' },
-  { id: 'paid', label: 'Paid' },
-  { id: 'overdue', label: 'Overdue' },
-  { id: 'cancelled', label: 'Cancelled' },
+  { id: 'draft', label: 'Ciornă' },
+  { id: 'sent', label: 'Trimisă' },
+  { id: 'viewed', label: 'Vizualizată' },
+  { id: 'paid', label: 'Plătită' },
+  { id: 'overdue', label: 'Restantă' },
+  { id: 'cancelled', label: 'Anulată' },
 ];
 
 const STATUS_ICONS: Record<InvoiceStatus, React.ReactNode> = {
-  draft: <FileText className="w-3.5 h-3.5" />,
-  sent: <Send className="w-3.5 h-3.5" />,
-  viewed: <Eye className="w-3.5 h-3.5" />,
-  paid: <CheckCircle2 className="w-3.5 h-3.5" />,
-  overdue: <AlertTriangle className="w-3.5 h-3.5" />,
-  cancelled: <Ban className="w-3.5 h-3.5" />,
+  draft: <FileText className="w-4 h-4" />,
+  sent: <Send className="w-4 h-4" />,
+  viewed: <Eye className="w-4 h-4" />,
+  paid: <CheckCircle2 className="w-4 h-4" />,
+  overdue: <AlertTriangle className="w-4 h-4" />,
+  cancelled: <Ban className="w-4 h-4" />,
 };
+
+function formatStatusLabel(status: InvoiceStatus): string {
+  const found = STATUSES.find((s) => s.id === status);
+  return found ? found.label : status.charAt(0).toUpperCase() + status.slice(1);
+}
 
 function generateTempId(): string {
   return `tmp_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
@@ -96,13 +101,13 @@ function createEmptyLineItem(): LineItem {
 
 function StatCardSkeleton() {
   return (
-    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5">
+    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6">
       <div className="flex items-center justify-between mb-3">
-        <div className="skeleton h-4 w-24 rounded" />
-        <div className="skeleton h-9 w-9 rounded-xl" />
+        <div className="skeleton h-5 w-28 rounded" />
+        <div className="skeleton h-11 w-11 rounded-xl" />
       </div>
-      <div className="skeleton h-7 w-20 rounded mb-1" />
-      <div className="skeleton h-3 w-32 rounded" />
+      <div className="skeleton h-8 w-24 rounded mb-1" />
+      <div className="skeleton h-4 w-36 rounded" />
     </div>
   );
 }
@@ -110,13 +115,13 @@ function StatCardSkeleton() {
 function TableRowSkeleton() {
   return (
     <tr className="border-b border-[var(--border-color)]">
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-28 rounded" /></td>
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-36 rounded" /></td>
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-20 rounded" /></td>
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-16 rounded-lg" /></td>
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-24 rounded" /></td>
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-24 rounded" /></td>
-      <td className="px-6 py-3.5"><div className="skeleton h-5 w-16 rounded" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-28 rounded" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-36 rounded" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-20 rounded" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-16 rounded-lg" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-24 rounded" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-24 rounded" /></td>
+      <td className="px-6 py-4.5"><div className="skeleton h-6 w-16 rounded" /></td>
     </tr>
   );
 }
@@ -136,7 +141,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, subtitle, icon, iconBg, accentColor = 'indigo' }: StatCardProps) {
   return (
-    <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 overflow-hidden group">
+    <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 overflow-hidden group">
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-500/[0.02] group-hover:to-indigo-500/[0.05] transition-all duration-500 rounded-2xl" />
       {/* Top accent line */}
@@ -149,13 +154,13 @@ function StatCard({ label, value, subtitle, icon, iconBg, accentColor = 'indigo'
       )} />
       <div className="relative">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
-          <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', iconBg)}>
+          <span className="text-[15px] font-medium text-[var(--text-secondary)]">{label}</span>
+          <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center', iconBg)}>
             {icon}
           </div>
         </div>
-        <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-        <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
+        <p className="text-3xl font-bold text-[var(--text-primary)]">{value}</p>
+        <p className="text-[13px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
       </div>
     </div>
   );
@@ -213,7 +218,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
     const fd = new FormData(e.currentTarget);
     const validLineItems = lineItems.filter((li) => li.description.trim() !== '');
     if (validLineItems.length === 0) {
-      toast.error('Add at least one line item with a description');
+      toast.error('Adaugă cel puțin un element cu descriere');
       return;
     }
     onSubmit({
@@ -230,51 +235,51 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
       <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeInScale max-h-[90vh] flex flex-col shadow-2xl shadow-black/10 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
+        <div className="flex items-center justify-between p-7 border-b border-[var(--border-color)]">
           <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">
-              {editingInvoice ? 'Edit Invoice' : 'Create Invoice'}
+            <h2 className="text-2xl font-bold text-[var(--text-primary)]">
+              {editingInvoice ? 'Editează Factură' : 'Creează Factură'}
             </h2>
-            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
+            <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
               {editingInvoice
-                ? `Editing ${editingInvoice.invoiceNumber}`
-                : 'Fill in the details to create a new invoice'}
+                ? `Editare ${editingInvoice.invoiceNumber}`
+                : 'Completează detaliile pentru a crea o factură nouă'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-tertiary)] transition-colors"
+            className="p-2.5 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-tertiary)] transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Modal Body */}
         <form onSubmit={handleFormSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          <div className="flex-1 overflow-y-auto p-7 space-y-5">
             {/* Top fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                  Contact ID
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                  ID Contact
                 </label>
                 <input
                   name="contactId"
                   defaultValue={editingInvoice?.contactId || ''}
-                  placeholder="Optional"
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                  placeholder="Opțional"
+                  className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                  Due Date *
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                  Scadență *
                 </label>
                 <input
                   name="dueDate"
                   type="date"
                   required
                   defaultValue={editingInvoice?.dueDate?.split('T')[0] || ''}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                  className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
             </div>
@@ -282,30 +287,30 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
             {/* Line Items */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
-                  Line Items *
+                <label className="text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+                  Elemente Factură *
                 </label>
                 <button
                   type="button"
                   onClick={addLineItem}
-                  className="flex items-center gap-1.5 text-[12px] font-semibold text-indigo-500 hover:text-indigo-400 transition-colors"
+                  className="flex items-center gap-1.5 text-[14px] font-semibold text-indigo-500 hover:text-indigo-400 transition-colors"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add Item
+                  <Plus className="w-4 h-4" />
+                  Adaugă Element
                 </button>
               </div>
 
               <div className="space-y-2">
                 {/* Column headers */}
                 <div className="grid grid-cols-[1fr_80px_100px_36px] gap-2 px-1">
-                  <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
-                    Description
+                  <span className="text-[13px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
+                    Descriere
                   </span>
-                  <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
-                    Qty
+                  <span className="text-[13px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
+                    Cant.
                   </span>
-                  <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
-                    Unit Price
+                  <span className="text-[13px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">
+                    Preț Unitar
                   </span>
                   <span />
                 </div>
@@ -318,8 +323,8 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                     <input
                       value={item.description}
                       onChange={(e) => updateLineItem(item.id, 'description', e.target.value)}
-                      placeholder="Item description"
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      placeholder="Descrierea elementului"
+                      className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                     <input
                       type="number"
@@ -329,7 +334,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       onChange={(e) =>
                         updateLineItem(item.id, 'quantity', Math.max(1, parseInt(e.target.value) || 1))
                       }
-                      className="w-full px-3 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-3.5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                     <input
                       type="number"
@@ -339,20 +344,20 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       onChange={(e) =>
                         updateLineItem(item.id, 'unitPrice', Math.max(0, parseFloat(e.target.value) || 0))
                       }
-                      className="w-full px-3 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                      className="w-full px-3.5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => removeLineItem(item.id)}
                       disabled={lineItems.length <= 1}
                       className={cn(
-                        'p-2 rounded-xl transition-colors',
+                        'p-2.5 rounded-xl transition-colors',
                         lineItems.length <= 1
                           ? 'text-[var(--text-tertiary)] opacity-30 cursor-not-allowed'
                           : 'text-[var(--text-secondary)] hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20',
                       )}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                 ))}
@@ -360,16 +365,16 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
             </div>
 
             {/* Totals & Tax */}
-            <div className="bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-2xl p-4 space-y-3">
+            <div className="bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-2xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[13px] text-[var(--text-secondary)]">Subtotal</span>
-                <span className="text-[13px] font-medium text-[var(--text-primary)]">
+                <span className="text-[15px] text-[var(--text-secondary)]">Subtotal</span>
+                <span className="text-[15px] font-medium text-[var(--text-primary)]">
                   {formatCurrency(subtotal)}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] text-[var(--text-secondary)]">Tax</span>
+                  <span className="text-[15px] text-[var(--text-secondary)]">TVA</span>
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
@@ -380,18 +385,18 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       onChange={(e) =>
                         setTaxRate(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))
                       }
-                      className="w-16 px-2 py-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[11px] text-[var(--text-primary)] text-center focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-colors"
+                      className="w-18 px-2.5 py-1.5 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[13px] text-[var(--text-primary)] text-center focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-colors"
                     />
-                    <span className="text-[11px] text-[var(--text-tertiary)]">%</span>
+                    <span className="text-[13px] text-[var(--text-tertiary)]">%</span>
                   </div>
                 </div>
-                <span className="text-[13px] font-medium text-[var(--text-primary)]">
+                <span className="text-[15px] font-medium text-[var(--text-primary)]">
                   {formatCurrency(taxAmount)}
                 </span>
               </div>
               <div className="border-t border-[var(--border-color)] pt-3 flex items-center justify-between">
-                <span className="text-[13px] font-semibold text-[var(--text-primary)]">Total</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
+                <span className="text-[15px] font-semibold text-[var(--text-primary)]">Total</span>
+                <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-indigo-500 bg-clip-text text-transparent">
                   {formatCurrency(total)}
                 </span>
               </div>
@@ -399,34 +404,34 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
 
             {/* Notes */}
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                Notes
+              <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                Note
               </label>
               <textarea
                 name="notes"
                 rows={3}
                 defaultValue={editingInvoice?.notes || ''}
-                placeholder="Additional notes or payment instructions..."
-                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
+                placeholder="Note suplimentare sau instrucțiuni de plată..."
+                className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
               />
             </div>
           </div>
 
           {/* Modal Footer */}
-          <div className="flex gap-3 p-6 border-t border-[var(--border-color)]">
+          <div className="flex gap-3 p-7 border-t border-[var(--border-color)]">
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+              className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
             >
-              {isPending ? 'Saving...' : editingInvoice ? 'Update Invoice' : 'Create Invoice'}
+              {isPending ? 'Se salvează...' : editingInvoice ? 'Actualizează Factură' : 'Creează Factură'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)] transition-colors"
+              className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)] transition-colors"
             >
-              Cancel
+              Anulează
             </button>
           </div>
         </form>
@@ -483,20 +488,20 @@ export function InvoicesPage() {
         : api.post('/invoices', invoice),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success(editingInvoice ? 'Invoice updated' : 'Invoice created');
+      toast.success(editingInvoice ? 'Factură actualizată' : 'Factură creată');
       setShowForm(false);
       setEditingInvoice(null);
     },
-    onError: () => toast.error('Failed to save invoice'),
+    onError: () => toast.error('Nu s-a putut salva factura'),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/invoices/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success('Invoice deleted');
+      toast.success('Factură ștearsă');
     },
-    onError: () => toast.error('Failed to delete invoice'),
+    onError: () => toast.error('Nu s-a putut șterge factura'),
   });
 
   // ---- Handlers ----
@@ -512,7 +517,7 @@ export function InvoicesPage() {
   };
 
   const handleDelete = (invoice: Invoice) => {
-    if (confirm(`Delete invoice ${invoice.invoiceNumber}? This action cannot be undone.`)) {
+    if (confirm(`Ștergi factura ${invoice.invoiceNumber}? Această acțiune nu poate fi anulată.`)) {
       deleteMutation.mutate(invoice.id);
     }
   };
@@ -529,21 +534,21 @@ export function InvoicesPage() {
   // ---- Render ----
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-7 animate-fadeIn">
       {/* ====== Header ====== */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Invoices</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-            Manage and track your invoices
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Facturi</h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+            Gestionează și urmărește facturile
           </p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
-          <Plus className="w-4 h-4" />
-          New Invoice
+          <Plus className="w-5 h-5" />
+          Factură Nouă
         </button>
       </div>
 
@@ -554,34 +559,34 @@ export function InvoicesPage() {
         ) : (
           <>
             <StatCard
-              label="Total Invoices"
+              label="Total Facturi"
               value={total.toLocaleString()}
-              subtitle={`${invoices.length} shown`}
-              icon={<Receipt className="w-4.5 h-4.5 text-indigo-500" />}
+              subtitle={`${invoices.length} afișate`}
+              icon={<Receipt className="w-5.5 h-5.5 text-indigo-500" />}
               iconBg="bg-indigo-500/10"
               accentColor="indigo"
             />
             <StatCard
-              label="Total Revenue"
+              label="Venituri Totale"
               value={formatCurrency(stats.totalRevenue)}
-              subtitle="From paid invoices"
-              icon={<TrendingUp className="w-4.5 h-4.5 text-green-600" />}
+              subtitle="Din facturile plătite"
+              icon={<TrendingUp className="w-5.5 h-5.5 text-green-600" />}
               iconBg="bg-green-600/10"
               accentColor="green"
             />
             <StatCard
-              label="Paid"
+              label="Plătite"
               value={stats.paidCount.toLocaleString()}
-              subtitle={`${total > 0 ? Math.round((stats.paidCount / total) * 100) : 0}% of total`}
-              icon={<CheckCircle2 className="w-4.5 h-4.5 text-emerald-600" />}
+              subtitle={`${total > 0 ? Math.round((stats.paidCount / total) * 100) : 0}% din total`}
+              icon={<CheckCircle2 className="w-5.5 h-5.5 text-emerald-600" />}
               iconBg="bg-emerald-600/10"
               accentColor="emerald"
             />
             <StatCard
-              label="Overdue"
+              label="Restante"
               value={stats.overdueCount.toLocaleString()}
-              subtitle={stats.overdueCount > 0 ? 'Needs attention' : 'All clear'}
-              icon={<AlertTriangle className="w-4.5 h-4.5 text-red-600" />}
+              subtitle={stats.overdueCount > 0 ? 'Necesită atenție' : 'Totul în regulă'}
+              icon={<AlertTriangle className="w-5.5 h-5.5 text-red-600" />}
               iconBg="bg-red-600/10"
               accentColor="red"
             />
@@ -592,29 +597,29 @@ export function InvoicesPage() {
       {/* ====== Filters ====== */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
           <input
             type="text"
-            placeholder="Search by invoice number, contact..."
+            placeholder="Caută după număr factură, contact..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
           />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none pl-4 pr-10 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all cursor-pointer"
+            className="appearance-none pl-5 pr-11 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all cursor-pointer"
           >
-            <option value="">All Statuses</option>
+            <option value="">Toate Statusurile</option>
             {STATUSES.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.label}
               </option>
             ))}
           </select>
-          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
         </div>
       </div>
 
@@ -624,26 +629,26 @@ export function InvoicesPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--border-color)]">
-                <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Invoice
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                  Factură
                 </th>
-                <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                   Contact
                 </th>
-                <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Amount
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                  Sumă
                 </th>
-                <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                   Status
                 </th>
-                <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Issued
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                  Emisă
                 </th>
-                <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Due Date
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                  Scadență
                 </th>
-                <th className="text-right px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Actions
+                <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                  Acțiuni
                 </th>
               </tr>
             </thead>
@@ -652,28 +657,28 @@ export function InvoicesPage() {
                 Array.from({ length: 6 }).map((_, i) => <TableRowSkeleton key={i} />)
               ) : invoices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-16 text-center">
+                  <td colSpan={7} className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                        <FileText className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                      <div className="w-14 h-14 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                        <FileText className="w-7 h-7 text-[var(--text-tertiary)] opacity-50" />
                       </div>
                       <div>
-                        <p className="text-[13px] font-medium text-[var(--text-secondary)]">
-                          No invoices found
+                        <p className="text-[15px] font-medium text-[var(--text-secondary)]">
+                          Nicio factură găsită
                         </p>
-                        <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
+                        <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">
                           {search || statusFilter
-                            ? 'Try adjusting your filters'
-                            : 'Create your first invoice to get started'}
+                            ? 'Încearcă să ajustezi filtrele'
+                            : 'Creează prima factură pentru a începe'}
                         </p>
                       </div>
                       {!search && !statusFilter && (
                         <button
                           onClick={handleCreate}
-                          className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all"
+                          className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all"
                         >
-                          <Plus className="w-4 h-4" />
-                          Create Invoice
+                          <Plus className="w-5 h-5" />
+                          Creează Factură
                         </button>
                       )}
                     </div>
@@ -696,95 +701,95 @@ export function InvoicesPage() {
                       style={{ animationDelay: `${index * 30}ms` }}
                     >
                       {/* Invoice Number */}
-                      <td className="px-6 py-3.5">
+                      <td className="px-6 py-4.5">
                         <div className="flex items-center gap-3">
                           <div className={cn(
-                            'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
+                            'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
                             isOverdue ? 'bg-red-500/10' : 'bg-indigo-500/10 group-hover:bg-indigo-500/15'
                           )}>
-                            <FileText className={cn('w-4 h-4', isOverdue ? 'text-red-500' : 'text-indigo-500')} />
+                            <FileText className={cn('w-5 h-5', isOverdue ? 'text-red-500' : 'text-indigo-500')} />
                           </div>
-                          <span className="text-[13px] font-semibold text-[var(--text-primary)]">
+                          <span className="text-[15px] font-semibold text-[var(--text-primary)]">
                             {invoice.invoiceNumber}
                           </span>
                         </div>
                       </td>
 
                       {/* Contact */}
-                      <td className="px-6 py-3.5">
-                        <span className="text-[13px] text-[var(--text-secondary)]">
+                      <td className="px-6 py-4.5">
+                        <span className="text-[15px] text-[var(--text-secondary)]">
                           {invoice.contactName || '--'}
                         </span>
                       </td>
 
                       {/* Amount */}
-                      <td className="px-6 py-3.5">
-                        <span className="text-[13px] font-semibold text-[var(--text-primary)]">
+                      <td className="px-6 py-4.5">
+                        <span className="text-[15px] font-semibold text-[var(--text-primary)]">
                           {formatCurrency(invoice.amount)}
                         </span>
                       </td>
 
                       {/* Status Badge */}
-                      <td className="px-6 py-3.5">
+                      <td className="px-6 py-4.5">
                         <span
                           className={cn(
-                            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
+                            'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold',
                             getStatusColor(invoice.status),
                           )}
                         >
                           {STATUS_ICONS[invoice.status]}
-                          {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                          {formatStatusLabel(invoice.status)}
                         </span>
                       </td>
 
                       {/* Issued Date */}
-                      <td className="px-6 py-3.5">
-                        <span className="text-[12px] text-[var(--text-secondary)]">
+                      <td className="px-6 py-4.5">
+                        <span className="text-[14px] text-[var(--text-secondary)]">
                           {invoice.issuedDate ? formatDate(invoice.issuedDate) : '--'}
                         </span>
                       </td>
 
                       {/* Due Date */}
-                      <td className="px-6 py-3.5">
+                      <td className="px-6 py-4.5">
                         <span
                           className={cn(
-                            'text-[12px] inline-flex items-center gap-1.5',
+                            'text-[14px] inline-flex items-center gap-1.5',
                             isOverdue
                               ? 'text-red-500 font-medium'
                               : 'text-[var(--text-secondary)]',
                           )}
                         >
                           {isOverdue && (
-                            <span className="relative flex h-2 w-2">
+                            <span className="relative flex h-2.5 w-2.5">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
                             </span>
                           )}
                           {invoice.dueDate ? formatDate(invoice.dueDate) : '--'}
                           {isOverdue && (
-                            <span className="text-[10px] font-semibold uppercase text-red-500">
-                              overdue
+                            <span className="text-[12px] font-semibold uppercase text-red-500">
+                              restantă
                             </span>
                           )}
                         </span>
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-3.5 text-right">
+                      <td className="px-6 py-4.5 text-right">
                         <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                           <button
                             onClick={() => handleEdit(invoice)}
-                            className="p-2 rounded-xl hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-indigo-500 transition-colors"
-                            title="Edit invoice"
+                            className="p-2.5 rounded-xl hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-indigo-500 transition-colors"
+                            title="Editează factura"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() => handleDelete(invoice)}
-                            className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
-                            title="Delete invoice"
+                            className="p-2.5 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
+                            title="Șterge factura"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
                       </td>
@@ -798,12 +803,12 @@ export function InvoicesPage() {
 
         {/* Table Footer */}
         {!isLoading && invoices.length > 0 && (
-          <div className="flex items-center justify-between px-6 py-3 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
-            <p className="text-[11px] text-[var(--text-tertiary)]">
-              Showing {invoices.length} of {total} invoice{total !== 1 ? 's' : ''}
+          <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+            <p className="text-[13px] text-[var(--text-tertiary)]">
+              Se afișează {invoices.length} din {total} factur{total !== 1 ? 'i' : 'ă'}
             </p>
-            <p className="text-[11px] text-[var(--text-tertiary)]">
-              Total value:{' '}
+            <p className="text-[13px] text-[var(--text-tertiary)]">
+              Valoare totală:{' '}
               <span className="font-semibold text-[var(--text-secondary)]">
                 {formatCurrency(
                   invoices.reduce(

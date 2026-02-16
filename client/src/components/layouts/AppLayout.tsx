@@ -47,7 +47,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
         className={cn(
           'layout-mesh-bg flex flex-1 flex-col min-w-0',
           'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-          sidebarCollapsed ? 'ml-[72px]' : 'ml-[260px]'
+          sidebarCollapsed ? 'ml-[78px]' : 'ml-[280px]'
         )}
       >
         {/* Top Navbar */}

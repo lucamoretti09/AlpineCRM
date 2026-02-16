@@ -53,14 +53,23 @@ interface EmailTemplate {
 // Helpers
 // ---------------------------------------------------------------------------
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  sent: 'trimis',
+  delivered: 'livrat',
+  opened: 'deschis',
+  clicked: 'accesat',
+  bounced: 'respins',
+  failed: 'eșuat',
+};
+
 const EMAIL_STATUSES = [
-  { value: '', label: 'All Status' },
-  { value: 'sent', label: 'Sent' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'opened', label: 'Opened' },
-  { value: 'clicked', label: 'Clicked' },
-  { value: 'bounced', label: 'Bounced' },
-  { value: 'failed', label: 'Failed' },
+  { value: '', label: 'Toate Statusurile' },
+  { value: 'sent', label: 'Trimis' },
+  { value: 'delivered', label: 'Livrat' },
+  { value: 'opened', label: 'Deschis' },
+  { value: 'clicked', label: 'Accesat' },
+  { value: 'bounced', label: 'Respins' },
+  { value: 'failed', label: 'Eșuat' },
 ] as const;
 
 function getEmailStatusColor(status: string): string {
@@ -78,20 +87,24 @@ function getEmailStatusColor(status: string): string {
 function getEmailStatusIcon(status: string) {
   switch (status) {
     case 'sent':
-      return <Send className="w-3.5 h-3.5" />;
+      return <Send className="w-4 h-4" />;
     case 'delivered':
-      return <CheckCircle2 className="w-3.5 h-3.5" />;
+      return <CheckCircle2 className="w-4 h-4" />;
     case 'opened':
-      return <Eye className="w-3.5 h-3.5" />;
+      return <Eye className="w-4 h-4" />;
     case 'clicked':
-      return <MousePointerClick className="w-3.5 h-3.5" />;
+      return <MousePointerClick className="w-4 h-4" />;
     case 'bounced':
-      return <AlertTriangle className="w-3.5 h-3.5" />;
+      return <AlertTriangle className="w-4 h-4" />;
     case 'failed':
-      return <X className="w-3.5 h-3.5" />;
+      return <X className="w-4 h-4" />;
     default:
-      return <Clock className="w-3.5 h-3.5" />;
+      return <Clock className="w-4 h-4" />;
   }
+}
+
+function getStatusLabel(status: string): string {
+  return STATUS_LABEL_MAP[status] || status;
 }
 
 // ---------------------------------------------------------------------------
@@ -100,13 +113,13 @@ function getEmailStatusIcon(status: string) {
 
 function StatCardSkeleton() {
   return (
-    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5">
+    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6">
       <div className="flex items-center justify-between mb-3">
-        <div className="skeleton h-4 w-20 rounded" />
-        <div className="skeleton h-8 w-8 rounded-xl" />
+        <div className="skeleton h-5 w-24 rounded" />
+        <div className="skeleton h-12 w-12 rounded-xl" />
       </div>
-      <div className="skeleton h-8 w-16 rounded mb-1" />
-      <div className="skeleton h-3 w-28 rounded" />
+      <div className="skeleton h-9 w-20 rounded mb-1" />
+      <div className="skeleton h-4 w-32 rounded" />
     </div>
   );
 }
@@ -114,23 +127,23 @@ function StatCardSkeleton() {
 function TableRowSkeleton() {
   return (
     <tr className="border-b border-[var(--border-color)]">
-      <td className="px-6 py-3.5">
-        <div className="skeleton h-5 w-40 rounded" />
+      <td className="px-6 py-4">
+        <div className="skeleton h-6 w-44 rounded" />
       </td>
-      <td className="px-6 py-3.5">
-        <div className="skeleton h-5 w-56 rounded" />
+      <td className="px-6 py-4">
+        <div className="skeleton h-6 w-60 rounded" />
       </td>
-      <td className="px-6 py-3.5">
-        <div className="skeleton h-6 w-20 rounded-lg" />
+      <td className="px-6 py-4">
+        <div className="skeleton h-7 w-24 rounded-lg" />
       </td>
-      <td className="px-6 py-3.5">
-        <div className="skeleton h-5 w-24 rounded" />
+      <td className="px-6 py-4">
+        <div className="skeleton h-6 w-28 rounded" />
       </td>
-      <td className="px-6 py-3.5">
-        <div className="skeleton h-5 w-16 rounded" />
+      <td className="px-6 py-4">
+        <div className="skeleton h-6 w-20 rounded" />
       </td>
-      <td className="px-6 py-3.5">
-        <div className="skeleton h-5 w-8 rounded" />
+      <td className="px-6 py-4">
+        <div className="skeleton h-6 w-10 rounded" />
       </td>
     </tr>
   );
@@ -156,7 +169,7 @@ function StatCard({
   accentColor?: string;
 }) {
   return (
-    <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 overflow-hidden group">
+    <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 overflow-hidden group">
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-500/[0.02] group-hover:to-indigo-500/[0.05] transition-all duration-500 rounded-2xl" />
       {/* Top accent line */}
@@ -170,14 +183,14 @@ function StatCard({
       )} />
       <div className="relative">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
-          <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center', iconBg)}>
+          <span className="text-[15px] font-medium text-[var(--text-secondary)]">{label}</span>
+          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', iconBg)}>
             {icon}
           </div>
         </div>
-        <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
+        <p className="text-3xl font-bold text-[var(--text-primary)]">{value}</p>
         {subtitle && (
-          <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
+          <p className="text-[13px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
         )}
       </div>
     </div>
@@ -233,19 +246,19 @@ function ComposeModal({
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
-              <Send className="w-4 h-4 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+              <Send className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-[var(--text-primary)]">Compose Email</h2>
-              <p className="text-[11px] text-[var(--text-tertiary)]">Create and send a new email</p>
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">Compune Email</h2>
+              <p className="text-[13px] text-[var(--text-tertiary)]">Creează și trimite un email nou</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
@@ -254,24 +267,24 @@ function ComposeModal({
           {/* Template Selector */}
           {templates.length > 0 && (
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                Template
+              <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                Șablon
               </label>
               <div className="relative">
-                <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
                 <select
                   value={selectedTemplateId}
                   onChange={(e) => handleTemplateChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 appearance-none transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 appearance-none transition-all"
                 >
-                  <option value="">No template (compose from scratch)</option>
+                  <option value="">Selectează un șablon...</option>
                   {templates.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.name}
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] pointer-events-none" />
               </div>
             </div>
           )}
@@ -279,59 +292,59 @@ function ComposeModal({
           {/* To & Contact ID */}
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                To *
+              <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                Către *
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
                 <input
                   name="to"
                   type="email"
                   required
-                  placeholder="recipient@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                  placeholder="destinatar@exemplu.com"
+                  className="w-full pl-10 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-                Contact ID
+              <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+                ID Contact
               </label>
               <input
                 name="contactId"
                 type="text"
-                placeholder="Optional"
-                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+                placeholder="Opțional"
+                className="w-full px-3.5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
               />
             </div>
           </div>
 
           {/* Subject */}
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-              Subject *
+            <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+              Subiect *
             </label>
             <input
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               required
-              placeholder="Email subject line"
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+              placeholder="Subiect email"
+              className="w-full px-3.5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
             />
           </div>
 
           {/* Body */}
           <div>
-            <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
-              Body *
+            <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+              Conținut *
             </label>
             <textarea
               value={body}
               onChange={(e) => setBody(e.target.value)}
               required
               rows={8}
-              placeholder="Write your email content here..."
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all resize-none leading-relaxed"
+              placeholder="Scrie conținutul email-ului aici..."
+              className="w-full px-3.5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all resize-none leading-relaxed"
             />
           </div>
 
@@ -340,26 +353,26 @@ function ComposeModal({
             <button
               type="submit"
               disabled={isSending}
-              className="flex items-center gap-2 flex-1 justify-center py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+              className="flex items-center gap-2 flex-1 justify-center py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
             >
               {isSending ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  Sending...
+                  <RefreshCw className="w-5 h-5 animate-spin" />
+                  Se trimite...
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
-                  Send Email
+                  <Send className="w-5 h-5" />
+                  Trimite Email
                 </>
               )}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)] transition-colors"
+              className="px-6 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)] transition-colors"
             >
-              Cancel
+              Anulează
             </button>
           </div>
         </form>
@@ -391,14 +404,14 @@ function EmailDetailView({
           onClick={onBack}
           className="group p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
+          <ArrowLeft className="w-6 h-6 transition-transform group-hover:-translate-x-0.5" />
         </button>
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-bold text-[var(--text-primary)] truncate">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] truncate">
             {email.subject}
           </h2>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-            To: {email.to}
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+            Către: {email.to}
             {email.contactName && (
               <span className="text-[var(--text-tertiary)]"> ({email.contactName})</span>
             )}
@@ -406,53 +419,53 @@ function EmailDetailView({
         </div>
         <button
           onClick={() => {
-            if (confirm('Are you sure you want to delete this email?')) {
+            if (confirm('Ești sigur că vrei să ștergi acest email?')) {
               onDelete(email.id);
             }
           }}
           disabled={isDeleting}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-800/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 text-[13px] font-medium"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 dark:border-red-800/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 text-[15px] font-medium"
         >
-          <Trash2 className="w-4 h-4" />
-          Delete
+          <Trash2 className="w-5 h-5" />
+          Șterge
         </button>
       </div>
 
       {/* Status & Tracking Banner */}
-      <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 overflow-hidden">
+      <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         <div className="flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-[13px] font-medium text-[var(--text-secondary)]">Status:</span>
+            <span className="text-[15px] font-medium text-[var(--text-secondary)]">Status:</span>
             <span
               className={cn(
-                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold',
                 getEmailStatusColor(email.status)
               )}
             >
               {getEmailStatusIcon(email.status)}
-              {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
+              {getStatusLabel(email.status).charAt(0).toUpperCase() + getStatusLabel(email.status).slice(1)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[13px] font-medium text-[var(--text-secondary)]">Sent:</span>
-            <span className="text-[13px] text-[var(--text-primary)]">
+            <span className="text-[15px] font-medium text-[var(--text-secondary)]">Trimis:</span>
+            <span className="text-[15px] text-[var(--text-primary)]">
               {formatDateTime(email.sentAt)}
             </span>
           </div>
           {email.openedAt && (
             <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-green-500" />
-              <span className="text-[13px] text-[var(--text-secondary)]">
-                Opened {formatDateTime(email.openedAt)}
+              <Eye className="w-5 h-5 text-green-500" />
+              <span className="text-[15px] text-[var(--text-secondary)]">
+                Deschis {formatDateTime(email.openedAt)}
               </span>
             </div>
           )}
           {email.clickedAt && (
             <div className="flex items-center gap-2">
-              <MousePointerClick className="w-4 h-4 text-purple-500" />
-              <span className="text-[13px] text-[var(--text-secondary)]">
-                Clicked {formatDateTime(email.clickedAt)}
+              <MousePointerClick className="w-5 h-5 text-purple-500" />
+              <span className="text-[15px] text-[var(--text-secondary)]">
+                Accesat {formatDateTime(email.clickedAt)}
               </span>
             </div>
           )}
@@ -463,10 +476,10 @@ function EmailDetailView({
       <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
-          <h3 className="text-[13px] font-semibold text-[var(--text-primary)]">Email Content</h3>
+          <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">Conținut Email</h3>
         </div>
         <div className="px-6 py-5">
-          <div className="text-[13px] text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap break-words">
+          <div className="text-[15px] text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap break-words">
             {email.body}
           </div>
         </div>
@@ -549,11 +562,11 @@ export function EmailsPage() {
     }) => api.post('/emails/send', payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['emails'] });
-      toast.success('Email sent successfully');
+      toast.success('Email trimis cu succes');
       setShowCompose(false);
     },
     onError: () => {
-      toast.error('Failed to send email');
+      toast.error('Trimiterea email-ului a eșuat');
     },
   });
 
@@ -563,11 +576,11 @@ export function EmailsPage() {
     mutationFn: (id: string) => api.delete(`/emails/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['emails'] });
-      toast.success('Email deleted');
+      toast.success('Email șters');
       setSelectedEmail(null);
     },
     onError: () => {
-      toast.error('Failed to delete email');
+      toast.error('Ștergerea email-ului a eșuat');
     },
   });
 
@@ -595,17 +608,17 @@ export function EmailsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Emails</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
-            {emailsData?.total ?? 0} total emails
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Email-uri</h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
+            {emailsData?.total ?? 0} email-uri în total
           </p>
         </div>
         <button
           onClick={() => setShowCompose(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
-          <Plus className="w-4 h-4" />
-          Compose
+          <Plus className="w-5 h-5" />
+          Compune
         </button>
       </div>
 
@@ -616,34 +629,34 @@ export function EmailsPage() {
         ) : (
           <>
             <StatCard
-              label="Total Sent"
+              label="Total Trimise"
               value={stats.total.toLocaleString()}
-              subtitle="Emails in this view"
-              icon={<Send className="w-4 h-4 text-blue-600" />}
+              subtitle="Email-uri în această vizualizare"
+              icon={<Send className="w-5 h-5 text-blue-600" />}
               iconBg="bg-blue-100 dark:bg-blue-900/30"
               accentColor="blue"
             />
             <StatCard
-              label="Open Rate"
+              label="Rată Deschidere"
               value={`${stats.openedRate}%`}
-              subtitle="Opened or clicked"
-              icon={<Eye className="w-4 h-4 text-green-600" />}
+              subtitle="Deschise sau click-uite"
+              icon={<Eye className="w-5 h-5 text-green-600" />}
               iconBg="bg-green-100 dark:bg-green-900/30"
               accentColor="green"
             />
             <StatCard
-              label="Click Rate"
+              label="Rată Click"
               value={`${stats.clickRate}%`}
-              subtitle="Links clicked"
-              icon={<MousePointerClick className="w-4 h-4 text-purple-600" />}
+              subtitle="Link-uri accesate"
+              icon={<MousePointerClick className="w-5 h-5 text-purple-600" />}
               iconBg="bg-purple-100 dark:bg-purple-900/30"
               accentColor="purple"
             />
             <StatCard
-              label="Bounce Rate"
+              label="Rată Respingere"
               value={`${stats.bounceRate}%`}
-              subtitle="Bounced or failed"
-              icon={<AlertTriangle className="w-4 h-4 text-orange-600" />}
+              subtitle="Respinse sau eșuate"
+              icon={<AlertTriangle className="w-5 h-5 text-orange-600" />}
               iconBg="bg-orange-100 dark:bg-orange-900/30"
               accentColor="orange"
             />
@@ -654,20 +667,20 @@ export function EmailsPage() {
       {/* Filters */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
           <input
             type="text"
-            placeholder="Search by subject or recipient..."
+            placeholder="Caută după subiect sau destinatar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
           />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 pr-10 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 appearance-none transition-all"
+            className="px-5 py-3 pr-10 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 appearance-none transition-all"
           >
             {EMAIL_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>
@@ -675,7 +688,7 @@ export function EmailsPage() {
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] pointer-events-none" />
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] pointer-events-none" />
         </div>
       </div>
 
@@ -684,23 +697,23 @@ export function EmailsPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                Recipient
+              <th className="text-left px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                Destinatar
               </th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                Subject
+              <th className="text-left px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                Subiect
               </th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+              <th className="text-left px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Status
               </th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                Sent
+              <th className="text-left px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                Trimis
               </th>
-              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                Tracking
+              <th className="text-left px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                Urmărire
               </th>
-              <th className="text-right px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                Actions
+              <th className="text-right px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                Acțiuni
               </th>
             </tr>
           </thead>
@@ -711,24 +724,24 @@ export function EmailsPage() {
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                      <Inbox className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                      <Inbox className="w-7 h-7 text-[var(--text-tertiary)] opacity-50" />
                     </div>
                     <div>
-                      <p className="text-[13px] text-[var(--text-secondary)] font-medium">No emails found</p>
-                      <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
+                      <p className="text-[15px] text-[var(--text-secondary)] font-medium">Niciun email găsit</p>
+                      <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">
                         {search || statusFilter
-                          ? 'Try adjusting your search or filters'
-                          : 'Send your first email to get started'}
+                          ? 'Încearcă să ajustezi căutarea'
+                          : 'Trimite primul email'}
                       </p>
                     </div>
                     {!search && !statusFilter && (
                       <button
                         onClick={() => setShowCompose(true)}
-                        className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all"
+                        className="mt-2 flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all"
                       >
-                        <Plus className="w-4 h-4" />
-                        Compose Email
+                        <Plus className="w-5 h-5" />
+                        Compune Email
                       </button>
                     )}
                   </div>
@@ -743,17 +756,17 @@ export function EmailsPage() {
                   onClick={() => setSelectedEmail(email)}
                 >
                   {/* Recipient */}
-                  <td className="px-6 py-3.5">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-500/15 transition-colors">
-                        <Mail className="w-4 h-4 text-indigo-500" />
+                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-500/15 transition-colors">
+                        <Mail className="w-5 h-5 text-indigo-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[13px] font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <p className="text-[15px] font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {email.to}
                         </p>
                         {email.contactName && (
-                          <p className="text-[11px] text-[var(--text-tertiary)] truncate">
+                          <p className="text-[13px] text-[var(--text-tertiary)] truncate">
                             {email.contactName}
                           </p>
                         )}
@@ -762,51 +775,51 @@ export function EmailsPage() {
                   </td>
 
                   {/* Subject */}
-                  <td className="px-6 py-3.5">
-                    <p className="text-[13px] text-[var(--text-primary)] truncate max-w-xs">
+                  <td className="px-6 py-4">
+                    <p className="text-[15px] text-[var(--text-primary)] truncate max-w-xs">
                       {email.subject}
                     </p>
                   </td>
 
                   {/* Status */}
-                  <td className="px-6 py-3.5">
+                  <td className="px-6 py-4">
                     <span
                       className={cn(
-                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
+                        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-semibold',
                         getEmailStatusColor(email.status)
                       )}
                     >
                       {getEmailStatusIcon(email.status)}
-                      {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
+                      {getStatusLabel(email.status).charAt(0).toUpperCase() + getStatusLabel(email.status).slice(1)}
                     </span>
                   </td>
 
                   {/* Sent Date */}
-                  <td className="px-6 py-3.5 text-[12px] text-[var(--text-secondary)]">
+                  <td className="px-6 py-4 text-[14px] text-[var(--text-secondary)]">
                     {formatDate(email.sentAt)}
                   </td>
 
                   {/* Tracking */}
-                  <td className="px-6 py-3.5">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       {email.openedAt ? (
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400">
-                          <Eye className="w-3.5 h-3.5" />
-                          Opened
+                        <span className="flex items-center gap-1 text-[13px] font-medium text-green-600 dark:text-green-400">
+                          <Eye className="w-4 h-4" />
+                          Deschis
                         </span>
                       ) : (
-                        <span className="text-[11px] text-[var(--text-tertiary)]">Not opened</span>
+                        <span className="text-[13px] text-[var(--text-tertiary)]">Nedeschis</span>
                       )}
                       {email.clickedAt && (
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400">
-                          <MousePointerClick className="w-3.5 h-3.5" />
+                        <span className="flex items-center gap-1 text-[13px] font-medium text-purple-600 dark:text-purple-400">
+                          <MousePointerClick className="w-4 h-4" />
                         </span>
                       )}
                     </div>
                   </td>
 
                   {/* Actions */}
-                  <td className="px-6 py-3.5 text-right">
+                  <td className="px-6 py-4 text-right">
                     <div
                       className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200"
                       onClick={(e) => e.stopPropagation()}
@@ -814,20 +827,20 @@ export function EmailsPage() {
                       <button
                         onClick={() => setSelectedEmail(email)}
                         className="p-2 rounded-xl hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-indigo-500 transition-colors"
-                        title="View email"
+                        title="Vizualizează email"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm('Are you sure you want to delete this email?')) {
+                          if (confirm('Ești sigur că vrei să ștergi acest email?')) {
                             deleteMutation.mutate(email.id);
                           }
                         }}
                         className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
-                        title="Delete email"
+                        title="Șterge email"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
                   </td>
@@ -840,19 +853,19 @@ export function EmailsPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)]">
-            <p className="text-[12px] text-[var(--text-tertiary)]">
-              Showing {((page - 1) * limit) + 1}
+            <p className="text-[14px] text-[var(--text-tertiary)]">
+              Se afișează {((page - 1) * limit) + 1}
               {' '}-{' '}
-              {Math.min(page * limit, emailsData?.total ?? 0)} of{' '}
-              {emailsData?.total ?? 0} emails
+              {Math.min(page * limit, emailsData?.total ?? 0)} din{' '}
+              {emailsData?.total ?? 0} email-uri
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-[12px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 text-[14px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                Previous
+                Anterior
               </button>
               {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
                 let pageNum: number;
@@ -870,7 +883,7 @@ export function EmailsPage() {
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
                     className={cn(
-                      'w-8 h-8 text-[12px] font-medium rounded-xl transition-colors',
+                      'w-9 h-9 text-[14px] font-medium rounded-xl transition-colors',
                       page === pageNum
                         ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
                         : 'bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
@@ -883,9 +896,9 @@ export function EmailsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-[12px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 text-[14px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
-                Next
+                Următor
               </button>
             </div>
           </div>
