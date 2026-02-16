@@ -10,15 +10,24 @@ build/
 .env.local
 .env.*.local
 
-# IDE
-.vscode/settings.json
+# IDE & Editors
+.vscode/
 .idea/
 *.swp
 *.swo
+*.sublime-project
+*.sublime-workspace
+
+# AI Tools
+.claude/
+.cursor/
+.aider*
+.copilot/
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 *.log
@@ -37,4 +46,11 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Deployment
 .vercel
+.netlify
+
+# Lock files (keep only root)
+server/package-lock.json
+client/package-lock.json

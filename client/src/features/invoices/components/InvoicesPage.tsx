@@ -453,7 +453,7 @@ export function InvoicesPage() {
 
   // ---- Data fetching ----
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['invoices', search, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -463,6 +463,7 @@ export function InvoicesPage() {
       const { data } = await api.get(`/invoices?${params}`);
       return data.data;
     },
+    retry: 2,
   });
 
   const invoices: Invoice[] = data?.invoices ?? [];

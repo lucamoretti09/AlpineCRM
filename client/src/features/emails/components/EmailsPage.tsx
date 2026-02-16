@@ -508,7 +508,7 @@ export function EmailsPage() {
 
   // ---- Fetch emails -------------------------------------------------------
 
-  const { data: emailsData, isLoading } = useQuery({
+  const { data: emailsData, isLoading, isError } = useQuery({
     queryKey: ['emails', search, statusFilter, page],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -519,16 +519,18 @@ export function EmailsPage() {
       const { data } = await api.get(`/emails?${params}`);
       return data.data as { emails: Email[]; total: number };
     },
+    retry: 2,
   });
 
   // ---- Fetch templates ----------------------------------------------------
 
-  const { data: templatesData } = useQuery({
+  const { data: templatesData, isError: isTemplatesError } = useQuery({
     queryKey: ['email-templates'],
     queryFn: async () => {
       const { data } = await api.get('/emails/templates');
       return data.data as EmailTemplate[];
     },
+    retry: 2,
   });
 
   const templates: EmailTemplate[] = templatesData ?? [];
@@ -566,7 +568,7 @@ export function EmailsPage() {
       setShowCompose(false);
     },
     onError: () => {
-      toast.error('Trimiterea email-ului a eșuat');
+      toast.error('Nu s-a putut trimite email-ul');
     },
   });
 
@@ -580,7 +582,7 @@ export function EmailsPage() {
       setSelectedEmail(null);
     },
     onError: () => {
-      toast.error('Ștergerea email-ului a eșuat');
+      toast.error('Nu s-a putut șterge email-ul');
     },
   });
 

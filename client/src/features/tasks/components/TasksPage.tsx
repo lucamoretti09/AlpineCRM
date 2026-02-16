@@ -37,7 +37,7 @@ export function TasksPage() {
   const [completingId, setCompletingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['tasks', search, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -47,6 +47,7 @@ export function TasksPage() {
       const { data } = await api.get(`/tasks?${params}`);
       return data.data;
     },
+    retry: 2,
   });
 
   const completeMutation = useMutation({
@@ -56,6 +57,7 @@ export function TasksPage() {
       toast.success('Sarcin\u0103 finalizat\u0103!');
       setTimeout(() => setCompletingId(null), 600);
     },
+    onError: () => toast.error('Nu s-a putut finaliza sarcina'),
   });
 
   const deleteMutation = useMutation({
@@ -64,6 +66,7 @@ export function TasksPage() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Sarcin\u0103 \u0219tears\u0103');
     },
+    onError: () => toast.error('Nu s-a putut șterge sarcina'),
   });
 
   const createMutation = useMutation({
@@ -73,6 +76,7 @@ export function TasksPage() {
       toast.success(editingTask ? 'Sarcin\u0103 actualizat\u0103' : 'Sarcin\u0103 creat\u0103');
       setShowForm(false); setEditingTask(null);
     },
+    onError: () => toast.error('Nu s-a putut salva sarcina'),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

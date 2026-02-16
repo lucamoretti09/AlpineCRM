@@ -58,7 +58,7 @@ export function ContactsPage() {
   const [editingContact, setEditingContact] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['contacts', search, statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -68,14 +68,16 @@ export function ContactsPage() {
       const { data } = await api.get(`/contacts?${params}`);
       return data.data;
     },
+    retry: 2,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/contacts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
-      toast.success('Contact \u0219ters');
+      toast.success('Contact șters');
     },
+    onError: () => toast.error('Nu s-a putut șterge contactul'),
   });
 
   const createMutation = useMutation({
@@ -88,7 +90,7 @@ export function ContactsPage() {
       setShowForm(false);
       setEditingContact(null);
     },
-    onError: () => toast.error('Salvarea contactului a e\u0219uat'),
+    onError: () => toast.error('Nu s-a putut salva contactul'),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {

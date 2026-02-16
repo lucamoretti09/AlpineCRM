@@ -148,7 +148,7 @@ export function TicketsPage() {
   const queryClient = useQueryClient();
 
   // ── Fetch tickets list ──────────────────────────────────────────────
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['tickets', search, statusFilter, priorityFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -159,16 +159,18 @@ export function TicketsPage() {
       const { data } = await api.get(`/tickets?${params}`);
       return data.data;
     },
+    retry: 2,
   });
 
   // ── Fetch single ticket detail (with comments) ─────────────────────
-  const { data: ticketDetail, isLoading: isDetailLoading } = useQuery({
+  const { data: ticketDetail, isLoading: isDetailLoading, isError: isDetailError } = useQuery({
     queryKey: ['tickets', selectedTicket?.id],
     queryFn: async () => {
       const { data } = await api.get(`/tickets/${selectedTicket!.id}`);
       return data.data as TicketData;
     },
     enabled: !!selectedTicket?.id,
+    retry: 2,
   });
 
   // ── Create / Update ticket ─────────────────────────────────────────

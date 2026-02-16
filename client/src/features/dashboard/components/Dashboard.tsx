@@ -229,7 +229,7 @@ export default function Dashboard() {
   const {
     data: stats,
     isLoading: statsLoading,
-    isError: _statsError,
+    isError: statsError,
   } = useQuery<DashboardStats>({
     queryKey: ['dashboard', 'stats'],
     queryFn: async () => {
@@ -237,11 +237,13 @@ export default function Dashboard() {
       return data.data;
     },
     refetchInterval: 60_000,
+    retry: 2,
   });
 
   const {
     data: pipeline,
     isLoading: pipelineLoading,
+    isError: pipelineError,
   } = useQuery<PipelineStage[]>({
     queryKey: ['dashboard', 'pipeline'],
     queryFn: async () => {
@@ -249,11 +251,13 @@ export default function Dashboard() {
       return data.data;
     },
     refetchInterval: 60_000,
+    retry: 2,
   });
 
   const {
     data: upcomingTasks,
     isLoading: tasksLoading,
+    isError: tasksError,
   } = useQuery<UpcomingTask[]>({
     queryKey: ['dashboard', 'upcoming-tasks'],
     queryFn: async () => {
@@ -261,10 +265,31 @@ export default function Dashboard() {
       return data.data;
     },
     refetchInterval: 60_000,
+    retry: 2,
   });
 
   if (statsLoading && pipelineLoading && tasksLoading) {
     return <DashboardSkeleton />;
+  }
+
+  if (statsError && pipelineError && tasksError) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-500/10">
+            <AlertTriangle className="h-8 w-8 text-rose-500" />
+          </div>
+          <h3 className="text-xl font-bold text-[var(--text-primary)]">Nu s-au putut încărca datele</h3>
+          <p className="text-[15px] text-[var(--text-tertiary)] max-w-md">A apărut o eroare la încărcarea panoului principal. Verificați conexiunea și reîncercați.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-2 rounded-xl bg-primary-500 px-6 py-3 text-[15px] font-semibold text-white hover:bg-primary-600 transition-colors"
+          >
+            Reîncarcă
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const firstName = user?.firstName || 'there';

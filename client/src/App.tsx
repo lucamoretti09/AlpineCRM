@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useThemeStore } from '@/stores/themeStore';
 import AppLayout from '@/components/layouts/AppLayout';
-import Dashboard from '@/features/dashboard/components/Dashboard';
-import { ContactsPage } from '@/features/contacts/components/ContactsPage';
-import { DealsPage } from '@/features/deals/components/DealsPage';
-import { TasksPage } from '@/features/tasks/components/TasksPage';
-import { TicketsPage } from '@/features/tickets/components/TicketsPage';
-import { CalendarPage } from '@/features/calendar/components/CalendarPage';
-import { InvoicesPage } from '@/features/invoices/components/InvoicesPage';
-import { EmailsPage } from '@/features/emails/components/EmailsPage';
-import { SettingsPage } from '@/features/settings/components/SettingsPage';
-import CommandPalette from '@/components/common/CommandPalette';
 import { useRealtime } from '@/hooks/useRealtime';
+
+// Lazy-load all feature pages for code-splitting
+const Dashboard = lazy(() => import('@/features/dashboard/components/Dashboard'));
+const ContactsPage = lazy(() => import('@/features/contacts/components/ContactsPage').then(m => ({ default: m.ContactsPage })));
+const DealsPage = lazy(() => import('@/features/deals/components/DealsPage').then(m => ({ default: m.DealsPage })));
+const TasksPage = lazy(() => import('@/features/tasks/components/TasksPage').then(m => ({ default: m.TasksPage })));
+const TicketsPage = lazy(() => import('@/features/tickets/components/TicketsPage').then(m => ({ default: m.TicketsPage })));
+const CalendarPage = lazy(() => import('@/features/calendar/components/CalendarPage').then(m => ({ default: m.CalendarPage })));
+const InvoicesPage = lazy(() => import('@/features/invoices/components/InvoicesPage').then(m => ({ default: m.InvoicesPage })));
+const EmailsPage = lazy(() => import('@/features/emails/components/EmailsPage').then(m => ({ default: m.EmailsPage })));
+const SettingsPage = lazy(() => import('@/features/settings/components/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const CommandPalette = lazy(() => import('@/components/common/CommandPalette'));
 
 function Router() {
   const [path, setPath] = useState(window.location.pathname);
@@ -89,9 +91,22 @@ function Router() {
   return (
     <>
       <AppLayout title={pageTitles[path] || 'Panou Principal'}>
-        {getPage()}
+        <Suspense
+          fallback={
+            <div className="flex h-[60vh] items-center justify-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-500/20 border-t-primary-500" />
+                <p className="text-[15px] font-medium text-[var(--text-tertiary)] animate-pulse">Se încarcă...</p>
+              </div>
+            </div>
+          }
+        >
+          {getPage()}
+        </Suspense>
       </AppLayout>
-      <CommandPalette />
+      <Suspense fallback={null}>
+        <CommandPalette />
+      </Suspense>
     </>
   );
 }

@@ -115,7 +115,7 @@ export function CalendarPage() {
 
   // ── Queries ────────────────────────────────────────────────────────────────
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['appointments', format(currentMonth, 'yyyy-MM')],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -125,6 +125,7 @@ export function CalendarPage() {
       const { data } = await api.get(`/appointments?${params}`);
       return data.data;
     },
+    retry: 2,
   });
 
   const appointments: Appointment[] = data?.appointments || [];
@@ -143,7 +144,7 @@ export function CalendarPage() {
       setEditingAppointment(null);
     },
     onError: () => {
-      toast.error(editingAppointment ? 'Nu s-a putut actualiza programarea' : 'Nu s-a putut crea programarea');
+      toast.error(editingAppointment ? 'Nu s-a putut actualiza programarea' : 'Nu s-a putut salva programarea');
     },
   });
 

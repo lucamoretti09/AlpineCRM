@@ -29,22 +29,24 @@ export function DealsPage() {
   const [editingDeal, setEditingDeal] = useState<any>(null);
   const queryClient = useQueryClient();
 
-  const { data: kanbanData, isLoading } = useQuery({
+  const { data: kanbanData, isLoading, isError } = useQuery({
     queryKey: ['deals-kanban'],
     queryFn: async () => {
       const { data } = await api.get('/deals/kanban');
       return data.data;
     },
     enabled: view === 'kanban',
+    retry: 2,
   });
 
-  const { data: listData } = useQuery({
+  const { data: listData, isError: isListError } = useQuery({
     queryKey: ['deals-list'],
     queryFn: async () => {
       const { data } = await api.get('/deals?limit=100');
       return data.data;
     },
     enabled: view === 'list',
+    retry: 2,
   });
 
   const stageMutation = useMutation({
@@ -54,6 +56,7 @@ export function DealsPage() {
       queryClient.invalidateQueries({ queryKey: ['deals-kanban'] });
       toast.success('Tranzac\u021Bie mutat\u0103');
     },
+    onError: () => toast.error('Eroare la mutarea tranzac\u021Biei'),
   });
 
   const createMutation = useMutation({
@@ -68,6 +71,7 @@ export function DealsPage() {
       setShowForm(false);
       setEditingDeal(null);
     },
+    onError: () => toast.error('Eroare la salvarea tranzac\u021Biei'),
   });
 
   const deleteMutation = useMutation({
@@ -78,6 +82,7 @@ export function DealsPage() {
       queryClient.invalidateQueries({ queryKey: ['deals-list'] });
       toast.success('Tranzac\u021Bie \u0219tears\u0103');
     },
+    onError: () => toast.error('Eroare la \u0219tergerea tranzac\u021Biei'),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
