@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mountain, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mountain, Mail, Lock, Eye, EyeOff, Loader2, ArrowRight, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [focused, setFocused] = useState<string | null>(null);
   const login = useAuthStore((state) => state.login);
   const isLoading = useAuthStore((state) => state.isLoading);
 
@@ -52,184 +53,224 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 px-4 py-12">
-      {/* Background decorative elements */}
+    <div className="aurora-bg min-h-screen flex items-center justify-center px-4 py-12">
+      {/* Floating grid dots */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl" />
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.08) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }} />
+        {/* Extra aurora blobs */}
+        <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-indigo-600/[0.07] rounded-full blur-[120px] animate-aurora" />
+        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-violet-600/[0.06] rounded-full blur-[100px] animate-aurora" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-2/3 left-1/4 w-[300px] h-[300px] bg-cyan-500/[0.05] rounded-full blur-[80px] animate-aurora" style={{ animationDelay: '2s' }} />
       </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Glassmorphism card */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/20 p-8">
-          {/* Branding */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-xl shadow-lg shadow-indigo-500/25 mb-4">
-              <Mountain className="w-7 h-7 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
-              Alpine CRM
-            </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Sign in to your account
-            </p>
-          </div>
+      <div className="relative w-full max-w-[440px] animate-fadeInUp">
+        {/* Top glow accent */}
+        <div className="absolute -top-px left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email field */}
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
-                Email address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Mail className="w-4.5 h-4.5 text-slate-500" />
+        {/* Card */}
+        <div className="relative bg-white/[0.04] backdrop-blur-2xl border border-white/[0.08] rounded-3xl shadow-2xl shadow-black/30 overflow-hidden">
+          {/* Top gradient line */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60" />
+
+          <div className="p-10">
+            {/* Branding */}
+            <div className="flex flex-col items-center mb-10">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-indigo-500/30 rounded-2xl blur-xl group-hover:bg-indigo-500/40 transition-all duration-500" />
+                <div className="relative flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 rounded-2xl shadow-lg shadow-indigo-500/30 animate-pulse-glow">
+                  <Mountain className="w-8 h-8 text-white drop-shadow-lg" />
                 </div>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  className={cn(
-                    'w-full pl-11 pr-4 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                    'transition-all duration-200',
-                    errors.email
-                      ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                      : 'border-white/10 hover:border-white/20'
-                  )}
-                  {...register('email')}
-                />
               </div>
-              {errors.email && (
-                <p className="mt-1.5 text-xs text-red-400">
-                  {errors.email.message}
-                </p>
-              )}
+              <h1 className="mt-5 text-[28px] font-bold text-white tracking-tight">
+                Alpine<span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">CRM</span>
+              </h1>
+              <p className="text-white/40 text-sm mt-1.5 font-medium tracking-wide">
+                Sign in to your workspace
+              </p>
             </div>
 
-            {/* Password field */}
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock className="w-4.5 h-4.5 text-slate-500" />
-                </div>
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
-                  className={cn(
-                    'w-full pl-11 pr-11 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                    'transition-all duration-200',
-                    errors.password
-                      ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                      : 'border-white/10 hover:border-white/20'
-                  )}
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              {/* Email field */}
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="email"
+                  className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-4.5 h-4.5" />
-                  ) : (
-                    <Eye className="w-4.5 h-4.5" />
-                  )}
-                </button>
+                  Email
+                </label>
+                <div className="relative group">
+                  <div className={cn(
+                    'absolute -inset-px rounded-xl transition-opacity duration-300',
+                    'bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50',
+                    focused === 'email' ? 'opacity-100' : 'opacity-0'
+                  )} />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                      <Mail className={cn(
+                        'w-[18px] h-[18px] transition-colors duration-200',
+                        focused === 'email' ? 'text-indigo-400' : 'text-white/25'
+                      )} />
+                    </div>
+                    <input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="you@company.com"
+                      {...register('email')}
+                      onFocus={() => setFocused('email')}
+                      onBlur={() => setFocused(null)}
+                      className={cn(
+                        'w-full pl-12 pr-4 py-3.5 bg-white/[0.04] border rounded-xl text-[15px] text-white placeholder-white/20',
+                        'focus:outline-none focus:bg-white/[0.06]',
+                        'transition-all duration-300',
+                        errors.email
+                          ? 'border-red-500/40'
+                          : 'border-white/[0.06] hover:border-white/[0.12]'
+                      )}
+                    />
+                  </div>
+                </div>
+                {errors.email && (
+                  <p className="text-xs text-red-400/90 font-medium pl-1 animate-fadeIn">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
-              {errors.password && (
-                <p className="mt-1.5 text-xs text-red-400">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
 
-            {/* Forgot password link */}
-            <div className="flex justify-end">
-              <a
-                href="/forgot-password"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = '/forgot-password';
-                }}
-                className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors"
+              {/* Password field */}
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="password"
+                  className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider"
+                >
+                  Password
+                </label>
+                <div className="relative group">
+                  <div className={cn(
+                    'absolute -inset-px rounded-xl transition-opacity duration-300',
+                    'bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50',
+                    focused === 'password' ? 'opacity-100' : 'opacity-0'
+                  )} />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                      <Lock className={cn(
+                        'w-[18px] h-[18px] transition-colors duration-200',
+                        focused === 'password' ? 'text-indigo-400' : 'text-white/25'
+                      )} />
+                    </div>
+                    <input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      placeholder="Enter your password"
+                      {...register('password')}
+                      onFocus={() => setFocused('password')}
+                      onBlur={() => setFocused(null)}
+                      className={cn(
+                        'w-full pl-12 pr-12 py-3.5 bg-white/[0.04] border rounded-xl text-[15px] text-white placeholder-white/20',
+                        'focus:outline-none focus:bg-white/[0.06]',
+                        'transition-all duration-300',
+                        errors.password
+                          ? 'border-red-500/40'
+                          : 'border-white/[0.06] hover:border-white/[0.12]'
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/25 hover:text-white/50 transition-colors z-10"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-[18px] h-[18px]" />
+                      ) : (
+                        <Eye className="w-[18px] h-[18px]" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-red-400/90 font-medium pl-1 animate-fadeIn">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Forgot password */}
+              <div className="flex justify-end">
+                <a
+                  href="/forgot-password"
+                  className="text-[13px] font-medium text-indigo-400/80 hover:text-indigo-300 transition-colors duration-200"
+                >
+                  Forgot password?
+                </a>
+              </div>
+
+              {/* Submit button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={cn(
+                  'group relative w-full py-3.5 px-4 rounded-xl text-[15px] font-semibold text-white overflow-hidden',
+                  'bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500',
+                  'shadow-lg shadow-indigo-500/25',
+                  'hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5',
+                  'focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:ring-offset-2 focus:ring-offset-transparent',
+                  'transition-all duration-300 ease-spring',
+                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg'
+                )}
               >
-                Forgot password?
-              </a>
+                {/* Shimmer effect on hover */}
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                {isLoading ? (
+                  <span className="relative flex items-center justify-center gap-2.5">
+                    <Loader2 className="w-[18px] h-[18px] animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  <span className="relative flex items-center justify-center gap-2">
+                    Sign in
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+                  </span>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/[0.06]" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-transparent px-4 text-[13px] text-white/25 font-medium backdrop-blur-sm">
+                  New to Alpine CRM?
+                </span>
+              </div>
             </div>
 
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={isLoading}
+            {/* Register link */}
+            <a
+              href="/register"
               className={cn(
-                'w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white',
-                'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400',
-                'shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40',
-                'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-slate-900',
-                'transition-all duration-200',
-                'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-indigo-500/25'
+                'group flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-[14px] font-semibold',
+                'text-white/60 bg-white/[0.03] border border-white/[0.06]',
+                'hover:bg-white/[0.06] hover:border-white/[0.1] hover:text-white/80',
+                'transition-all duration-300'
               )}
             >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Signing in...
-                </span>
-              ) : (
-                'Sign in'
-              )}
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-slate-900/80 px-3 text-slate-500">
-                New to Alpine CRM?
-              </span>
-            </div>
+              <Sparkles className="w-4 h-4 text-indigo-400/60 group-hover:text-indigo-400 transition-colors" />
+              Create an account
+            </a>
           </div>
-
-          {/* Register link */}
-          <a
-            href="/register"
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href = '/register';
-            }}
-            className={cn(
-              'flex items-center justify-center w-full py-2.5 px-4 rounded-xl text-sm font-medium',
-              'text-slate-300 bg-white/5 border border-white/10',
-              'hover:bg-white/10 hover:border-white/20 hover:text-white',
-              'transition-all duration-200'
-            )}
-          >
-            Create an account
-          </a>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-600 mt-6">
-          &copy; {new Date().getFullYear()} Alpine CRM. All rights reserved.
+        <p className="text-center text-[12px] text-white/15 mt-8 font-medium tracking-wide">
+          &copy; {new Date().getFullYear()} Alpine CRM &middot; Built for modern teams
         </p>
       </div>
     </div>

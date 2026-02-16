@@ -220,33 +220,33 @@ export function TicketsPage() {
         {/* Back navigation */}
         <button
           onClick={() => setSelectedTicket(null)}
-          className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+          className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
           <ChevronLeft className="w-4 h-4" />
           Back to tickets
         </button>
 
         {/* Ticket header card */}
-        <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-6">
+        <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 animate-fadeInUp">
           {isDetailLoading ? (
             <div className="space-y-4">
-              <div className="skeleton h-8 w-3/4 rounded-lg" />
-              <div className="skeleton h-4 w-1/3 rounded" />
-              <div className="skeleton h-20 w-full rounded-lg" />
+              <div className="skeleton h-8 w-3/4 rounded-xl" />
+              <div className="skeleton h-4 w-1/3 rounded-lg" />
+              <div className="skeleton h-20 w-full rounded-xl" />
             </div>
           ) : (
             <>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-mono text-[var(--text-tertiary)]">
+                    <span className="text-[12px] font-mono text-[var(--text-tertiary)]">
                       #{ticket.ticketNumber}
                     </span>
-                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium', getStatusColor(ticket.status))}>
+                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(ticket.status))}>
                       {getStatusIcon(ticket.status)}
                       {formatStatusLabel(ticket.status)}
                     </span>
-                    <span className={cn('px-2.5 py-1 rounded-full text-xs font-medium', getPriorityColor(ticket.priority))}>
+                    <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold', getPriorityColor(ticket.priority))}>
                       {ticket.priority}
                     </span>
                   </div>
@@ -258,7 +258,7 @@ export function TicketsPage() {
                       setEditingTicket(ticket);
                       setShowForm(true);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all"
                   >
                     <Edit className="w-4 h-4" />
                     Edit
@@ -269,7 +269,7 @@ export function TicketsPage() {
                         deleteMutation.mutate(ticket.id);
                       }
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-sm text-[var(--text-secondary)] hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-secondary)] hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete
@@ -278,7 +278,7 @@ export function TicketsPage() {
               </div>
 
               {/* Meta row */}
-              <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-[var(--text-secondary)]">
+              <div className="flex flex-wrap items-center gap-4 mt-4 text-[13px] text-[var(--text-secondary)]">
                 <div className="flex items-center gap-1.5">
                   <Tag className="w-3.5 h-3.5" />
                   <span>{getCategoryLabel(ticket.category)}</span>
@@ -298,8 +298,8 @@ export function TicketsPage() {
               {/* Description */}
               {ticket.description && (
                 <div className="mt-5 pt-5 border-t border-[var(--border-color)]">
-                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">Description</h3>
-                  <p className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+                  <h3 className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Description</h3>
+                  <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
                     {ticket.description}
                   </p>
                 </div>
@@ -307,7 +307,7 @@ export function TicketsPage() {
 
               {/* Inline status update */}
               <div className="mt-5 pt-5 border-t border-[var(--border-color)]">
-                <label className="text-sm font-semibold text-[var(--text-primary)] mr-3">Update Status:</label>
+                <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mr-3">Update Status:</label>
                 <div className="inline-flex gap-2 mt-2">
                   {STATUS_OPTIONS.map((s) => (
                     <button
@@ -319,10 +319,10 @@ export function TicketsPage() {
                         }
                       }}
                       className={cn(
-                        'px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
+                        'px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition-all',
                         ticket.status === s.value
-                          ? 'bg-primary-600 text-white border-primary-600'
-                          : 'bg-[var(--bg-secondary)] border-[var(--border-color)] text-[var(--text-secondary)] hover:border-primary-500 hover:text-[var(--text-primary)]'
+                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white border-indigo-600 shadow-md shadow-indigo-500/20'
+                          : 'bg-[var(--bg-secondary)]/60 border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500 hover:text-[var(--text-primary)]'
                       )}
                     >
                       {s.label}
@@ -335,14 +335,14 @@ export function TicketsPage() {
         </div>
 
         {/* Comments section */}
-        <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl">
+        <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl animate-fadeInUp" style={{ animationDelay: '60ms' }}>
           <div className="px-6 py-4 border-b border-[var(--border-color)]">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[var(--text-secondary)]" />
-              <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+              <h2 className="text-[15px] font-semibold text-[var(--text-primary)]">
                 Comments
               </h2>
-              <span className="text-sm text-[var(--text-tertiary)]">
+              <span className="text-[12px] text-[var(--text-tertiary)]">
                 ({comments.length})
               </span>
             </div>
@@ -355,49 +355,49 @@ export function TicketsPage() {
                 <div key={i} className="px-6 py-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="skeleton w-8 h-8 rounded-full" />
-                    <div className="skeleton h-4 w-32 rounded" />
+                    <div className="skeleton h-4 w-32 rounded-lg" />
                   </div>
-                  <div className="skeleton h-12 w-full rounded-lg ml-11" />
+                  <div className="skeleton h-12 w-full rounded-xl ml-11" />
                 </div>
               ))
             ) : comments.length === 0 ? (
               <div className="px-6 py-12 text-center text-[var(--text-tertiary)]">
                 <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                <p>No comments yet. Start the conversation below.</p>
+                <p className="text-[13px]">No comments yet. Start the conversation below.</p>
               </div>
             ) : (
               comments.map((comment: Comment) => (
                 <div
                   key={comment.id}
                   className={cn(
-                    'px-6 py-4',
+                    'px-6 py-4 hover:bg-[var(--bg-secondary)]/60 transition-colors',
                     comment.isInternal && 'bg-yellow-50/50 dark:bg-yellow-900/10'
                   )}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-medium flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0 mt-0.5 shadow-md shadow-indigo-500/20">
                       {comment.author
                         ? `${comment.author.firstName.charAt(0)}${comment.author.lastName.charAt(0)}`
                         : '??'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium text-[var(--text-primary)]">
+                        <span className="text-[13px] font-semibold text-[var(--text-primary)]">
                           {comment.author
                             ? `${comment.author.firstName} ${comment.author.lastName}`
                             : 'Unknown'}
                         </span>
-                        <span className="text-xs text-[var(--text-tertiary)]">
+                        <span className="text-[11px] text-[var(--text-tertiary)]">
                           {formatRelativeTime(comment.createdAt)}
                         </span>
                         {comment.isInternal && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
                             <Lock className="w-3 h-3" />
                             Internal
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+                      <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
                         {comment.content}
                       </p>
                     </div>
@@ -415,17 +415,17 @@ export function TicketsPage() {
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
                 rows={3}
-                className="w-full px-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 resize-none transition-colors"
+                className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 resize-none transition-all"
               />
               <div className="flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setIsInternalComment(!isInternalComment)}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all',
+                    'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition-all',
                     isInternalComment
                       ? 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700'
-                      : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-primary-500'
+                      : 'bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] border-[var(--border-color)] hover:border-indigo-500'
                   )}
                 >
                   {isInternalComment ? (
@@ -443,7 +443,7 @@ export function TicketsPage() {
                 <button
                   type="submit"
                   disabled={!commentText.trim() || commentMutation.isPending}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
                   {commentMutation.isPending ? 'Sending...' : 'Send'}
@@ -463,7 +463,7 @@ export function TicketsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Tickets</h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
+          <p className="text-[13px] text-[var(--text-secondary)] mt-1">
             {data?.total || 0} total tickets
           </p>
         </div>
@@ -472,7 +472,7 @@ export function TicketsPage() {
             setEditingTicket(null);
             setShowForm(true);
           }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all"
         >
           <Plus className="w-4 h-4" /> New Ticket
         </button>
@@ -487,13 +487,13 @@ export function TicketsPage() {
             placeholder="Search tickets by subject or number..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500"
+          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
         >
           <option value="">All Status</option>
           {STATUS_OPTIONS.map((s) => (
@@ -505,7 +505,7 @@ export function TicketsPage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500"
+          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
         >
           <option value="">All Priority</option>
           {PRIORITY_OPTIONS.map((p) => (
@@ -517,16 +517,16 @@ export function TicketsPage() {
       </div>
 
       {/* Tickets Table */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl overflow-hidden">
+      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">Ticket</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">Status</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">Priority</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">Category</th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">Created</th>
-              <th className="text-right px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">Actions</th>
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Ticket</th>
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Priority</th>
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Category</th>
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Created</th>
+              <th className="text-right px-6 py-3.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -534,7 +534,7 @@ export function TicketsPage() {
               Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i} className="border-b border-[var(--border-color)]">
                   <td colSpan={6} className="px-6 py-4">
-                    <div className="skeleton h-6 w-full rounded" />
+                    <div className="skeleton h-6 w-full rounded-lg" />
                   </td>
                 </tr>
               ))
@@ -542,8 +542,8 @@ export function TicketsPage() {
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">
                   <Ticket className="w-10 h-10 mx-auto mb-3 text-[var(--text-tertiary)] opacity-40" />
-                  <p className="text-[var(--text-tertiary)]">No tickets found</p>
-                  <p className="text-sm text-[var(--text-tertiary)] mt-1">
+                  <p className="text-[var(--text-tertiary)] text-[13px]">No tickets found</p>
+                  <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
                     {search || statusFilter || priorityFilter
                       ? 'Try adjusting your search or filters'
                       : 'Create your first ticket to get started'}
@@ -554,17 +554,17 @@ export function TicketsPage() {
               data?.tickets?.map((ticket: TicketData) => (
                 <tr
                   key={ticket.id}
-                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)] transition-colors cursor-pointer group"
+                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-colors cursor-pointer group"
                   onClick={() => setSelectedTicket(ticket)}
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary-600/10 flex items-center justify-center flex-shrink-0">
-                        <Ticket className="w-4 h-4 text-primary-600" />
+                      <div className="w-9 h-9 rounded-xl bg-indigo-600/10 flex items-center justify-center flex-shrink-0">
+                        <Ticket className="w-4 h-4 text-indigo-600" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-[var(--text-primary)] truncate">{ticket.subject}</p>
-                        <p className="text-xs text-[var(--text-tertiary)] font-mono mt-0.5">
+                        <p className="font-semibold text-[13px] text-[var(--text-primary)] truncate">{ticket.subject}</p>
+                        <p className="text-[11px] text-[var(--text-tertiary)] font-mono mt-0.5">
                           <Hash className="w-3 h-3 inline-block mr-0.5" />
                           {ticket.ticketNumber}
                         </p>
@@ -572,23 +572,23 @@ export function TicketsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium', getStatusColor(ticket.status))}>
+                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(ticket.status))}>
                       {getStatusIcon(ticket.status)}
                       {formatStatusLabel(ticket.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={cn('px-2.5 py-1 rounded-full text-xs font-medium capitalize', getPriorityColor(ticket.priority))}>
+                    <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize', getPriorityColor(ticket.priority))}>
                       {ticket.priority}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
+                    <div className="flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
                       <Tag className="w-3.5 h-3.5" />
                       <span>{getCategoryLabel(ticket.category)}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
+                  <td className="px-6 py-4 text-[13px] text-[var(--text-secondary)]">
                     {formatDate(ticket.createdAt)}
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -599,7 +599,7 @@ export function TicketsPage() {
                           setEditingTicket(ticket);
                           setShowForm(true);
                         }}
-                        className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors"
+                        className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -610,7 +610,7 @@ export function TicketsPage() {
                             deleteMutation.mutate(ticket.id);
                           }
                         }}
-                        className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
+                        className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -625,15 +625,15 @@ export function TicketsPage() {
 
       {/* Create / Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg mx-4 animate-fadeIn max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">
               {editingTicket ? 'Edit Ticket' : 'New Ticket'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Subject */}
               <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
                   Subject *
                 </label>
                 <input
@@ -641,13 +641,13 @@ export function TicketsPage() {
                   defaultValue={editingTicket?.subject}
                   required
                   placeholder="Brief summary of the issue"
-                  className="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
                   Description
                 </label>
                 <textarea
@@ -655,20 +655,20 @@ export function TicketsPage() {
                   rows={4}
                   defaultValue={editingTicket?.description}
                   placeholder="Detailed description of the ticket..."
-                  className="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 resize-none transition-colors"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 resize-none transition-all"
                 />
               </div>
 
               {/* Category & Priority */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
                     Category
                   </label>
                   <select
                     name="category"
                     defaultValue={editingTicket?.category || 'support'}
-                    className="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
                   >
                     {CATEGORY_OPTIONS.map((c) => (
                       <option key={c.value} value={c.value}>
@@ -678,13 +678,13 @@ export function TicketsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
                     Priority
                   </label>
                   <select
                     name="priority"
                     defaultValue={editingTicket?.priority || 'medium'}
-                    className="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
                   >
                     {PRIORITY_OPTIONS.map((p) => (
                       <option key={p.value} value={p.value}>
@@ -699,13 +699,13 @@ export function TicketsPage() {
               <div className="grid grid-cols-2 gap-4">
                 {editingTicket && (
                   <div>
-                    <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
                       Status
                     </label>
                     <select
                       name="status"
                       defaultValue={editingTicket.status}
-                      className="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s.value} value={s.value}>
@@ -716,7 +716,7 @@ export function TicketsPage() {
                   </div>
                 )}
                 <div className={editingTicket ? '' : 'col-span-2'}>
-                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
                     Contact ID
                     <span className="text-[var(--text-tertiary)] font-normal ml-1">(optional)</span>
                   </label>
@@ -724,7 +724,7 @@ export function TicketsPage() {
                     name="contactId"
                     defaultValue={editingTicket?.contactId}
                     placeholder="Link to a contact"
-                    className="w-full px-3 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -734,7 +734,7 @@ export function TicketsPage() {
                 <button
                   type="submit"
                   disabled={saveMutation.isPending}
-                  className="flex-1 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
                 >
                   {saveMutation.isPending
                     ? 'Saving...'
@@ -748,7 +748,7 @@ export function TicketsPage() {
                     setShowForm(false);
                     setEditingTicket(null);
                   }}
-                  className="px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-lg font-medium hover:bg-[var(--bg-tertiary)] transition-colors"
+                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   Cancel
                 </button>

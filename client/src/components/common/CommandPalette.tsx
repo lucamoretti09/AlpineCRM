@@ -15,6 +15,8 @@ import {
   Sun,
   LogOut,
   Command,
+  ArrowRight,
+  Hash,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -145,8 +147,11 @@ export default function CommandPalette() {
     if (items.length === 0) return null;
     return (
       <div key={label}>
-        <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
-          {label}
+        <div className="flex items-center gap-2 px-4 py-2.5">
+          <Hash className="w-3 h-3 text-[var(--text-tertiary)] opacity-50" />
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+            {label}
+          </span>
         </div>
         {items.map((cmd) => {
           flatIndex++;
@@ -159,20 +164,30 @@ export default function CommandPalette() {
               onClick={cmd.action}
               onMouseEnter={() => setSelectedIndex(idx)}
               className={cn(
-                'flex w-full items-center gap-3 px-3 py-2.5 text-left rounded-lg mx-1',
-                'transition-colors duration-100',
+                'flex w-full items-center gap-3 px-4 py-2.5 text-left rounded-xl mx-1 transition-all duration-150',
                 idx === selectedIndex
-                  ? 'bg-primary-500/10 text-primary-500'
-                  : 'text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'
+                  ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400'
+                  : 'text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]/60'
               )}
+              style={{ width: 'calc(100% - 8px)' }}
             >
-              <Icon className="h-4.5 w-4.5 shrink-0 opacity-70" />
+              <div className={cn(
+                'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-150',
+                idx === selectedIndex
+                  ? 'bg-indigo-500/15'
+                  : 'bg-[var(--bg-secondary)]/60'
+              )}>
+                <Icon className="h-4 w-4 shrink-0" />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{cmd.label}</p>
+                <p className="text-[13px] font-medium truncate">{cmd.label}</p>
                 {cmd.description && (
-                  <p className="text-xs text-[var(--text-tertiary)] truncate">{cmd.description}</p>
+                  <p className="text-[11px] text-[var(--text-tertiary)] truncate mt-0.5">{cmd.description}</p>
                 )}
               </div>
+              {idx === selectedIndex && (
+                <ArrowRight className="w-3.5 h-3.5 text-indigo-500/50 flex-shrink-0 animate-fadeIn" />
+              )}
             </button>
           );
         })}
@@ -181,17 +196,20 @@ export default function CommandPalette() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[20vh]">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[18vh]">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 backdrop-blur-md"
         onClick={() => setIsOpen(false)}
       />
 
       {/* Palette */}
-      <div className="relative w-full max-w-lg mx-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl overflow-hidden animate-fadeIn">
+      <div className="relative w-full max-w-xl mx-4 bg-white/70 dark:bg-[var(--bg-card)] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl shadow-2xl shadow-black/20 overflow-hidden animate-fadeInScale">
+        {/* Top accent */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-40" />
+
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]">
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border-color)]">
           <Search className="h-5 w-5 text-[var(--text-tertiary)] shrink-0" />
           <input
             ref={inputRef}
@@ -200,18 +218,24 @@ export default function CommandPalette() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleInputKeyDown}
-            className="flex-1 bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-sm outline-none"
+            className="flex-1 bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)] text-[14px] outline-none"
           />
-          <kbd className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium text-[var(--text-tertiary)] bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+          <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-secondary)]/60 border border-[var(--border-color)]">
             ESC
           </kbd>
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[300px] overflow-y-auto py-2 px-1">
+        <div ref={listRef} className="max-h-[340px] overflow-y-auto py-2 px-1.5">
           {flatFiltered.length === 0 ? (
-            <div className="py-8 text-center text-sm text-[var(--text-tertiary)]">
-              No results found for "{query}"
+            <div className="py-12 text-center">
+              <Search className="w-8 h-8 mx-auto mb-3 text-[var(--text-tertiary)] opacity-30" />
+              <p className="text-[13px] text-[var(--text-tertiary)]">
+                No results found for "<span className="text-[var(--text-secondary)]">{query}</span>"
+              </p>
+              <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
+                Try a different search term
+              </p>
             </div>
           ) : (
             <>
@@ -223,12 +247,18 @@ export default function CommandPalette() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-2 border-t border-[var(--border-color)] text-[10px] text-[var(--text-tertiary)]">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1"><kbd className="px-1 py-0.5 rounded bg-[var(--bg-secondary)] border border-[var(--border-color)]">&uarr;&darr;</kbd> Navigate</span>
-            <span className="flex items-center gap-1"><kbd className="px-1 py-0.5 rounded bg-[var(--bg-secondary)] border border-[var(--border-color)]">&crarr;</kbd> Select</span>
+        <div className="flex items-center justify-between px-5 py-2.5 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-tertiary)]">
+              <kbd className="px-1.5 py-0.5 rounded-md bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[10px] font-semibold">&uarr;&darr;</kbd>
+              Navigate
+            </span>
+            <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-tertiary)]">
+              <kbd className="px-1.5 py-0.5 rounded-md bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[10px] font-semibold">&crarr;</kbd>
+              Select
+            </span>
           </div>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5 text-[10px] text-[var(--text-tertiary)]">
             <Command className="h-3 w-3" />K to toggle
           </span>
         </div>

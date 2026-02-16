@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mountain, Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
+import { Mountain, Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/lib/utils';
@@ -43,6 +43,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
   const registerUser = useAuthStore((state) => state.register);
   const isLoading = useAuthStore((state) => state.isLoading);
 
@@ -50,6 +51,7 @@ export default function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -60,6 +62,12 @@ export default function RegisterForm() {
       confirmPassword: '',
     },
   });
+
+  const password = watch('password');
+  const hasLower = /[a-z]/.test(password || '');
+  const hasUpper = /[A-Z]/.test(password || '');
+  const hasNumber = /\d/.test(password || '');
+  const hasLength = (password || '').length >= 8;
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
@@ -81,15 +89,24 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 px-4 py-12">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-violet-500/5 rounded-full blur-3xl" />
+    <div className="aurora-bg min-h-screen flex items-center justify-center px-4 py-12">
+      {/* Grid dot pattern */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.03]"
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
+        }}
+      />
+
+      {/* Animated aurora blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-indigo-600/15 rounded-full blur-[120px] animate-aurora" />
+        <div className="absolute top-1/3 -right-20 w-[400px] h-[400px] bg-violet-500/10 rounded-full blur-[100px] animate-aurora" style={{ animationDelay: '-4s' }} />
+        <div className="absolute -bottom-32 left-1/3 w-[450px] h-[450px] bg-cyan-500/8 rounded-full blur-[110px] animate-aurora" style={{ animationDelay: '-8s' }} />
       </div>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-lg animate-fadeInUp">
         {/* Back to login */}
         <a
           href="/login"
@@ -97,24 +114,27 @@ export default function RegisterForm() {
             e.preventDefault();
             window.location.href = '/login';
           }}
-          className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white mb-6 transition-colors group"
+          className="inline-flex items-center gap-1.5 text-[13px] text-white/40 hover:text-white/80 mb-6 transition-all duration-300 group"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform duration-300" />
           Back to sign in
         </a>
 
-        {/* Glassmorphism card */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl shadow-black/20 p-8">
+        {/* Card */}
+        <div className="relative bg-white/[0.04] backdrop-blur-2xl border border-white/[0.08] rounded-3xl shadow-2xl shadow-black/30 p-8 overflow-hidden">
+          {/* Top accent gradient line */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60" />
+
           {/* Branding */}
           <div className="flex flex-col items-center mb-8">
-            <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-xl shadow-lg shadow-indigo-500/25 mb-4">
+            <div className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 rounded-2xl shadow-xl shadow-indigo-500/30 mb-4 animate-pulse-glow">
               <Mountain className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-[24px] font-bold text-white tracking-tight">
               Create Account
             </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Get started with Alpine CRM
+            <p className="text-white/40 text-[13px] mt-1">
+              Get started with Alpine<span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent font-semibold">CRM</span>
             </p>
           </div>
 
@@ -124,228 +144,241 @@ export default function RegisterForm() {
             <div className="grid grid-cols-2 gap-3">
               {/* First name */}
               <div>
-                <label
-                  htmlFor="firstName"
-                  className="block text-sm font-medium text-slate-300 mb-1.5"
-                >
+                <label htmlFor="firstName" className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider mb-1.5">
                   First name
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <User className="w-4 h-4 text-slate-500" />
+                <div className="relative group">
+                  {focusedField === 'firstName' && (
+                    <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50 rounded-xl blur-[1px] opacity-80 transition-opacity duration-300" />
+                  )}
+                  <div className="relative flex items-center">
+                    <div className="absolute left-3.5 pointer-events-none">
+                      <User className="w-4 h-4 text-white/30" />
+                    </div>
+                    <input
+                      id="firstName"
+                      type="text"
+                      autoComplete="given-name"
+                      placeholder="John"
+                      {...register('firstName')}
+                      onFocus={() => setFocusedField('firstName')}
+                      onBlur={() => setFocusedField(null)}
+                      className={cn(
+                        'w-full pl-10 pr-3 py-2.5 bg-white/[0.04] border rounded-xl text-[14px] text-white placeholder-white/20',
+                        'focus:outline-none transition-all duration-300',
+                        errors.firstName
+                          ? 'border-red-500/50'
+                          : 'border-white/[0.08] hover:border-white/[0.15]'
+                      )}
+                    />
                   </div>
-                  <input
-                    id="firstName"
-                    type="text"
-                    autoComplete="given-name"
-                    placeholder="John"
-                    className={cn(
-                      'w-full pl-10 pr-3 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                      'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                      'transition-all duration-200',
-                      errors.firstName
-                        ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                        : 'border-white/10 hover:border-white/20'
-                    )}
-                    {...register('firstName')}
-                  />
                 </div>
                 {errors.firstName && (
-                  <p className="mt-1 text-xs text-red-400">
-                    {errors.firstName.message}
-                  </p>
+                  <p className="mt-1 text-[11px] text-red-400/90">{errors.firstName.message}</p>
                 )}
               </div>
 
               {/* Last name */}
               <div>
-                <label
-                  htmlFor="lastName"
-                  className="block text-sm font-medium text-slate-300 mb-1.5"
-                >
+                <label htmlFor="lastName" className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider mb-1.5">
                   Last name
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <User className="w-4 h-4 text-slate-500" />
+                <div className="relative group">
+                  {focusedField === 'lastName' && (
+                    <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50 rounded-xl blur-[1px] opacity-80 transition-opacity duration-300" />
+                  )}
+                  <div className="relative flex items-center">
+                    <div className="absolute left-3.5 pointer-events-none">
+                      <User className="w-4 h-4 text-white/30" />
+                    </div>
+                    <input
+                      id="lastName"
+                      type="text"
+                      autoComplete="family-name"
+                      placeholder="Doe"
+                      {...register('lastName')}
+                      onFocus={() => setFocusedField('lastName')}
+                      onBlur={() => setFocusedField(null)}
+                      className={cn(
+                        'w-full pl-10 pr-3 py-2.5 bg-white/[0.04] border rounded-xl text-[14px] text-white placeholder-white/20',
+                        'focus:outline-none transition-all duration-300',
+                        errors.lastName
+                          ? 'border-red-500/50'
+                          : 'border-white/[0.08] hover:border-white/[0.15]'
+                      )}
+                    />
                   </div>
-                  <input
-                    id="lastName"
-                    type="text"
-                    autoComplete="family-name"
-                    placeholder="Doe"
-                    className={cn(
-                      'w-full pl-10 pr-3 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                      'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                      'transition-all duration-200',
-                      errors.lastName
-                        ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                        : 'border-white/10 hover:border-white/20'
-                    )}
-                    {...register('lastName')}
-                  />
                 </div>
                 {errors.lastName && (
-                  <p className="mt-1 text-xs text-red-400">
-                    {errors.lastName.message}
-                  </p>
+                  <p className="mt-1 text-[11px] text-red-400/90">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
 
             {/* Email field */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
+              <label htmlFor="email" className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider mb-1.5">
                 Email address
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Mail className="w-4.5 h-4.5 text-slate-500" />
+              <div className="relative group">
+                {focusedField === 'email' && (
+                  <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50 rounded-xl blur-[1px] opacity-80 transition-opacity duration-300" />
+                )}
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 pointer-events-none">
+                    <Mail className="w-4 h-4 text-white/30" />
+                  </div>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@company.com"
+                    {...register('email')}
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    className={cn(
+                      'w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border rounded-xl text-[14px] text-white placeholder-white/20',
+                      'focus:outline-none transition-all duration-300',
+                      errors.email
+                        ? 'border-red-500/50'
+                        : 'border-white/[0.08] hover:border-white/[0.15]'
+                    )}
+                  />
                 </div>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  className={cn(
-                    'w-full pl-11 pr-4 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                    'transition-all duration-200',
-                    errors.email
-                      ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                      : 'border-white/10 hover:border-white/20'
-                  )}
-                  {...register('email')}
-                />
               </div>
               {errors.email && (
-                <p className="mt-1.5 text-xs text-red-400">
-                  {errors.email.message}
-                </p>
+                <p className="mt-1.5 text-[11px] text-red-400/90">{errors.email.message}</p>
               )}
             </div>
 
             {/* Password field */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
+              <label htmlFor="password" className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider mb-1.5">
                 Password
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock className="w-4.5 h-4.5 text-slate-500" />
+              <div className="relative group">
+                {focusedField === 'password' && (
+                  <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50 rounded-xl blur-[1px] opacity-80 transition-opacity duration-300" />
+                )}
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 pointer-events-none">
+                    <Lock className="w-4 h-4 text-white/30" />
+                  </div>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    placeholder="Create a strong password"
+                    {...register('password')}
+                    onFocus={() => setFocusedField('password')}
+                    onBlur={() => setFocusedField(null)}
+                    className={cn(
+                      'w-full pl-10 pr-11 py-2.5 bg-white/[0.04] border rounded-xl text-[14px] text-white placeholder-white/20',
+                      'focus:outline-none transition-all duration-300',
+                      errors.password
+                        ? 'border-red-500/50'
+                        : 'border-white/[0.08] hover:border-white/[0.15]'
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 text-white/30 hover:text-white/60 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  placeholder="Create a strong password"
-                  className={cn(
-                    'w-full pl-11 pr-11 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                    'transition-all duration-200',
-                    errors.password
-                      ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                      : 'border-white/10 hover:border-white/20'
-                  )}
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4.5 h-4.5" />
-                  ) : (
-                    <Eye className="w-4.5 h-4.5" />
-                  )}
-                </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-red-400">
-                  {errors.password.message}
-                </p>
+                <p className="mt-1.5 text-[11px] text-red-400/90">{errors.password.message}</p>
               )}
             </div>
+
+            {/* Password strength indicators */}
+            {password && (
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 animate-fadeIn">
+                {[
+                  { met: hasLength, label: '8+ characters' },
+                  { met: hasUpper, label: 'Uppercase letter' },
+                  { met: hasLower, label: 'Lowercase letter' },
+                  { met: hasNumber, label: 'Number' },
+                ].map((req) => (
+                  <div key={req.label} className="flex items-center gap-1.5">
+                    <div className={cn(
+                      'w-3.5 h-3.5 rounded-full flex items-center justify-center transition-all duration-300',
+                      req.met ? 'bg-emerald-500/20' : 'bg-white/5'
+                    )}>
+                      <Check className={cn('w-2.5 h-2.5 transition-all duration-300', req.met ? 'text-emerald-400' : 'text-white/15')} />
+                    </div>
+                    <span className={cn('text-[11px] transition-colors duration-300', req.met ? 'text-emerald-400/80' : 'text-white/25')}>
+                      {req.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Confirm password field */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-slate-300 mb-1.5"
-              >
+              <label htmlFor="confirmPassword" className="block text-[13px] font-semibold text-white/50 uppercase tracking-wider mb-1.5">
                 Confirm password
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                  <Lock className="w-4.5 h-4.5 text-slate-500" />
+              <div className="relative group">
+                {focusedField === 'confirmPassword' && (
+                  <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/50 via-violet-500/50 to-indigo-500/50 rounded-xl blur-[1px] opacity-80 transition-opacity duration-300" />
+                )}
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 pointer-events-none">
+                    <Lock className="w-4 h-4 text-white/30" />
+                  </div>
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    placeholder="Confirm your password"
+                    {...register('confirmPassword')}
+                    onFocus={() => setFocusedField('confirmPassword')}
+                    onBlur={() => setFocusedField(null)}
+                    className={cn(
+                      'w-full pl-10 pr-11 py-2.5 bg-white/[0.04] border rounded-xl text-[14px] text-white placeholder-white/20',
+                      'focus:outline-none transition-all duration-300',
+                      errors.confirmPassword
+                        ? 'border-red-500/50'
+                        : 'border-white/[0.08] hover:border-white/[0.15]'
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3.5 text-white/30 hover:text-white/60 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
-                <input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  placeholder="Confirm your password"
-                  className={cn(
-                    'w-full pl-11 pr-11 py-2.5 bg-white/5 border rounded-xl text-white placeholder-slate-500 text-sm',
-                    'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50',
-                    'transition-all duration-200',
-                    errors.confirmPassword
-                      ? 'border-red-500/50 focus:ring-red-500/50 focus:border-red-500/50'
-                      : 'border-white/10 hover:border-white/20'
-                  )}
-                  {...register('confirmPassword')}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="w-4.5 h-4.5" />
-                  ) : (
-                    <Eye className="w-4.5 h-4.5" />
-                  )}
-                </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-red-400">
-                  {errors.confirmPassword.message}
-                </p>
+                <p className="mt-1.5 text-[11px] text-red-400/90">{errors.confirmPassword.message}</p>
               )}
             </div>
-
-            {/* Password requirements hint */}
-            <p className="text-xs text-slate-500">
-              Must be at least 8 characters with one uppercase, one lowercase,
-              and one number.
-            </p>
 
             {/* Submit button */}
             <button
               type="submit"
               disabled={isLoading}
-              className={cn(
-                'w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-white',
-                'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400',
-                'shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40',
-                'focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-2 focus:ring-offset-slate-900',
-                'transition-all duration-200',
-                'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-indigo-500/25'
-              )}
+              className="relative w-full py-3 px-4 rounded-xl text-[14px] font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 focus:outline-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden mt-2"
             >
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
+                <span className="relative flex items-center justify-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Creating account...
                 </span>
               ) : (
-                'Create account'
+                <span className="relative flex items-center justify-center gap-2">
+                  Create account
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                </span>
               )}
             </button>
           </form>
@@ -353,10 +386,10 @@ export default function RegisterForm() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
+              <div className="w-full border-t border-white/[0.06]" />
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-slate-900/80 px-3 text-slate-500">
+            <div className="relative flex justify-center text-[11px]">
+              <span className="px-3 text-white/30 bg-transparent backdrop-blur-sm">
                 Already have an account?
               </span>
             </div>
@@ -369,19 +402,14 @@ export default function RegisterForm() {
               e.preventDefault();
               window.location.href = '/login';
             }}
-            className={cn(
-              'flex items-center justify-center w-full py-2.5 px-4 rounded-xl text-sm font-medium',
-              'text-slate-300 bg-white/5 border border-white/10',
-              'hover:bg-white/10 hover:border-white/20 hover:text-white',
-              'transition-all duration-200'
-            )}
+            className="flex items-center justify-center w-full py-2.5 px-4 rounded-xl text-[13px] font-medium text-white/60 bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12] hover:text-white/90 transition-all duration-300"
           >
             Sign in instead
           </a>
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-600 mt-6">
+        <p className="text-center text-[11px] text-white/20 mt-6">
           &copy; {new Date().getFullYear()} Alpine CRM. All rights reserved.
         </p>
       </div>

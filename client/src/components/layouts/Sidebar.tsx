@@ -53,37 +53,42 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 flex h-screen flex-col',
-        'bg-[var(--bg-sidebar)] border-r border-[var(--border-color)]',
-        'transition-all duration-300 ease-in-out',
+        'sidebar-glow fixed left-0 top-0 z-40 flex h-screen flex-col',
+        'bg-[var(--bg-sidebar)]',
+        'border-r border-[var(--border-color)]',
+        'transition-all duration-300 ease-spring',
         sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'
       )}
     >
       {/* Logo Section */}
       <div
         className={cn(
-          'flex h-16 items-center border-b border-[var(--border-color)]',
+          'flex h-[68px] items-center border-b border-[var(--border-color)]',
           'px-4 shrink-0',
           sidebarCollapsed ? 'justify-center' : 'gap-3'
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 shadow-md shadow-primary-500/25">
-          <Mountain className="h-5 w-5 text-white" />
+        <div className="relative group">
+          <div className="absolute inset-0 bg-indigo-500/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/20">
+            <Mountain className="h-5 w-5 text-white" />
+          </div>
         </div>
-        <span
+        <div
           className={cn(
-            'text-lg font-bold tracking-tight text-[var(--text-primary)]',
             'transition-all duration-300 overflow-hidden whitespace-nowrap',
             sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
           )}
         >
-          Alpine<span className="text-primary-500">CRM</span>
-        </span>
+          <span className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
+            Alpine<span className="text-primary-500">CRM</span>
+          </span>
+        </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col gap-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
@@ -96,24 +101,25 @@ export default function Sidebar() {
                   onMouseEnter={() => setHoveredItem(item.path)}
                   onMouseLeave={() => setHoveredItem(null)}
                   className={cn(
-                    'group relative flex items-center gap-3 rounded-lg px-3 py-2.5',
-                    'transition-all duration-200 ease-in-out',
-                    'text-sm font-medium',
+                    'group relative flex items-center gap-3 rounded-xl px-3 py-2.5',
+                    'transition-all duration-200 ease-spring',
+                    'text-[13.5px] font-medium',
                     sidebarCollapsed && 'justify-center px-0',
                     active
-                      ? 'bg-primary-500/10 text-primary-500'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]'
+                      ? 'bg-primary-500/[0.08] text-primary-500 dark:bg-primary-500/[0.12]'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]'
                   )}
                 >
                   {/* Active indicator bar */}
                   {active && (
-                    <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-primary-500 transition-all duration-200" />
+                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-primary-400 to-primary-600 shadow-sm shadow-primary-500/30 transition-all duration-300" />
                   )}
 
                   <Icon
                     className={cn(
-                      'h-5 w-5 shrink-0 transition-transform duration-200',
-                      (active || hovered) && 'scale-110'
+                      'h-[18px] w-[18px] shrink-0 transition-all duration-200',
+                      active && 'drop-shadow-sm',
+                      (active || hovered) && 'scale-105'
                     )}
                   />
 
@@ -131,11 +137,11 @@ export default function Sidebar() {
                     <span
                       className={cn(
                         'pointer-events-none absolute left-full z-50 ml-3',
-                        'rounded-md bg-[var(--bg-tertiary)] px-2.5 py-1.5',
+                        'rounded-lg bg-[var(--bg-card)] px-3 py-2',
                         'text-xs font-medium text-[var(--text-primary)]',
                         'border border-[var(--border-color)]',
-                        'shadow-lg opacity-0 transition-opacity duration-150',
-                        'group-hover:opacity-100 whitespace-nowrap'
+                        'shadow-xl opacity-0 transition-all duration-200 scale-95',
+                        'group-hover:opacity-100 group-hover:scale-100 whitespace-nowrap'
                       )}
                     >
                       {item.label}
@@ -153,17 +159,17 @@ export default function Sidebar() {
         <button
           onClick={toggleSidebar}
           className={cn(
-            'flex w-full items-center gap-3 rounded-lg px-3 py-2',
-            'text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-secondary)]',
-            'transition-all duration-200 ease-in-out text-sm',
+            'flex w-full items-center gap-3 rounded-xl px-3 py-2',
+            'text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-secondary)]',
+            'transition-all duration-200 ease-spring text-[13px]',
             sidebarCollapsed && 'justify-center px-0'
           )}
         >
           {sidebarCollapsed ? (
-            <ChevronsRight className="h-5 w-5 shrink-0" />
+            <ChevronsRight className="h-[18px] w-[18px] shrink-0" />
           ) : (
             <>
-              <ChevronsLeft className="h-5 w-5 shrink-0" />
+              <ChevronsLeft className="h-[18px] w-[18px] shrink-0" />
               <span className="truncate">Collapse</span>
             </>
           )}
@@ -179,7 +185,7 @@ export default function Sidebar() {
       >
         <div
           className={cn(
-            'flex items-center gap-3 rounded-lg p-2',
+            'flex items-center gap-3 rounded-xl p-2',
             'transition-all duration-200',
             sidebarCollapsed ? 'justify-center' : ''
           )}
@@ -189,10 +195,10 @@ export default function Sidebar() {
             <img
               src={user.avatarUrl}
               alt={`${user.firstName} ${user.lastName}`}
-              className="h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-primary-500/20"
+              className="h-9 w-9 shrink-0 rounded-xl object-cover ring-2 ring-primary-500/15"
             />
           ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-xs font-semibold text-white ring-2 ring-primary-500/20">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-primary-500/15 shadow-sm shadow-indigo-500/20">
               {user ? getInitials(user.firstName, user.lastName) : '??'}
             </div>
           )}
@@ -201,17 +207,17 @@ export default function Sidebar() {
           {!sidebarCollapsed && (
             <div className="flex flex-1 items-center justify-between overflow-hidden">
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
+                <p className="truncate text-[13px] font-semibold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
                 </p>
-                <p className="truncate text-xs text-[var(--text-tertiary)]">
+                <p className="truncate text-[11px] text-[var(--text-tertiary)] capitalize">
                   {user?.role ?? 'Unknown'}
                 </p>
               </div>
               <button
                 onClick={logout}
-                title="Logout"
-                className="ml-2 shrink-0 rounded-md p-1.5 text-[var(--text-tertiary)] hover:bg-red-500/10 hover:text-red-500 transition-colors duration-200"
+                title="Sign out"
+                className="ml-2 shrink-0 rounded-lg p-1.5 text-[var(--text-tertiary)] hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
               >
                 <LogOut className="h-4 w-4" />
               </button>

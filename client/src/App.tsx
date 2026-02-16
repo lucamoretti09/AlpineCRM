@@ -131,9 +131,16 @@ export default function App() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: isDark ? '#1e293b' : '#ffffff',
-            color: isDark ? '#f1f5f9' : '#0f172a',
-            border: `1px solid ${isDark ? '#334155' : '#e2e8f0'}`,
+            background: isDark ? '#0d1025' : '#ffffff',
+            color: isDark ? '#eef0fa' : '#0f0d23',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#e0e4ef'}`,
+            borderRadius: '14px',
+            fontSize: '13px',
+            fontWeight: 500,
+            boxShadow: isDark
+              ? '0 8px 30px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3)'
+              : '0 8px 30px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.03)',
+            backdropFilter: 'blur(12px)',
           },
         }}
       />

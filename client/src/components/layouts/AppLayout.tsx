@@ -12,17 +12,14 @@ interface AppLayoutProps {
 export default function AppLayout({ children, title }: AppLayoutProps) {
   const { sidebarCollapsed, toggleSidebar } = useThemeStore();
 
-  // Auto-collapse sidebar on small screens
   useEffect(() => {
     function handleResize() {
       const isSmall = window.innerWidth < 768;
-      // Only auto-collapse if we go below breakpoint while expanded
       if (isSmall && !sidebarCollapsed) {
         toggleSidebar();
       }
     }
 
-    // Run on mount
     if (window.innerWidth < 768 && !sidebarCollapsed) {
       toggleSidebar();
     }
@@ -33,14 +30,14 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
   }, []);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-primary)]">
+    <div className="noise-overlay flex h-screen overflow-hidden bg-[var(--bg-primary)]">
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Mobile overlay when sidebar is open */}
+      {/* Mobile overlay */}
       {!sidebarCollapsed && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm md:hidden transition-opacity duration-300"
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden transition-opacity duration-300"
           onClick={toggleSidebar}
         />
       )}
@@ -48,7 +45,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
       {/* Main Content Area */}
       <div
         className={cn(
-          'flex flex-1 flex-col transition-all duration-300 ease-in-out min-w-0',
+          'flex flex-1 flex-col transition-all duration-300 ease-spring min-w-0',
           sidebarCollapsed ? 'ml-[72px]' : 'ml-[260px]'
         )}
       >
@@ -57,7 +54,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
 
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="mx-auto w-full max-w-7xl px-6 py-6 animate-fadeIn">
+          <div className="mx-auto w-full max-w-[1440px] px-6 py-6 animate-fadeIn">
             {children}
           </div>
         </main>

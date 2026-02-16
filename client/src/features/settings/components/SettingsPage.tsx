@@ -106,7 +106,7 @@ function SectionCard({ children, className }: { children: React.ReactNode; class
   return (
     <div
       className={cn(
-        'bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-6',
+        'bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6',
         className,
       )}
     >
@@ -116,16 +116,16 @@ function SectionCard({ children, className }: { children: React.ReactNode; class
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-1">{children}</h3>;
+  return <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">{children}</h3>;
 }
 
 function SectionDescription({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-[var(--text-secondary)] mb-6">{children}</p>;
+  return <p className="text-[13px] text-[var(--text-secondary)] mb-6">{children}</p>;
 }
 
 function FormLabel({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+    <label htmlFor={htmlFor} className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
       {children}
     </label>
   );
@@ -161,10 +161,10 @@ function FormInput({
         disabled={disabled}
         autoComplete={autoComplete}
         className={cn(
-          'w-full px-3.5 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg',
-          'text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]',
-          'focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/30',
-          'transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+          'w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl',
+          'text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]',
+          'focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30',
+          'transition-all disabled:opacity-50 disabled:cursor-not-allowed',
           rightElement && 'pr-11',
         )}
       />
@@ -193,8 +193,8 @@ function ToggleSwitch({
       onClick={() => onChange(!checked)}
       className={cn(
         'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent',
-        'transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
-        checked ? 'bg-primary-600' : 'bg-[var(--border-color)]',
+        'transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
+        checked ? 'bg-gradient-to-r from-indigo-600 to-indigo-500' : 'bg-[var(--border-color)]',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
     >
@@ -224,8 +224,8 @@ function SaveButton({
       onClick={onClick}
       disabled={loading || disabled}
       className={cn(
-        'flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg',
-        'font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+        'flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl',
+        'font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed',
       )}
     >
       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -282,7 +282,7 @@ function ProfileTab() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeInUp">
       {/* Avatar section */}
       <SectionCard>
         <SectionTitle>Profile Photo</SectionTitle>
@@ -293,10 +293,10 @@ function ProfileTab() {
             <img
               src={avatarUrl}
               alt={`${firstName} ${lastName}`}
-              className="w-20 h-20 rounded-full object-cover border-2 border-[var(--border-color)]"
+              className="w-20 h-20 rounded-2xl object-cover border-2 border-[var(--border-color)] shadow-lg"
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-primary-600 flex items-center justify-center text-white text-2xl font-bold select-none">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold select-none shadow-lg shadow-indigo-500/20">
               {initials}
             </div>
           )}
@@ -309,7 +309,7 @@ function ProfileTab() {
               onChange={setAvatarUrl}
               placeholder="https://example.com/avatar.jpg"
             />
-            <p className="text-xs text-[var(--text-tertiary)]">
+            <p className="text-[11px] text-[var(--text-tertiary)]">
               Paste a direct link to your profile image. Recommended size: 256 x 256px.
             </p>
           </div>
@@ -399,7 +399,7 @@ function AccountTab() {
   );
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeInUp">
       <SectionCard>
         <SectionTitle>Change Password</SectionTitle>
         <SectionDescription>
@@ -434,7 +434,7 @@ function AccountTab() {
               rightElement={visibilityToggle(showNew, () => setShowNew(!showNew))}
             />
             {newPassword.length > 0 && newPassword.length < 8 && (
-              <p className="text-xs text-red-500 mt-1">Password must be at least 8 characters.</p>
+              <p className="text-[11px] text-red-500 mt-1">Password must be at least 8 characters.</p>
             )}
           </div>
 
@@ -450,7 +450,7 @@ function AccountTab() {
               rightElement={visibilityToggle(showConfirm, () => setShowConfirm(!showConfirm))}
             />
             {confirmNewPassword.length > 0 && !passwordsMatch && (
-              <p className="text-xs text-red-500 mt-1">Passwords do not match.</p>
+              <p className="text-[11px] text-red-500 mt-1">Passwords do not match.</p>
             )}
           </div>
         </div>
@@ -478,7 +478,7 @@ function AppearanceTab() {
   }, []);
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeInUp">
       {/* Theme */}
       <SectionCard>
         <SectionTitle>Theme</SectionTitle>
@@ -487,19 +487,19 @@ function AppearanceTab() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {isDark ? (
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
                 <Moon className="w-5 h-5 text-indigo-400" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
                 <Sun className="w-5 h-5 text-amber-500" />
               </div>
             )}
             <div>
-              <p className="text-sm font-medium text-[var(--text-primary)]">
+              <p className="text-[13px] font-medium text-[var(--text-primary)]">
                 {isDark ? 'Dark Mode' : 'Light Mode'}
               </p>
-              <p className="text-xs text-[var(--text-tertiary)]">
+              <p className="text-[11px] text-[var(--text-tertiary)]">
                 {isDark ? 'Easier on the eyes in low-light environments' : 'Classic bright interface'}
               </p>
             </div>
@@ -515,7 +515,7 @@ function AppearanceTab() {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[var(--bg-secondary)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--bg-secondary)]/60 flex items-center justify-center">
               {sidebarCollapsed ? (
                 <PanelLeftClose className="w-5 h-5 text-[var(--text-secondary)]" />
               ) : (
@@ -523,10 +523,10 @@ function AppearanceTab() {
               )}
             </div>
             <div>
-              <p className="text-sm font-medium text-[var(--text-primary)]">
+              <p className="text-[13px] font-medium text-[var(--text-primary)]">
                 {sidebarCollapsed ? 'Sidebar Collapsed' : 'Sidebar Expanded'}
               </p>
-              <p className="text-xs text-[var(--text-tertiary)]">
+              <p className="text-[11px] text-[var(--text-tertiary)]">
                 {sidebarCollapsed
                   ? 'Sidebar shows icons only for more workspace'
                   : 'Sidebar shows full navigation labels'}
@@ -552,34 +552,34 @@ function AppearanceTab() {
                 type="button"
                 onClick={() => handleDensityChange(opt.value)}
                 className={cn(
-                  'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all text-center',
+                  'flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 text-center',
                   selected
-                    ? 'border-primary-500 bg-primary-500/5'
-                    : 'border-[var(--border-color)] bg-[var(--bg-secondary)] hover:border-[var(--text-tertiary)]',
+                    ? 'border-indigo-500 bg-indigo-500/5 shadow-lg shadow-indigo-500/5'
+                    : 'border-[var(--border-color)] bg-[var(--bg-secondary)]/40 hover:border-[var(--text-tertiary)] hover:bg-[var(--bg-secondary)]/60',
                 )}
               >
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-lg flex items-center justify-center',
-                    selected ? 'bg-primary-500/10' : 'bg-[var(--bg-primary)]',
+                    'w-10 h-10 rounded-xl flex items-center justify-center',
+                    selected ? 'bg-indigo-500/10' : 'bg-[var(--bg-primary)]',
                   )}
                 >
                   <Icon
                     className={cn(
                       'w-5 h-5',
-                      selected ? 'text-primary-500' : 'text-[var(--text-tertiary)]',
+                      selected ? 'text-indigo-500' : 'text-[var(--text-tertiary)]',
                     )}
                   />
                 </div>
                 <p
                   className={cn(
-                    'text-sm font-medium',
-                    selected ? 'text-primary-500' : 'text-[var(--text-primary)]',
+                    'text-[13px] font-medium',
+                    selected ? 'text-indigo-500' : 'text-[var(--text-primary)]',
                   )}
                 >
                   {opt.label}
                 </p>
-                <p className="text-xs text-[var(--text-tertiary)] leading-snug">{opt.description}</p>
+                <p className="text-[11px] text-[var(--text-tertiary)] leading-snug">{opt.description}</p>
               </button>
             );
           })}
@@ -648,7 +648,7 @@ function NotificationsTab() {
   );
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeInUp">
       <SectionCard>
         <SectionTitle>Notification Preferences</SectionTitle>
         <SectionDescription>
@@ -660,24 +660,24 @@ function NotificationsTab() {
             const Icon = opt.icon;
             const isOn = prefs[opt.key];
             return (
-              <div key={opt.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+              <div key={opt.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 group">
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={cn(
-                      'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
-                      isOn ? 'bg-primary-500/10' : 'bg-[var(--bg-secondary)]',
+                      'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-300',
+                      isOn ? 'bg-indigo-500/10' : 'bg-[var(--bg-secondary)]/60',
                     )}
                   >
                     <Icon
                       className={cn(
-                        'w-5 h-5',
-                        isOn ? 'text-primary-500' : 'text-[var(--text-tertiary)]',
+                        'w-5 h-5 transition-colors duration-300',
+                        isOn ? 'text-indigo-500' : 'text-[var(--text-tertiary)]',
                       )}
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[var(--text-primary)]">{opt.label}</p>
-                    <p className="text-xs text-[var(--text-tertiary)] truncate">{opt.description}</p>
+                    <p className="text-[13px] font-medium text-[var(--text-primary)]">{opt.label}</p>
+                    <p className="text-[11px] text-[var(--text-tertiary)] truncate">{opt.description}</p>
                   </div>
                 </div>
                 <div className="ml-4 flex-shrink-0">
@@ -719,12 +719,12 @@ export function SettingsPage() {
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-xl bg-primary-600/10 flex items-center justify-center">
-            <Settings className="w-5 h-5 text-primary-500" />
+          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+            <Settings className="w-5 h-5 text-indigo-500" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">Settings</h1>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-[13px] text-[var(--text-secondary)]">
               Manage your account, preferences, and notifications
             </p>
           </div>
@@ -735,7 +735,7 @@ export function SettingsPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Tab Navigation */}
         <nav className="lg:w-56 flex-shrink-0">
-          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-1.5 flex lg:flex-col gap-1">
+          <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-1.5 flex lg:flex-col gap-1">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -745,10 +745,10 @@ export function SettingsPage() {
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all w-full',
+                    'flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all w-full',
                     isActive
-                      ? 'bg-primary-600 text-white shadow-sm'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]',
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)]',
                   )}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />

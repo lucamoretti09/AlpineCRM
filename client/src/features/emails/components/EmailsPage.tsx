@@ -100,10 +100,10 @@ function getEmailStatusIcon(status: string) {
 
 function StatCardSkeleton() {
   return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-5">
+    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="skeleton h-4 w-20 rounded" />
-        <div className="skeleton h-8 w-8 rounded-lg" />
+        <div className="skeleton h-8 w-8 rounded-xl" />
       </div>
       <div className="skeleton h-8 w-16 rounded mb-1" />
       <div className="skeleton h-3 w-28 rounded" />
@@ -121,7 +121,7 @@ function TableRowSkeleton() {
         <div className="skeleton h-5 w-56 rounded" />
       </td>
       <td className="px-6 py-4">
-        <div className="skeleton h-6 w-20 rounded-full" />
+        <div className="skeleton h-6 w-20 rounded-lg" />
       </td>
       <td className="px-6 py-4">
         <div className="skeleton h-5 w-24 rounded" />
@@ -154,16 +154,16 @@ function StatCard({
   iconBg: string;
 }) {
   return (
-    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-5 transition-all hover:border-primary-500/30">
+    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-medium text-[var(--text-secondary)]">{label}</span>
-        <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', iconBg)}>
+        <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
+        <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center', iconBg)}>
           {icon}
         </div>
       </div>
       <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
       {subtitle && (
-        <p className="text-xs text-[var(--text-tertiary)] mt-1">{subtitle}</p>
+        <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
       )}
     </div>
   );
@@ -212,19 +212,19 @@ function ComposeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeIn shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeInScale shadow-2xl shadow-black/10 overflow-hidden">
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary-600/10 flex items-center justify-center">
-              <Send className="w-4 h-4 text-primary-600" />
+            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+              <Send className="w-4 h-4 text-indigo-500" />
             </div>
             <h2 className="text-lg font-bold text-[var(--text-primary)]">Compose Email</h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] transition-colors"
+            className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -235,7 +235,7 @@ function ComposeModal({
           {/* Template Selector */}
           {templates.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
                 Template
               </label>
               <div className="relative">
@@ -243,7 +243,7 @@ function ComposeModal({
                 <select
                   value={selectedTemplateId}
                   onChange={(e) => handleTemplateChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500 appearance-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 appearance-none transition-all"
                 >
                   <option value="">No template (compose from scratch)</option>
                   {templates.map((t) => (
@@ -260,7 +260,7 @@ function ComposeModal({
           {/* To & Contact ID */}
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
                 To *
               </label>
               <div className="relative">
@@ -270,26 +270,26 @@ function ComposeModal({
                   type="email"
                   required
                   placeholder="recipient@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
                 Contact ID
               </label>
               <input
                 name="contactId"
                 type="text"
                 placeholder="Optional"
-                className="w-full px-3 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
               />
             </div>
           </div>
 
           {/* Subject */}
           <div>
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
               Subject *
             </label>
             <input
@@ -297,13 +297,13 @@ function ComposeModal({
               onChange={(e) => setSubject(e.target.value)}
               required
               placeholder="Email subject line"
-              className="w-full px-3 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
             />
           </div>
 
           {/* Body */}
           <div>
-            <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+            <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
               Body *
             </label>
             <textarea
@@ -312,7 +312,7 @@ function ComposeModal({
               required
               rows={8}
               placeholder="Write your email content here..."
-              className="w-full px-3 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors resize-none leading-relaxed"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all resize-none leading-relaxed"
             />
           </div>
 
@@ -321,7 +321,7 @@ function ComposeModal({
             <button
               type="submit"
               disabled={isSending}
-              className="flex items-center gap-2 flex-1 justify-center py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 flex-1 justify-center py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
             >
               {isSending ? (
                 <>
@@ -338,7 +338,7 @@ function ComposeModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-lg font-medium hover:bg-[var(--bg-tertiary)] transition-colors"
+              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-tertiary)] transition-colors"
             >
               Cancel
             </button>
@@ -370,7 +370,7 @@ function EmailDetailView({
       <div className="flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] transition-colors"
+          className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -378,7 +378,7 @@ function EmailDetailView({
           <h2 className="text-xl font-bold text-[var(--text-primary)] truncate">
             {email.subject}
           </h2>
-          <p className="text-sm text-[var(--text-secondary)] mt-0.5">
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
             To: {email.to}
             {email.contactName && (
               <span className="text-[var(--text-tertiary)]"> ({email.contactName})</span>
@@ -392,7 +392,7 @@ function EmailDetailView({
             }
           }}
           disabled={isDeleting}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 dark:border-red-800/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-800/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 text-[13px] font-medium"
         >
           <Trash2 className="w-4 h-4" />
           Delete
@@ -400,13 +400,13 @@ function EmailDetailView({
       </div>
 
       {/* Status & Tracking Banner */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-5">
+      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5">
         <div className="flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-[var(--text-secondary)]">Status:</span>
+            <span className="text-[13px] font-medium text-[var(--text-secondary)]">Status:</span>
             <span
               className={cn(
-                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
                 getEmailStatusColor(email.status)
               )}
             >
@@ -415,15 +415,15 @@ function EmailDetailView({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-[var(--text-secondary)]">Sent:</span>
-            <span className="text-sm text-[var(--text-primary)]">
+            <span className="text-[13px] font-medium text-[var(--text-secondary)]">Sent:</span>
+            <span className="text-[13px] text-[var(--text-primary)]">
               {formatDateTime(email.sentAt)}
             </span>
           </div>
           {email.openedAt && (
             <div className="flex items-center gap-2">
               <Eye className="w-4 h-4 text-green-500" />
-              <span className="text-sm text-[var(--text-secondary)]">
+              <span className="text-[13px] text-[var(--text-secondary)]">
                 Opened {formatDateTime(email.openedAt)}
               </span>
             </div>
@@ -431,7 +431,7 @@ function EmailDetailView({
           {email.clickedAt && (
             <div className="flex items-center gap-2">
               <MousePointerClick className="w-4 h-4 text-purple-500" />
-              <span className="text-sm text-[var(--text-secondary)]">
+              <span className="text-[13px] text-[var(--text-secondary)]">
                 Clicked {formatDateTime(email.clickedAt)}
               </span>
             </div>
@@ -440,12 +440,12 @@ function EmailDetailView({
       </div>
 
       {/* Email Body */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/50">
-          <h3 className="text-sm font-semibold text-[var(--text-primary)]">Email Content</h3>
+      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+          <h3 className="text-[13px] font-semibold text-[var(--text-primary)]">Email Content</h3>
         </div>
         <div className="px-6 py-5">
-          <div className="text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap break-words">
+          <div className="text-[13px] text-[var(--text-primary)] leading-relaxed whitespace-pre-wrap break-words">
             {email.body}
           </div>
         </div>
@@ -575,13 +575,13 @@ export function EmailsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Emails</h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-1">
+          <p className="text-[13px] text-[var(--text-secondary)] mt-1">
             {emailsData?.total ?? 0} total emails
           </p>
         </div>
         <button
           onClick={() => setShowCompose(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all"
         >
           <Plus className="w-4 h-4" />
           Compose
@@ -635,14 +635,14 @@ export function EmailsPage() {
             placeholder="Search by subject or recipient..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
           />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 pr-10 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:border-primary-500 appearance-none transition-colors"
+            className="px-4 py-2.5 pr-10 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 appearance-none transition-all"
           >
             {EMAIL_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>
@@ -655,26 +655,26 @@ export function EmailsPage() {
       </div>
 
       {/* Email Table */}
-      <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl overflow-hidden">
+      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Recipient
               </th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Subject
               </th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Status
               </th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Sent
               </th>
-              <th className="text-left px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">
+              <th className="text-left px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Tracking
               </th>
-              <th className="text-right px-6 py-3 text-xs font-semibold uppercase text-[var(--text-tertiary)]">
+              <th className="text-right px-6 py-3.5 text-[11px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                 Actions
               </th>
             </tr>
@@ -686,12 +686,12 @@ export function EmailsPage() {
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[var(--bg-secondary)] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
                       <Inbox className="w-6 h-6 text-[var(--text-tertiary)]" />
                     </div>
                     <div>
-                      <p className="text-[var(--text-secondary)] font-medium">No emails found</p>
-                      <p className="text-sm text-[var(--text-tertiary)] mt-1">
+                      <p className="text-[13px] text-[var(--text-secondary)] font-medium">No emails found</p>
+                      <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
                         {search || statusFilter
                           ? 'Try adjusting your search or filters'
                           : 'Send your first email to get started'}
@@ -700,7 +700,7 @@ export function EmailsPage() {
                     {!search && !statusFilter && (
                       <button
                         onClick={() => setShowCompose(true)}
-                        className="mt-2 flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-medium shadow-md shadow-indigo-500/20 transition-all"
                       >
                         <Plus className="w-4 h-4" />
                         Compose Email
@@ -713,21 +713,21 @@ export function EmailsPage() {
               emailsData.emails.map((email) => (
                 <tr
                   key={email.id}
-                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)] transition-colors cursor-pointer group"
+                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-colors cursor-pointer group"
                   onClick={() => setSelectedEmail(email)}
                 >
                   {/* Recipient */}
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-primary-600/10 flex items-center justify-center flex-shrink-0">
-                        <Mail className="w-4 h-4 text-primary-600" />
+                      <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                        <Mail className="w-4 h-4 text-indigo-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                        <p className="text-[13px] font-medium text-[var(--text-primary)] truncate">
                           {email.to}
                         </p>
                         {email.contactName && (
-                          <p className="text-xs text-[var(--text-tertiary)] truncate">
+                          <p className="text-[11px] text-[var(--text-tertiary)] truncate">
                             {email.contactName}
                           </p>
                         )}
@@ -737,7 +737,7 @@ export function EmailsPage() {
 
                   {/* Subject */}
                   <td className="px-6 py-4">
-                    <p className="text-sm text-[var(--text-primary)] truncate max-w-xs">
+                    <p className="text-[13px] text-[var(--text-primary)] truncate max-w-xs">
                       {email.subject}
                     </p>
                   </td>
@@ -746,7 +746,7 @@ export function EmailsPage() {
                   <td className="px-6 py-4">
                     <span
                       className={cn(
-                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+                        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
                         getEmailStatusColor(email.status)
                       )}
                     >
@@ -756,7 +756,7 @@ export function EmailsPage() {
                   </td>
 
                   {/* Sent Date */}
-                  <td className="px-6 py-4 text-sm text-[var(--text-secondary)]">
+                  <td className="px-6 py-4 text-[12px] text-[var(--text-secondary)]">
                     {formatDate(email.sentAt)}
                   </td>
 
@@ -764,15 +764,15 @@ export function EmailsPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       {email.openedAt ? (
-                        <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                        <span className="flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400">
                           <Eye className="w-3.5 h-3.5" />
                           Opened
                         </span>
                       ) : (
-                        <span className="text-xs text-[var(--text-tertiary)]">Not opened</span>
+                        <span className="text-[11px] text-[var(--text-tertiary)]">Not opened</span>
                       )}
                       {email.clickedAt && (
-                        <span className="flex items-center gap-1 text-xs text-purple-600 dark:text-purple-400">
+                        <span className="flex items-center gap-1 text-[11px] font-medium text-purple-600 dark:text-purple-400">
                           <MousePointerClick className="w-3.5 h-3.5" />
                         </span>
                       )}
@@ -787,7 +787,7 @@ export function EmailsPage() {
                     >
                       <button
                         onClick={() => setSelectedEmail(email)}
-                        className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] transition-colors"
+                        className="p-2 rounded-xl hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-indigo-500 transition-colors"
                         title="View email"
                       >
                         <Eye className="w-4 h-4" />
@@ -798,7 +798,7 @@ export function EmailsPage() {
                             deleteMutation.mutate(email.id);
                           }
                         }}
-                        className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
+                        className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
                         title="Delete email"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -814,7 +814,7 @@ export function EmailsPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)]">
-            <p className="text-sm text-[var(--text-tertiary)]">
+            <p className="text-[12px] text-[var(--text-tertiary)]">
               Showing {((page - 1) * limit) + 1}
               {' '}-{' '}
               {Math.min(page * limit, emailsData?.total ?? 0)} of{' '}
@@ -824,7 +824,7 @@ export function EmailsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-sm font-medium rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-[12px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
@@ -844,10 +844,10 @@ export function EmailsPage() {
                     key={pageNum}
                     onClick={() => setPage(pageNum)}
                     className={cn(
-                      'w-8 h-8 text-sm font-medium rounded-lg transition-colors',
+                      'w-8 h-8 text-[12px] font-medium rounded-xl transition-colors',
                       page === pageNum
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                        : 'bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
                     )}
                   >
                     {pageNum}
@@ -857,7 +857,7 @@ export function EmailsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-3 py-1.5 text-sm font-medium rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-[12px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
