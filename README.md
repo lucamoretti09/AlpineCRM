@@ -157,7 +157,7 @@ AlpineCRM is a **full-featured, open-source CRM** built for small-to-medium busi
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/AlpineCRM.git
+git clone https://github.com/lucamoretti09/AlpineCRM.git
 cd AlpineCRM
 
 # Copy environment file
@@ -175,7 +175,7 @@ docker-compose up -d
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/AlpineCRM.git
+git clone https://github.com/lucamoretti09/AlpineCRM.git
 cd AlpineCRM
 ```
 
@@ -530,7 +530,7 @@ We welcome contributions! Please see our contributing guidelines:
 
 ```bash
 # Clone your fork
-git clone https://github.com/yourusername/AlpineCRM.git
+git clone https://github.com/lucamoretti09/AlpineCRM.git
 cd AlpineCRM
 
 # Install all dependencies
