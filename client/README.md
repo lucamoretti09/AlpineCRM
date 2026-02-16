@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# Alpine CRM
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern, self-hostable CRM built with React, TypeScript, and Tailwind CSS.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** + TypeScript
+- **Vite 7** for blazing-fast builds
+- **Tailwind CSS v4** with custom design system
+- **Zustand** for state management
+- **TanStack React Query** for data fetching
+- **Recharts** for analytics visualizations
+- **Lucide React** for icons
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Dashboard with real-time analytics and pipeline overview
+- Contact management with search, filters, and bulk actions
+- Deal pipeline with drag-and-drop Kanban board
+- Task management with priority and status tracking
+- Support ticket system with comments and SLA tracking
+- Interactive calendar with appointment scheduling
+- Invoice management with line items and status tracking
+- Email system with templates and threading
+- Settings with profile, appearance, and notification preferences
+- Command palette (Ctrl+K) for quick navigation
+- Dark/light mode with glassmorphism design
+- Fully responsive layout
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+## Project Structure
+
+```
+src/
+  components/
+    common/       # Shared components (CommandPalette, StatsCard, ActivityFeed)
+    layouts/      # AppLayout, Sidebar, Navbar
+  features/
+    calendar/     # Calendar & appointments
+    contacts/     # Contact management
+    dashboard/    # Dashboard & analytics
+    deals/        # Sales pipeline
+    emails/       # Email system
+    invoices/     # Invoice management
+    settings/     # User settings
+    tasks/        # Task management
+    tickets/      # Support tickets
+  hooks/          # Custom React hooks
+  lib/            # API client, mock data, utilities
+  stores/         # Zustand state stores
+```
+
+## License
+
+MIT

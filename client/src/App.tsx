@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
-import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
-import LoginForm from '@/features/auth/components/LoginForm';
-import RegisterForm from '@/features/auth/components/RegisterForm';
-import ForgotPasswordForm from '@/features/auth/components/ForgotPasswordForm';
 import AppLayout from '@/components/layouts/AppLayout';
 import Dashboard from '@/features/dashboard/components/Dashboard';
 import { ContactsPage } from '@/features/contacts/components/ContactsPage';
@@ -47,20 +43,8 @@ function Router() {
     return () => document.removeEventListener('click', handleClick);
   }, []);
 
-  const { isAuthenticated, fetchUser } = useAuthStore();
-
-  // Initialize realtime and fetch user on mount
+  // Initialize realtime
   useRealtime();
-  useEffect(() => {
-    if (isAuthenticated) fetchUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auth routes
-  if (!isAuthenticated) {
-    if (path === '/register') return <RegisterForm />;
-    if (path === '/forgot-password') return <ForgotPasswordForm />;
-    return <LoginForm />;
-  }
 
   // Page title map
   const pageTitles: Record<string, string> = {

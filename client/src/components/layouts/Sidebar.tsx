@@ -12,7 +12,6 @@ import {
   Settings,
   ChevronsLeft,
   ChevronsRight,
-  LogOut,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -38,7 +37,7 @@ const navItems: NavItem[] = [
 
 export default function Sidebar() {
   const { sidebarCollapsed, toggleSidebar } = useThemeStore();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const currentPath = window.location.pathname;
@@ -203,9 +202,8 @@ export default function Sidebar() {
             </div>
           )}
 
-          {/* User info + logout */}
           {!sidebarCollapsed && (
-            <div className="flex flex-1 items-center justify-between overflow-hidden">
+            <div className="flex flex-1 items-center overflow-hidden">
               <div className="min-w-0">
                 <p className="truncate text-[13px] font-semibold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
@@ -214,13 +212,6 @@ export default function Sidebar() {
                   {user?.role ?? 'Unknown'}
                 </p>
               </div>
-              <button
-                onClick={logout}
-                title="Sign out"
-                className="ml-2 shrink-0 rounded-lg p-1.5 text-[var(--text-tertiary)] hover:bg-red-500/10 hover:text-red-500 transition-all duration-200"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
             </div>
           )}
         </div>

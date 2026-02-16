@@ -7,7 +7,6 @@ import {
   ChevronDown,
   User,
   Settings,
-  LogOut,
   Command,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
@@ -20,7 +19,7 @@ interface NavbarProps {
 
 export default function Navbar({ title }: NavbarProps) {
   const { isDark, toggleTheme } = useThemeStore();
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -255,15 +254,6 @@ export default function Navbar({ title }: NavbarProps) {
                 </a>
               </div>
 
-              <div className="border-t border-[var(--border-color)] py-1.5">
-                <button
-                  onClick={logout}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-red-500 hover:bg-red-500/10 transition-colors duration-150"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </button>
-              </div>
             </div>
           )}
         </div>

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getMockResponse } from './mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -16,15 +17,27 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor - handle errors
+// Response interceptor - use mock data when API is unavailable (demo mode)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    // If backend is unreachable, serve mock data
+    const url = error.config?.url || '';
+    const method = (error.config?.method || 'get').toUpperCase();
+    const mockData = getMockResponse(url, method);
+
+    if (mockData) {
+      return Promise.resolve({ data: mockData, status: 200, statusText: 'OK (Demo)', headers: {}, config: error.config });
     }
+
+    // If no mock data and it's a 401, don't redirect in demo mode
+    if (error.response?.status === 401) {
+      const mockFallback = getMockResponse(url, method);
+      if (mockFallback) {
+        return Promise.resolve({ data: mockFallback, status: 200, statusText: 'OK (Demo)', headers: {}, config: error.config });
+      }
+    }
+
     return Promise.reject(error);
   }
 );

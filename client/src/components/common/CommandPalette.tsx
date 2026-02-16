@@ -13,13 +13,11 @@ import {
   Plus,
   Moon,
   Sun,
-  LogOut,
   Command,
   ArrowRight,
   Hash,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
-import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/lib/utils';
 
 interface CommandItem {
@@ -39,8 +37,6 @@ export default function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const { isDark, toggleTheme } = useThemeStore();
-  const { logout } = useAuthStore();
-
   const navigate = useCallback((path: string) => {
     window.history.pushState({}, '', path);
     window.dispatchEvent(new PopStateEvent('popstate'));
@@ -64,7 +60,6 @@ export default function CommandPalette() {
     { id: 'act-new-task', label: 'Create New Task', description: 'Add a task to your list', icon: Plus, action: () => navigate('/tasks'), category: 'actions', keywords: ['add', 'todo'] },
     // Settings
     { id: 'set-theme', label: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode', icon: isDark ? Sun : Moon, action: () => { toggleTheme(); setIsOpen(false); }, category: 'settings', keywords: ['theme', 'dark', 'light', 'appearance'] },
-    { id: 'set-logout', label: 'Sign Out', description: 'Log out of your account', icon: LogOut, action: () => { logout(); setIsOpen(false); }, category: 'settings', keywords: ['exit', 'signout'] },
   ];
 
   const filtered = query
