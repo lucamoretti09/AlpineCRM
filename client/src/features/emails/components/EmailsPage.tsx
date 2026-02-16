@@ -188,9 +188,9 @@ function StatCard({
             {icon}
           </div>
         </div>
-        <p className="text-3xl font-bold text-[var(--text-primary)]">{value}</p>
+        <p className="text-[28px] font-bold text-[var(--text-primary)] truncate">{value}</p>
         {subtitle && (
-          <p className="text-[13px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
+          <p className="text-[13px] text-[var(--text-tertiary)] mt-1 truncate">{subtitle}</p>
         )}
       </div>
     </div>

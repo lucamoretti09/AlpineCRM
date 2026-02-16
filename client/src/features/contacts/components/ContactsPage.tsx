@@ -114,11 +114,11 @@ export function ContactsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Contacte</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afi\u0219eaz\u0103 {data?.contacts?.length || 0} din {data?.total || 0} contacte</p>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afișează {data?.contacts?.length || 0} din {data?.total || 0} contacte</p>
         </div>
         <button onClick={() => { setEditingContact(null); setShowForm(true); }}
           className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Adaug\u0103 Contact
+          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Adaugă Contact
         </button>
       </div>
 
@@ -126,7 +126,7 @@ export function ContactsPage() {
       <div className="flex gap-3">
         <div className="relative flex-1 group/search">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
-          <input type="text" placeholder="Caut\u0103 contacte..." value={search} onChange={(e) => setSearch(e.target.value)}
+          <input type="text" placeholder="Caută contacte..." value={search} onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
@@ -148,7 +148,7 @@ export function ContactsPage() {
               <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
               <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Scor Lead</th>
               <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Creat</th>
-              <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Ac\u021Biuni</th>
+              <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Acțiuni</th>
             </tr>
           </thead>
           <tbody>
@@ -179,8 +179,8 @@ export function ContactsPage() {
                       <UserPlus className="w-8 h-8 text-primary-500/60" />
                     </div>
                     <div>
-                      <p className="text-[15px] font-semibold text-[var(--text-primary)]">Niciun contact g\u0103sit</p>
-                      <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">\u00CEncearc\u0103 s\u0103 ajustezi filtrele sau adaug\u0103 un contact nou</p>
+                      <p className="text-[15px] font-semibold text-[var(--text-primary)]">Niciun contact găsit</p>
+                      <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">Încearcă să ajustezi filtrele sau adaugă un contact nou</p>
                     </div>
                   </div>
                 </td>
@@ -230,7 +230,7 @@ export function ContactsPage() {
                         className="p-2.5 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                         <Edit className="w-4.5 h-4.5" />
                       </button>
-                      <button onClick={() => { if (confirm('\u0218tergi acest contact?')) deleteMutation.mutate(contact.id); }}
+                      <button onClick={() => { if (confirm('Ștergi acest contact?')) deleteMutation.mutate(contact.id); }}
                         className="p-2.5 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                         <Trash2 className="w-4.5 h-4.5" />
                       </button>
@@ -252,7 +252,7 @@ export function ContactsPage() {
             {/* Subtle background glow */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
             <h2 className="text-[22px] font-bold text-[var(--text-primary)] mb-7 tracking-tight">
-              {editingContact ? 'Editeaz\u0103 Contact' : 'Contact Nou'}
+              {editingContact ? 'Editează Contact' : 'Contact Nou'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
@@ -285,7 +285,7 @@ export function ContactsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Func\u021Bie</label>
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Funcție</label>
                 <input name="jobTitle" defaultValue={editingContact?.jobTitle}
                   className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
@@ -300,7 +300,7 @@ export function ContactsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Surs\u0103</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Sursă</label>
                   <select name="source" defaultValue={editingContact?.source || 'other'}
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     <option value="website">Website</option>
@@ -315,11 +315,11 @@ export function ContactsPage() {
               <div className="flex gap-3 pt-4">
                 <button type="submit" disabled={createMutation.isPending}
                   className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
-                  {createMutation.isPending ? 'Se salveaz\u0103...' : editingContact ? 'Actualizeaz\u0103 Contact' : 'Creeaz\u0103 Contact'}
+                  {createMutation.isPending ? 'Se salvează...' : editingContact ? 'Actualizează Contact' : 'Creează Contact'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingContact(null); }}
                   className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200">
-                  Anuleaz\u0103
+                  Anulează
                 </button>
               </div>
             </form>

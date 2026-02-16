@@ -10,7 +10,7 @@ const STAGES = [
   { id: 'qualification', label: 'Calificare', color: 'bg-amber-500' },
   { id: 'proposal', label: 'Propunere', color: 'bg-violet-500' },
   { id: 'negotiation', label: 'Negociere', color: 'bg-orange-500' },
-  { id: 'closed_won', label: 'C\u00e2\u0219tigat', color: 'bg-emerald-500' },
+  { id: 'closed_won', label: 'Câștigat', color: 'bg-emerald-500' },
   { id: 'closed_lost', label: 'Pierdut', color: 'bg-red-500' },
 ];
 
@@ -19,7 +19,7 @@ const STAGE_LABELS: Record<string, string> = {
   qualification: 'Calificare',
   proposal: 'Propunere',
   negotiation: 'Negociere',
-  closed_won: 'C\u00e2\u0219tigat',
+  closed_won: 'Câștigat',
   closed_lost: 'Pierdut',
 };
 
@@ -54,9 +54,9 @@ export function DealsPage() {
       api.patch(`/deals/${dealId}/stage`, { stage }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['deals-kanban'] });
-      toast.success('Tranzac\u021Bie mutat\u0103');
+      toast.success('Tranzacție mutată');
     },
-    onError: () => toast.error('Eroare la mutarea tranzac\u021Biei'),
+    onError: () => toast.error('Eroare la mutarea tranzacției'),
   });
 
   const createMutation = useMutation({
@@ -67,11 +67,11 @@ export function DealsPage() {
       queryClient.invalidateQueries({ queryKey: ['deals'] });
       queryClient.invalidateQueries({ queryKey: ['deals-kanban'] });
       queryClient.invalidateQueries({ queryKey: ['deals-list'] });
-      toast.success(editingDeal ? 'Tranzac\u021Bie actualizat\u0103' : 'Tranzac\u021Bie creat\u0103');
+      toast.success(editingDeal ? 'Tranzacție actualizată' : 'Tranzacție creată');
       setShowForm(false);
       setEditingDeal(null);
     },
-    onError: () => toast.error('Eroare la salvarea tranzac\u021Biei'),
+    onError: () => toast.error('Eroare la salvarea tranzacției'),
   });
 
   const deleteMutation = useMutation({
@@ -80,9 +80,9 @@ export function DealsPage() {
       queryClient.invalidateQueries({ queryKey: ['deals'] });
       queryClient.invalidateQueries({ queryKey: ['deals-kanban'] });
       queryClient.invalidateQueries({ queryKey: ['deals-list'] });
-      toast.success('Tranzac\u021Bie \u0219tears\u0103');
+      toast.success('Tranzacție ștearsă');
     },
-    onError: () => toast.error('Eroare la \u0219tergerea tranzac\u021Biei'),
+    onError: () => toast.error('Eroare la ștergerea tranzacției'),
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -103,8 +103,8 @@ export function DealsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Tranzac\u021Bii</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Gestioneaz\u0103 pipeline-ul de v\u00e2nz\u0103ri</p>
+          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Tranzacții</h1>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Gestionează pipeline-ul de vânzări</p>
         </div>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
@@ -125,7 +125,7 @@ export function DealsPage() {
           </div>
           <button onClick={() => { setEditingDeal(null); setShowForm(true); }}
             className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-            <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Tranzac\u021Bie Nou\u0103
+            <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Tranzacție Nouă
           </button>
         </div>
       </div>
@@ -166,7 +166,7 @@ export function DealsPage() {
                       <div className="w-12 h-12 rounded-xl bg-[var(--bg-tertiary)]/60 flex items-center justify-center">
                         <FolderOpen className="w-5 h-5 text-[var(--text-tertiary)]" />
                       </div>
-                      <p className="text-[14px] text-[var(--text-tertiary)]">Nicio tranzac\u021Bie</p>
+                      <p className="text-[14px] text-[var(--text-tertiary)]">Nicio tranzacție</p>
                     </div>
                   ) : (
                     stageData?.deals?.map((deal: any, dealIndex: number) => (
@@ -182,7 +182,7 @@ export function DealsPage() {
                               className="p-2 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button onClick={() => { if (confirm('\u0218tergi?')) deleteMutation.mutate(deal.id); }}
+                            <button onClick={() => { if (confirm('Ștergi?')) deleteMutation.mutate(deal.id); }}
                               className="p-2 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -230,12 +230,12 @@ export function DealsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--border-color)]">
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Tranzac\u021Bie</th>
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Tranzacție</th>
                 <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Valoare</th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Etap\u0103</th>
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Etapă</th>
                 <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Probabilitate</th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Data \u00CEnchidere</th>
-                <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Ac\u021Biuni</th>
+                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Data Închidere</th>
+                <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Acțiuni</th>
               </tr>
             </thead>
             <tbody>
@@ -247,8 +247,8 @@ export function DealsPage() {
                         <TrendingUp className="w-8 h-8 text-primary-500/60" />
                       </div>
                       <div>
-                        <p className="text-[15px] font-semibold text-[var(--text-primary)]">Nicio tranzac\u021Bie</p>
-                        <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">Creeaz\u0103 prima tranzac\u021Bie pentru a \u00EEncepe s\u0103 urm\u0103re\u0219ti pipeline-ul</p>
+                        <p className="text-[15px] font-semibold text-[var(--text-primary)]">Nicio tranzacție</p>
+                        <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">Creează prima tranzacție pentru a începe să urmărești pipeline-ul</p>
                       </div>
                     </div>
                   </td>
@@ -280,7 +280,7 @@ export function DealsPage() {
                           className="p-2.5 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                           <Edit className="w-4.5 h-4.5" />
                         </button>
-                        <button onClick={() => { if (confirm('\u0218tergi?')) deleteMutation.mutate(deal.id); }}
+                        <button onClick={() => { if (confirm('Ștergi?')) deleteMutation.mutate(deal.id); }}
                           className="p-2.5 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                           <Trash2 className="w-4.5 h-4.5" />
                         </button>
@@ -303,11 +303,11 @@ export function DealsPage() {
             {/* Subtle background glow */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
             <h2 className="text-[22px] font-bold text-[var(--text-primary)] mb-7 tracking-tight">
-              {editingDeal ? 'Editeaz\u0103 Tranzac\u021Bie' : 'Tranzac\u021Bie Nou\u0103'}
+              {editingDeal ? 'Editează Tranzacție' : 'Tranzacție Nouă'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Nume Tranzac\u021Bie *</label>
+                <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Nume Tranzacție *</label>
                 <input name="name" defaultValue={editingDeal?.name} required
                   className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
@@ -318,7 +318,7 @@ export function DealsPage() {
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Etap\u0103</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Etapă</label>
                   <select name="stage" defaultValue={editingDeal?.stage || 'prospecting'}
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
@@ -332,7 +332,7 @@ export function DealsPage() {
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
                 <div>
-                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Data Estimat\u0103 \u00CEnchidere</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Data Estimată Închidere</label>
                   <input name="expectedCloseDate" type="date" defaultValue={editingDeal?.expectedCloseDate?.split('T')[0]}
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
@@ -345,11 +345,11 @@ export function DealsPage() {
               <div className="flex gap-3 pt-4">
                 <button type="submit" disabled={createMutation.isPending}
                   className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
-                  {createMutation.isPending ? 'Se salveaz\u0103...' : editingDeal ? 'Actualizeaz\u0103 Tranzac\u021Bie' : 'Creeaz\u0103 Tranzac\u021Bie'}
+                  {createMutation.isPending ? 'Se salvează...' : editingDeal ? 'Actualizează Tranzacție' : 'Creează Tranzacție'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingDeal(null); }}
                   className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200">
-                  Anuleaz\u0103
+                  Anulează
                 </button>
               </div>
             </form>

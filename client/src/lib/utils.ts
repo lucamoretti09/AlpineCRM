@@ -10,6 +10,26 @@ export function formatCurrency(amount: number | string, currency = 'USD'): strin
   return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(num);
 }
 
+export function formatCompactCurrency(amount: number | string, currency = 'USD'): string {
+  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+  if (Math.abs(num) >= 1_000_000) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    }).format(num);
+  }
+  if (Math.abs(num) >= 10_000) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 0,
+    }).format(num);
+  }
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(num);
+}
+
 export function formatDate(date: string | Date): string {
   return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }

@@ -14,19 +14,19 @@ const PRIORITY_DOTS: Record<string, string> = {
 };
 
 const PRIORITY_LABELS: Record<string, string> = {
-  low: 'sc\u0103zut\u0103',
+  low: 'scăzută',
   medium: 'medie',
   normal: 'medie',
-  high: 'ridicat\u0103',
-  urgent: 'urgent\u0103',
+  high: 'ridicată',
+  urgent: 'urgentă',
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  task: 'sarcin\u0103',
+  task: 'sarcină',
   call: 'apel',
   email: 'email',
-  meeting: '\u00eent\u00e2lnire',
-  follow_up: 'urm\u0103rire',
+  meeting: 'întâlnire',
+  follow_up: 'urmărire',
 };
 
 export function TasksPage() {
@@ -54,7 +54,7 @@ export function TasksPage() {
     mutationFn: (id: string) => api.patch(`/tasks/${id}/complete`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Sarcin\u0103 finalizat\u0103!');
+      toast.success('Sarcină finalizată!');
       setTimeout(() => setCompletingId(null), 600);
     },
     onError: () => toast.error('Nu s-a putut finaliza sarcina'),
@@ -64,7 +64,7 @@ export function TasksPage() {
     mutationFn: (id: string) => api.delete(`/tasks/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success('Sarcin\u0103 \u0219tears\u0103');
+      toast.success('Sarcină ștearsă');
     },
     onError: () => toast.error('Nu s-a putut șterge sarcina'),
   });
@@ -73,7 +73,7 @@ export function TasksPage() {
     mutationFn: (task: any) => editingTask ? api.put(`/tasks/${editingTask.id}`, task) : api.post('/tasks', task),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
-      toast.success(editingTask ? 'Sarcin\u0103 actualizat\u0103' : 'Sarcin\u0103 creat\u0103');
+      toast.success(editingTask ? 'Sarcină actualizată' : 'Sarcină creată');
       setShowForm(false); setEditingTask(null);
     },
     onError: () => toast.error('Nu s-a putut salva sarcina'),
@@ -124,25 +124,25 @@ export function TasksPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Sarcini</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afi\u0219eaz\u0103 {data?.tasks?.length || 0} din {data?.total || 0} sarcini</p>
+          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afișează {data?.tasks?.length || 0} din {data?.total || 0} sarcini</p>
         </div>
         <button onClick={() => { setEditingTask(null); setShowForm(true); }}
           className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Sarcin\u0103 Nou\u0103
+          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Sarcină Nouă
         </button>
       </div>
 
       <div className="flex gap-3">
         <div className="relative flex-1 group/search">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
-          <input type="text" placeholder="Caut\u0103 sarcini..." value={search} onChange={(e) => setSearch(e.target.value)}
+          <input type="text" placeholder="Caută sarcini..." value={search} onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           className="px-5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
           <option value="">Toate Statusurile</option>
-          <option value="pending">\u00CEn a\u0219teptare</option>
-          <option value="in_progress">\u00CEn progres</option>
+          <option value="pending">În așteptare</option>
+          <option value="in_progress">În progres</option>
           <option value="completed">Finalizat</option>
           <option value="cancelled">Anulat</option>
         </select>
@@ -168,8 +168,8 @@ export function TasksPage() {
               <ClipboardList className="w-8 h-8 text-primary-500/60" />
             </div>
             <div className="text-center">
-              <p className="text-[15px] font-semibold text-[var(--text-primary)]">Nicio sarcin\u0103 g\u0103sit\u0103</p>
-              <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">Creeaz\u0103 prima sarcin\u0103 pentru a \u00eencepe</p>
+              <p className="text-[15px] font-semibold text-[var(--text-primary)]">Nicio sarcină găsită</p>
+              <p className="text-[14px] text-[var(--text-tertiary)] mt-0.5">Creează prima sarcină pentru a începe</p>
             </div>
           </div>
         ) : (
@@ -217,7 +217,7 @@ export function TasksPage() {
                   className="p-2.5 rounded-xl hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                   <Edit className="w-5 h-5" />
                 </button>
-                <button onClick={() => { if (confirm('\u0218tergi?')) deleteMutation.mutate(task.id); }}
+                <button onClick={() => { if (confirm('Ștergi?')) deleteMutation.mutate(task.id); }}
                   className="p-2.5 rounded-xl hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -234,7 +234,7 @@ export function TasksPage() {
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 via-primary-500 to-violet-500 rounded-t-2xl" />
             {/* Subtle background glow */}
             <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-            <h2 className="text-[22px] font-bold text-[var(--text-primary)] mb-7 tracking-tight">{editingTask ? 'Editeaz\u0103 Sarcin\u0103' : 'Sarcin\u0103 Nou\u0103'}</h2>
+            <h2 className="text-[22px] font-bold text-[var(--text-primary)] mb-7 tracking-tight">{editingTask ? 'Editează Sarcină' : 'Sarcină Nouă'}</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Titlu *</label>
@@ -251,20 +251,20 @@ export function TasksPage() {
                   <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Tip</label>
                   <select name="type" defaultValue={editingTask?.type || 'task'}
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
-                    <option value="task">Sarcin\u0103</option><option value="call">Apel</option><option value="meeting">\u00CEnt\u00e2lnire</option>
-                    <option value="email">Email</option><option value="follow_up">Urm\u0103rire</option>
+                    <option value="task">Sarcină</option><option value="call">Apel</option><option value="meeting">Întâlnire</option>
+                    <option value="email">Email</option><option value="follow_up">Urmărire</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Prioritate</label>
                   <select name="priority" defaultValue={editingTask?.priority || 'medium'}
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
-                    <option value="low">Sc\u0103zut\u0103</option><option value="medium">Medie</option>
-                    <option value="high">Ridicat\u0103</option><option value="urgent">Urgent\u0103</option>
+                    <option value="low">Scăzută</option><option value="medium">Medie</option>
+                    <option value="high">Ridicată</option><option value="urgent">Urgentă</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Data Scaden\u021Bei</label>
+                  <label className="block text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Data Scadenței</label>
                   <input name="dueDate" type="date" defaultValue={editingTask?.dueDate?.split('T')[0]}
                     className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
@@ -272,11 +272,11 @@ export function TasksPage() {
               <div className="flex gap-3 pt-4">
                 <button type="submit" disabled={createMutation.isPending}
                   className="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
-                  {createMutation.isPending ? 'Se salveaz\u0103...' : editingTask ? 'Actualizeaz\u0103 Sarcin\u0103' : 'Creeaz\u0103 Sarcin\u0103'}
+                  {createMutation.isPending ? 'Se salvează...' : editingTask ? 'Actualizează Sarcină' : 'Creează Sarcină'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingTask(null); }}
                   className="px-7 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200">
-                  Anuleaz\u0103
+                  Anulează
                 </button>
               </div>
             </form>

@@ -19,7 +19,7 @@ import {
   Ban,
 } from 'lucide-react';
 import api from '@/lib/api';
-import { cn, formatCurrency, formatDate, getStatusColor } from '@/lib/utils';
+import { cn, formatCurrency, formatCompactCurrency, formatDate, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 // ---------------------------------------------------------------------------
@@ -159,8 +159,8 @@ function StatCard({ label, value, subtitle, icon, iconBg, accentColor = 'indigo'
             {icon}
           </div>
         </div>
-        <p className="text-3xl font-bold text-[var(--text-primary)]">{value}</p>
-        <p className="text-[13px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
+        <p className="text-[28px] font-bold text-[var(--text-primary)] truncate">{value}</p>
+        <p className="text-[13px] text-[var(--text-tertiary)] mt-1 truncate">{subtitle}</p>
       </div>
     </div>
   );
@@ -569,7 +569,7 @@ export function InvoicesPage() {
             />
             <StatCard
               label="Venituri Totale"
-              value={formatCurrency(stats.totalRevenue)}
+              value={formatCompactCurrency(stats.totalRevenue)}
               subtitle="Din facturile plătite"
               icon={<TrendingUp className="w-5.5 h-5.5 text-green-600" />}
               iconBg="bg-green-600/10"

@@ -170,21 +170,21 @@ export default function StatsCard({
         }}
       />
 
-      <div className="relative flex items-start justify-between p-8">
-        <div className="min-w-0 flex-1">
-          <p className="text-[16px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+      <div className="relative flex items-start justify-between p-6">
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <p className="text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
             {title}
           </p>
           <p
             className={cn(
-              'mt-2 text-[48px] font-bold tracking-tight text-[var(--text-primary)] leading-none',
+              'mt-1.5 text-[32px] font-bold tracking-tight text-[var(--text-primary)] leading-none truncate',
               isVisible && 'animate-statsValuePop',
             )}
           >
             {value}
           </p>
           {subtitle && (
-            <p className="mt-2 text-[16px] font-medium text-[var(--text-secondary)]">
+            <p className="mt-1.5 text-[14px] font-medium text-[var(--text-secondary)] truncate">
               {subtitle}
             </p>
           )}
@@ -192,13 +192,13 @@ export default function StatsCard({
 
         <div
           className={cn(
-            'flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl',
+            'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ml-3',
             colors.iconBg,
             'transition-all duration-400 ease-spring',
             'group-hover:scale-110 group-hover:-translate-y-0.5',
           )}
         >
-          <Icon className={cn('h-8 w-8 transition-transform duration-400', colors.iconText)} />
+          <Icon className={cn('h-6 w-6 transition-transform duration-400', colors.iconText)} />
         </div>
       </div>
     </div>

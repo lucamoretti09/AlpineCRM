@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import api from '@/lib/api';
-import { cn, formatCurrency, formatRelativeTime } from '@/lib/utils';
+import { cn, formatCurrency, formatCompactCurrency, formatRelativeTime } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import StatsCard from '@/components/common/StatsCard';
 import ActivityFeed, { type Activity } from '@/components/common/ActivityFeed';
@@ -370,7 +370,7 @@ export default function Dashboard() {
           <div className="animate-fadeInUp stagger-3">
             <StatsCard
               title="Valoare Pipeline"
-              value={formatCurrency(stats.deals.pipelineValue)}
+              value={formatCompactCurrency(stats.deals.pipelineValue)}
               subtitle={`${stats.deals.total} tranzacții deschise`}
               icon={TrendingUp}
               color="purple"
@@ -392,7 +392,7 @@ export default function Dashboard() {
           <div className="animate-fadeInUp stagger-5">
             <StatsCard
               title="Venituri"
-              value={formatCurrency(stats.invoices.totalRevenue)}
+              value={formatCompactCurrency(stats.invoices.totalRevenue)}
               subtitle={`${stats.invoices.paid} facturi plătite`}
               icon={DollarSign}
               color="green"
