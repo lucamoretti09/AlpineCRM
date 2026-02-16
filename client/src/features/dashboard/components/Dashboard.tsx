@@ -22,6 +22,7 @@ import {
   Clock,
   AlertTriangle,
   Loader2,
+  Sparkles,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import api from '@/lib/api';
@@ -64,14 +65,14 @@ interface UpcomingTask {
   dealName?: string;
 }
 
-// --- Pipeline chart colors ---
+// --- Pipeline chart colors with gradient pairs ---
 
 const PIPELINE_COLORS = [
-  '#6366f1', // indigo - prospecting
-  '#f59e0b', // amber - qualification
-  '#8b5cf6', // violet - proposal
-  '#f97316', // orange - negotiation
-  '#10b981', // emerald - closed won
+  { solid: '#6366f1', light: '#818cf8' }, // indigo
+  { solid: '#f59e0b', light: '#fbbf24' }, // amber
+  { solid: '#8b5cf6', light: '#a78bfa' }, // violet
+  { solid: '#f97316', light: '#fb923c' }, // orange
+  { solid: '#10b981', light: '#34d399' }, // emerald
 ];
 
 function formatStageName(stage: string): string {
@@ -97,19 +98,25 @@ function PipelineTooltip({
   return (
     <div
       className={cn(
-        'rounded-xl border border-white/10 px-4 py-3',
-        'bg-[#0d1025]/95 backdrop-blur-xl',
-        'shadow-xl shadow-black/30',
+        'rounded-2xl border px-5 py-4',
+        'border-[var(--border-color)]',
+        'bg-[var(--bg-card)]/95 backdrop-blur-xl',
+        'shadow-2xl',
       )}
+      style={{
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05)',
+      }}
     >
-      <p className="text-[13px] font-bold text-white">
+      <p className="text-[13px] font-bold text-[var(--text-primary)]">
         {formatStageName(label || '')}
       </p>
-      <p className="mt-1 text-[12px] text-slate-400">
-        {data.count} deal{data.count !== 1 ? 's' : ''}
-      </p>
-      <p className="text-[14px] font-semibold text-emerald-400">
-        {formatCurrency(data.totalValue)}
+      <div className="mt-2 flex items-baseline gap-2">
+        <p className="text-[20px] font-bold text-emerald-500 dark:text-emerald-400">
+          {formatCurrency(data.totalValue)}
+        </p>
+      </div>
+      <p className="mt-1 text-[12px] text-[var(--text-tertiary)]">
+        {data.count} deal{data.count !== 1 ? 's' : ''} in stage
       </p>
     </div>
   );
@@ -146,24 +153,33 @@ function PriorityBadge({ priority }: { priority: string }) {
   );
 }
 
-// --- Loading skeleton ---
+// --- Loading skeleton (premium) ---
 
 function DashboardSkeleton() {
   return (
-    <div className="animate-pulse space-y-8 p-6 lg:p-8">
-      <div className="space-y-2">
-        <div className="h-8 w-64 rounded-xl skeleton" />
-        <div className="h-4 w-96 rounded-xl skeleton" />
+    <div className="space-y-8 p-6 lg:p-8">
+      {/* Welcome skeleton */}
+      <div className="space-y-3">
+        <div className="h-8 w-64 rounded-2xl skeleton-premium" />
+        <div className="h-4 w-96 rounded-2xl skeleton-premium" style={{ animationDelay: '0.1s' }} />
       </div>
+      {/* Stats cards skeleton */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-[120px] rounded-2xl skeleton" />
+          <div
+            key={i}
+            className="h-[120px] rounded-2xl skeleton-premium"
+            style={{ animationDelay: `${0.15 + i * 0.08}s` }}
+          />
         ))}
       </div>
+      {/* Charts skeleton */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="col-span-2 h-96 rounded-2xl skeleton" />
-        <div className="h-96 rounded-2xl skeleton" />
+        <div className="col-span-2 h-96 rounded-2xl skeleton-premium" style={{ animationDelay: '0.55s' }} />
+        <div className="h-96 rounded-2xl skeleton-premium" style={{ animationDelay: '0.65s' }} />
       </div>
+      {/* Tasks skeleton */}
+      <div className="h-64 rounded-2xl skeleton-premium" style={{ animationDelay: '0.75s' }} />
     </div>
   );
 }
@@ -185,6 +201,9 @@ function GlassCard({
         'backdrop-blur-xl backdrop-saturate-150',
         'border border-[var(--border-color)]',
         'shadow-sm dark:shadow-black/20',
+        'transition-all duration-300 ease-spring',
+        'hover:border-[rgba(99,102,241,0.12)] dark:hover:border-[rgba(99,102,241,0.15)]',
+        'hover:shadow-md',
         className,
       )}
     >
@@ -244,9 +263,25 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 p-2 lg:p-4">
-      {/* ===== Welcome Header ===== */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-fadeInUp">
-        <div>
+      {/* ===== Welcome Header with mesh gradient ===== */}
+      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between animate-fadeInUp">
+        {/* Mesh gradient background behind greeting */}
+        <div
+          className="pointer-events-none absolute -top-8 -left-8 h-40 w-80 rounded-full opacity-30 dark:opacity-20"
+          style={{
+            background: 'radial-gradient(ellipse at 30% 50%, rgba(99,102,241,0.3) 0%, rgba(139,92,246,0.15) 40%, transparent 70%)',
+            filter: 'blur(40px)',
+          }}
+        />
+        <div
+          className="pointer-events-none absolute -top-4 left-32 h-32 w-48 rounded-full opacity-20 dark:opacity-15"
+          style={{
+            background: 'radial-gradient(ellipse at 70% 50%, rgba(6,182,212,0.25) 0%, transparent 70%)',
+            filter: 'blur(35px)',
+          }}
+        />
+
+        <div className="relative">
           <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">
             {greeting}, <span className="gradient-text">{firstName}</span>
           </h1>
@@ -255,7 +290,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="relative flex flex-wrap gap-2">
           <QuickActionButton
             icon={UserPlus}
             label="New Contact"
@@ -358,8 +393,16 @@ export default function Dashboard() {
                     name: formatStageName(s.stage),
                   }))}
                   margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
-                  barSize={44}
+                  barSize={48}
                 >
+                  <defs>
+                    {PIPELINE_COLORS.map((c, i) => (
+                      <linearGradient key={i} id={`pipelineGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={c.light} stopOpacity={0.95} />
+                        <stop offset="100%" stopColor={c.solid} stopOpacity={0.85} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
@@ -383,19 +426,18 @@ export default function Dashboard() {
                   />
                   <Tooltip
                     content={<PipelineTooltip />}
-                    cursor={{ fill: 'rgba(148,163,184,0.04)' }}
+                    cursor={{ fill: 'rgba(148,163,184,0.04)', radius: 8 }}
                   />
                   <Bar
                     dataKey="totalValue"
-                    radius={[8, 8, 0, 0]}
-                    animationDuration={800}
+                    radius={[10, 10, 4, 4]}
+                    animationDuration={1000}
                     animationEasing="ease-out"
                   >
                     {pipeline.map((_, index) => (
                       <Cell
                         key={index}
-                        fill={PIPELINE_COLORS[index % PIPELINE_COLORS.length]}
-                        fillOpacity={0.85}
+                        fill={`url(#pipelineGrad-${index % PIPELINE_COLORS.length})`}
                       />
                     ))}
                   </Bar>
@@ -403,8 +445,11 @@ export default function Dashboard() {
               </ResponsiveContainer>
             ) : (
               <div className="flex h-72 flex-col items-center justify-center text-[var(--text-tertiary)]">
-                <TrendingUp className="mb-2 h-8 w-8 opacity-40" />
-                <p className="text-[13px]">No pipeline data available</p>
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] mb-3">
+                  <TrendingUp className="h-7 w-7 opacity-50" />
+                </div>
+                <p className="text-[14px] font-medium">No pipeline data available</p>
+                <p className="text-[12px] mt-1 opacity-60">Create your first deal to see the pipeline</p>
               </div>
             )}
           </div>
@@ -470,8 +515,11 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-[var(--text-tertiary)]">
-              <CheckCircle2 className="mb-2 h-8 w-8 opacity-40" />
-              <p className="text-[13px] font-medium">No upcoming tasks. You're all caught up!</p>
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--bg-secondary)] mb-3">
+                <Sparkles className="h-7 w-7 opacity-50" />
+              </div>
+              <p className="text-[14px] font-medium text-[var(--text-secondary)]">All caught up!</p>
+              <p className="text-[12px] mt-1 opacity-60">No upcoming tasks. Enjoy your day.</p>
             </div>
           )}
         </div>
@@ -494,16 +542,16 @@ function QuickActionButton({
   color: 'indigo' | 'emerald' | 'violet';
 }) {
   const colorClasses = {
-    indigo: 'from-indigo-600 to-indigo-500 shadow-indigo-600/20 hover:shadow-indigo-600/30',
-    emerald: 'from-emerald-600 to-emerald-500 shadow-emerald-600/20 hover:shadow-emerald-600/30',
-    violet: 'from-violet-600 to-violet-500 shadow-violet-600/20 hover:shadow-violet-600/30',
+    indigo: 'from-indigo-600 to-indigo-500 shadow-indigo-600/20 hover:shadow-indigo-500/40',
+    emerald: 'from-emerald-600 to-emerald-500 shadow-emerald-600/20 hover:shadow-emerald-500/40',
+    violet: 'from-violet-600 to-violet-500 shadow-violet-600/20 hover:shadow-violet-500/40',
   };
 
   return (
     <a
       href={href}
       className={cn(
-        'inline-flex items-center gap-2 rounded-xl px-4 py-2.5',
+        'group/btn inline-flex items-center gap-2 rounded-xl px-4 py-2.5',
         'text-[13px] font-semibold text-white',
         'bg-gradient-to-r shadow-md',
         'transition-all duration-300 ease-spring',
@@ -512,7 +560,7 @@ function QuickActionButton({
         colorClasses[color],
       )}
     >
-      <Icon className="h-4 w-4" />
+      <Icon className="h-4 w-4 transition-transform duration-300 group-hover/btn:rotate-12" />
       {label}
     </a>
   );
@@ -526,14 +574,16 @@ function TaskRow({ task }: { task: UpcomingTask }) {
     <div
       className={cn(
         'group flex items-center gap-4 rounded-xl px-4 py-3',
-        'transition-all duration-200',
+        'transition-all duration-200 ease-spring',
         'hover:bg-[var(--bg-secondary)]/60',
+        'hover:-translate-y-px hover:shadow-sm',
         isOverdue && 'border-l-2 border-red-500 pl-3.5',
       )}
     >
       <div
         className={cn(
           'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+          'transition-all duration-200',
           isOverdue
             ? 'bg-red-500/10 dark:bg-red-500/[0.12]'
             : 'bg-[var(--bg-secondary)]',

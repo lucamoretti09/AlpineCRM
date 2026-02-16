@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
 import {
   User,
   Lock,
@@ -106,26 +106,30 @@ function SectionCard({ children, className }: { children: React.ReactNode; class
   return (
     <div
       className={cn(
-        'bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6',
+        'relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6',
+        'hover:border-[var(--border-color)]/80 transition-all duration-300',
+        'group/card',
         className,
       )}
     >
+      {/* Subtle top accent line on hover */}
+      <div className="absolute top-0 left-4 right-4 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/0 to-transparent group-hover/card:via-indigo-500/20 transition-all duration-500 rounded-full" />
       {children}
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-lg font-bold text-[var(--text-primary)] mb-1">{children}</h3>;
+  return <h3 className="text-[15px] font-bold tracking-tight text-[var(--text-primary)] mb-1">{children}</h3>;
 }
 
 function SectionDescription({ children }: { children: React.ReactNode }) {
-  return <p className="text-[13px] text-[var(--text-secondary)] mb-6">{children}</p>;
+  return <p className="text-[12px] text-[var(--text-secondary)] mb-6 leading-relaxed">{children}</p>;
 }
 
 function FormLabel({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+    <label htmlFor={htmlFor} className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
       {children}
     </label>
   );
@@ -163,8 +167,8 @@ function FormInput({
         className={cn(
           'w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl',
           'text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]',
-          'focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30',
-          'transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+          'focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10',
+          'transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',
           rightElement && 'pr-11',
         )}
       />
@@ -193,16 +197,16 @@ function ToggleSwitch({
       onClick={() => onChange(!checked)}
       className={cn(
         'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent',
-        'transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
-        checked ? 'bg-gradient-to-r from-indigo-600 to-indigo-500' : 'bg-[var(--border-color)]',
+        'transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
+        checked ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md shadow-indigo-500/20' : 'bg-[var(--border-color)]',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
     >
       <span
         className={cn(
-          'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0',
-          'transform transition duration-200 ease-in-out',
-          checked ? 'translate-x-5' : 'translate-x-0',
+          'pointer-events-none inline-block h-5 w-5 rounded-full bg-white ring-0',
+          'transform transition-all duration-300 ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]',
+          checked ? 'translate-x-5 shadow-lg shadow-indigo-500/30' : 'translate-x-0 shadow-md',
         )}
       />
     </button>
@@ -225,7 +229,8 @@ function SaveButton({
       disabled={loading || disabled}
       className={cn(
         'flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl',
-        'font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed',
+        'text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/25',
+        'transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed',
       )}
     >
       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -289,17 +294,28 @@ function ProfileTab() {
         <SectionDescription>This is displayed across the CRM alongside your name.</SectionDescription>
 
         <div className="flex items-center gap-6">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={`${firstName} ${lastName}`}
-              className="w-20 h-20 rounded-2xl object-cover border-2 border-[var(--border-color)] shadow-lg"
-            />
-          ) : (
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold select-none shadow-lg shadow-indigo-500/20">
-              {initials}
+          {/* Avatar with animated gradient ring */}
+          <div className="relative group/avatar">
+            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-50 group-hover/avatar:opacity-80 blur-sm transition-all duration-500 animate-[spin_6s_linear_infinite]" style={{ backgroundSize: '200% 200%', animation: 'gradient-spin 4s linear infinite' }} />
+            <div className="absolute -inset-[3px] rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-60 group-hover/avatar:opacity-100 transition-opacity duration-300" />
+            <div className="relative">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={`${firstName} ${lastName}`}
+                  className="w-20 h-20 rounded-2xl object-cover border-2 border-white dark:border-gray-900 shadow-lg relative z-10"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold select-none shadow-lg shadow-indigo-500/20 border-2 border-white dark:border-gray-900 relative z-10">
+                  {initials}
+                </div>
+              )}
             </div>
-          )}
+            {/* Camera overlay */}
+            <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover/avatar:bg-black/30 transition-all duration-300 flex items-center justify-center z-20 cursor-pointer">
+              <Camera className="w-5 h-5 text-white opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300" />
+            </div>
+          </div>
 
           <div className="flex-1 space-y-2">
             <FormLabel htmlFor="avatarUrl">Image URL</FormLabel>
@@ -391,7 +407,7 @@ function AccountTab() {
     <button
       type="button"
       onClick={toggle}
-      className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
+      className="text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors duration-200"
       tabIndex={-1}
     >
       {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -420,7 +436,12 @@ function AccountTab() {
             />
           </div>
 
-          <hr className="border-[var(--border-color)]" />
+          <div className="relative">
+            <hr className="border-[var(--border-color)]" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-white dark:bg-[var(--bg-primary)] px-2 text-[10px] uppercase tracking-widest text-[var(--text-tertiary)] font-medium">New Password</span>
+            </div>
+          </div>
 
           <div>
             <FormLabel htmlFor="newPassword">New Password</FormLabel>
@@ -434,7 +455,10 @@ function AccountTab() {
               rightElement={visibilityToggle(showNew, () => setShowNew(!showNew))}
             />
             {newPassword.length > 0 && newPassword.length < 8 && (
-              <p className="text-[11px] text-red-500 mt-1">Password must be at least 8 characters.</p>
+              <p className="text-[11px] text-red-500 mt-1.5 flex items-center gap-1">
+                <span className="w-1 h-1 rounded-full bg-red-500 inline-block" />
+                Password must be at least 8 characters.
+              </p>
             )}
           </div>
 
@@ -450,7 +474,10 @@ function AccountTab() {
               rightElement={visibilityToggle(showConfirm, () => setShowConfirm(!showConfirm))}
             />
             {confirmNewPassword.length > 0 && !passwordsMatch && (
-              <p className="text-[11px] text-red-500 mt-1">Passwords do not match.</p>
+              <p className="text-[11px] text-red-500 mt-1.5 flex items-center gap-1">
+                <span className="w-1 h-1 rounded-full bg-red-500 inline-block" />
+                Passwords do not match.
+              </p>
             )}
           </div>
         </div>
@@ -486,15 +513,18 @@ function AppearanceTab() {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {isDark ? (
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                <Moon className="w-5 h-5 text-indigo-400" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                <Sun className="w-5 h-5 text-amber-500" />
-              </div>
-            )}
+            <div
+              className={cn(
+                'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500',
+                isDark ? 'bg-indigo-500/10' : 'bg-amber-500/10',
+              )}
+            >
+              {isDark ? (
+                <Moon className="w-5 h-5 text-indigo-400 transition-transform duration-500" />
+              ) : (
+                <Sun className="w-5 h-5 text-amber-500 transition-transform duration-500" />
+              )}
+            </div>
             <div>
               <p className="text-[13px] font-medium text-[var(--text-primary)]">
                 {isDark ? 'Dark Mode' : 'Light Mode'}
@@ -515,11 +545,11 @@ function AppearanceTab() {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--bg-secondary)]/60 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--bg-secondary)]/60 flex items-center justify-center transition-all duration-300">
               {sidebarCollapsed ? (
-                <PanelLeftClose className="w-5 h-5 text-[var(--text-secondary)]" />
+                <PanelLeftClose className="w-5 h-5 text-[var(--text-secondary)] transition-transform duration-300" />
               ) : (
-                <PanelLeft className="w-5 h-5 text-[var(--text-secondary)]" />
+                <PanelLeft className="w-5 h-5 text-[var(--text-secondary)] transition-transform duration-300" />
               )}
             </div>
             <div>
@@ -552,28 +582,32 @@ function AppearanceTab() {
                 type="button"
                 onClick={() => handleDensityChange(opt.value)}
                 className={cn(
-                  'flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all duration-300 text-center',
+                  'relative flex flex-col items-center gap-2.5 p-4 rounded-2xl border-2 transition-all duration-300 text-center group/density',
                   selected
-                    ? 'border-indigo-500 bg-indigo-500/5 shadow-lg shadow-indigo-500/5'
-                    : 'border-[var(--border-color)] bg-[var(--bg-secondary)]/40 hover:border-[var(--text-tertiary)] hover:bg-[var(--bg-secondary)]/60',
+                    ? 'border-indigo-500 bg-indigo-500/5 shadow-lg shadow-indigo-500/10'
+                    : 'border-[var(--border-color)] bg-[var(--bg-secondary)]/40 hover:border-[var(--text-tertiary)]/50 hover:bg-[var(--bg-secondary)]/60',
                 )}
               >
+                {/* Selected indicator accent */}
+                {selected && (
+                  <div className="absolute top-0 left-3 right-3 h-[2px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent rounded-full" />
+                )}
                 <div
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center',
-                    selected ? 'bg-indigo-500/10' : 'bg-[var(--bg-primary)]',
+                    'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300',
+                    selected ? 'bg-indigo-500/10 scale-110' : 'bg-[var(--bg-primary)] group-hover/density:scale-105',
                   )}
                 >
                   <Icon
                     className={cn(
-                      'w-5 h-5',
+                      'w-5 h-5 transition-colors duration-300',
                       selected ? 'text-indigo-500' : 'text-[var(--text-tertiary)]',
                     )}
                   />
                 </div>
                 <p
                   className={cn(
-                    'text-[13px] font-medium',
+                    'text-[13px] font-semibold transition-colors duration-300',
                     selected ? 'text-indigo-500' : 'text-[var(--text-primary)]',
                   )}
                 >
@@ -655,23 +689,27 @@ function NotificationsTab() {
           Choose which notifications you would like to receive. Changes are saved automatically.
         </SectionDescription>
 
-        <div className="divide-y divide-[var(--border-color)]">
-          {NOTIFICATION_OPTIONS.map((opt) => {
+        <div className="divide-y divide-[var(--border-color)]/60">
+          {NOTIFICATION_OPTIONS.map((opt, index) => {
             const Icon = opt.icon;
             const isOn = prefs[opt.key];
             return (
-              <div key={opt.key} className="flex items-center justify-between py-4 first:pt-0 last:pb-0 group">
+              <div
+                key={opt.key}
+                className="flex items-center justify-between py-4 first:pt-0 last:pb-0 group animate-fadeInUp"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={cn(
-                      'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors duration-300',
-                      isOn ? 'bg-indigo-500/10' : 'bg-[var(--bg-secondary)]/60',
+                      'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300',
+                      isOn ? 'bg-indigo-500/10 shadow-sm shadow-indigo-500/10' : 'bg-[var(--bg-secondary)]/60',
                     )}
                   >
                     <Icon
                       className={cn(
-                        'w-5 h-5 transition-colors duration-300',
-                        isOn ? 'text-indigo-500' : 'text-[var(--text-tertiary)]',
+                        'w-5 h-5 transition-all duration-300',
+                        isOn ? 'text-indigo-500 scale-100' : 'text-[var(--text-tertiary)] scale-90',
                       )}
                     />
                   </div>
@@ -698,6 +736,43 @@ function NotificationsTab() {
 
 export function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('profile');
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const navRef = useRef<HTMLDivElement>(null);
+  const [indicatorStyle, setIndicatorStyle] = useState<{ top: number; height: number; opacity: number }>({ top: 0, height: 0, opacity: 0 });
+  const [indicatorStyleH, setIndicatorStyleH] = useState<{ left: number; width: number; opacity: number }>({ left: 0, width: 0, opacity: 0 });
+
+  // Animated indicator position calculation
+  const updateIndicator = useCallback(() => {
+    const btn = tabRefs.current[activeTab];
+    const nav = navRef.current;
+    if (!btn || !nav) return;
+
+    const navRect = nav.getBoundingClientRect();
+    const btnRect = btn.getBoundingClientRect();
+
+    // Vertical indicator for lg+ screens
+    setIndicatorStyle({
+      top: btnRect.top - navRect.top,
+      height: btnRect.height,
+      opacity: 1,
+    });
+
+    // Horizontal indicator for smaller screens
+    setIndicatorStyleH({
+      left: btnRect.left - navRect.left,
+      width: btnRect.width,
+      opacity: 1,
+    });
+  }, [activeTab]);
+
+  useLayoutEffect(() => {
+    updateIndicator();
+  }, [updateIndicator]);
+
+  useEffect(() => {
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [updateIndicator]);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -719,12 +794,12 @@ export function SettingsPage() {
       {/* Page Header */}
       <div>
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center">
             <Settings className="w-5 h-5 text-indigo-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">Settings</h1>
-            <p className="text-[13px] text-[var(--text-secondary)]">
+            <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Settings</h1>
+            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
               Manage your account, preferences, and notifications
             </p>
           </div>
@@ -733,21 +808,43 @@ export function SettingsPage() {
 
       {/* Layout: sidebar tabs + content */}
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Tab Navigation */}
+        {/* Tab Navigation with animated indicator */}
         <nav className="lg:w-56 flex-shrink-0">
-          <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-1.5 flex lg:flex-col gap-1">
+          <div
+            ref={navRef}
+            className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-1.5 flex lg:flex-col gap-1"
+          >
+            {/* Animated indicator - vertical (lg+) */}
+            <div
+              className="absolute left-1.5 right-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md shadow-indigo-500/20 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hidden lg:block z-0"
+              style={{
+                top: indicatorStyle.top,
+                height: indicatorStyle.height,
+                opacity: indicatorStyle.opacity,
+              }}
+            />
+            {/* Animated indicator - horizontal (< lg) */}
+            <div
+              className="absolute top-1.5 bottom-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md shadow-indigo-500/20 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden z-0"
+              style={{
+                left: indicatorStyleH.left,
+                width: indicatorStyleH.width,
+                opacity: indicatorStyleH.opacity,
+              }}
+            />
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
+                  ref={(el) => { tabRefs.current[tab.id] = el; }}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all w-full',
+                    'relative z-10 flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 w-full',
                     isActive
-                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                      ? 'text-white'
                       : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)]',
                   )}
                 >
@@ -760,7 +857,7 @@ export function SettingsPage() {
         </nav>
 
         {/* Tab Content */}
-        <div className="flex-1 min-w-0">{renderContent()}</div>
+        <div className="flex-1 min-w-0" key={activeTab}>{renderContent()}</div>
       </div>
     </div>
   );

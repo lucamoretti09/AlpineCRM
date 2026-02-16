@@ -84,8 +84,8 @@ const activityIconMap: Record<string, { icon: LucideIcon; color: string; bg: str
 
 const defaultActivityIcon = {
   icon: FileText,
-  color: 'text-slate-500 dark:text-slate-400',
-  bg: 'bg-slate-500/10 dark:bg-slate-500/15',
+  color: 'text-[var(--text-secondary)]',
+  bg: 'bg-[var(--bg-tertiary)]',
 };
 
 function getInitialsFromName(name: string): string {
@@ -102,10 +102,10 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
   if (displayActivities.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-          <FileText className="h-6 w-6 text-slate-400" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-tertiary)]">
+          <FileText className="h-6 w-6 text-[var(--text-tertiary)]" />
         </div>
-        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-sm text-[var(--text-secondary)]">
           No recent activity
         </p>
       </div>
@@ -122,21 +122,30 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
 
           return (
             <li key={activity.id} className="relative pb-4">
-              {/* Timeline connector line */}
+              {/* Timeline connector line with gradient fade */}
               {!isLast && (
                 <span
-                  className="absolute left-5 top-11 -ml-px h-[calc(100%-1.5rem)] w-0.5 bg-slate-200 dark:bg-white/[0.06]"
+                  className="absolute left-5 top-11 -ml-px h-[calc(100%-1.5rem)] w-0.5"
                   aria-hidden="true"
+                  style={{
+                    background: 'linear-gradient(to bottom, var(--border-color) 0%, var(--border-color) 70%, transparent 100%)',
+                  }}
                 />
               )}
 
-              <div className="relative flex items-start gap-4">
+              <div
+                className={cn(
+                  'relative flex items-start gap-4 rounded-xl px-2 py-1.5 -mx-2',
+                  'transition-all duration-200 ease-spring',
+                  'hover:bg-[var(--bg-secondary)]/50',
+                )}
+              >
                 {/* Activity icon */}
                 <div
                   className={cn(
                     'relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
                     bg,
-                    'ring-4 ring-white dark:ring-slate-900/80',
+                    'ring-4 ring-[var(--bg-primary)]',
                     'transition-transform duration-200',
                   )}
                 >
@@ -146,16 +155,16 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                 {/* Content */}
                 <div className="min-w-0 flex-1 pt-0.5">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
                       {activity.title}
                     </p>
-                    <time className="shrink-0 text-xs text-slate-400 dark:text-slate-500">
+                    <time className="shrink-0 text-xs text-[var(--text-tertiary)]">
                       {formatRelativeTime(activity.createdAt)}
                     </time>
                   </div>
 
                   {activity.description && (
-                    <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                    <p className="mt-0.5 text-sm text-[var(--text-secondary)]">
                       {activity.description}
                     </p>
                   )}
@@ -167,16 +176,16 @@ export default function ActivityFeed({ activities, maxItems }: ActivityFeedProps
                         <img
                           src={activity.userAvatar}
                           alt={activity.userName}
-                          className="h-5 w-5 rounded-full object-cover ring-1 ring-white/20"
+                          className="h-5 w-5 rounded-full object-cover ring-1 ring-[var(--border-color)]"
                         />
                       ) : (
-                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-600 dark:to-slate-700">
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-[var(--text-tertiary)] to-[var(--text-secondary)]">
                           <span className="text-[9px] font-semibold text-white">
                             {getInitialsFromName(activity.userName)}
                           </span>
                         </div>
                       )}
-                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                      <span className="text-xs text-[var(--text-tertiary)]">
                         {activity.userName}
                       </span>
                     </div>

@@ -1,9 +1,49 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Plus, Search, Building2, Star, Trash2, Edit } from 'lucide-react';
+import { Users, Plus, Search, Building2, Star, Trash2, Edit, UserPlus, Sparkles } from 'lucide-react';
 import api from '@/lib/api';
 import { cn, formatDate, getStatusColor, getInitials } from '@/lib/utils';
 import toast from 'react-hot-toast';
+
+const AVATAR_GRADIENTS: Record<string, string> = {
+  A: 'from-rose-400 via-rose-500 to-pink-600',
+  B: 'from-orange-400 via-orange-500 to-amber-600',
+  C: 'from-amber-400 via-amber-500 to-yellow-600',
+  D: 'from-emerald-400 via-emerald-500 to-green-600',
+  E: 'from-teal-400 via-teal-500 to-cyan-600',
+  F: 'from-cyan-400 via-cyan-500 to-blue-600',
+  G: 'from-blue-400 via-blue-500 to-indigo-600',
+  H: 'from-indigo-400 via-indigo-500 to-violet-600',
+  I: 'from-violet-400 via-violet-500 to-purple-600',
+  J: 'from-purple-400 via-purple-500 to-fuchsia-600',
+  K: 'from-fuchsia-400 via-fuchsia-500 to-pink-600',
+  L: 'from-pink-400 via-pink-500 to-rose-600',
+  M: 'from-red-400 via-red-500 to-orange-600',
+  N: 'from-sky-400 via-sky-500 to-blue-600',
+  O: 'from-lime-400 via-lime-500 to-green-600',
+  P: 'from-indigo-400 via-purple-500 to-violet-600',
+  Q: 'from-teal-400 via-emerald-500 to-green-600',
+  R: 'from-blue-400 via-indigo-500 to-purple-600',
+  S: 'from-rose-400 via-pink-500 to-fuchsia-600',
+  T: 'from-amber-400 via-orange-500 to-red-600',
+  U: 'from-cyan-400 via-teal-500 to-emerald-600',
+  V: 'from-violet-400 via-purple-500 to-indigo-600',
+  W: 'from-emerald-400 via-teal-500 to-cyan-600',
+  X: 'from-fuchsia-400 via-pink-500 to-rose-600',
+  Y: 'from-orange-400 via-amber-500 to-yellow-600',
+  Z: 'from-blue-400 via-sky-500 to-cyan-600',
+};
+
+function getAvatarGradient(firstName: string): string {
+  const letter = firstName?.charAt(0)?.toUpperCase() || 'A';
+  return AVATAR_GRADIENTS[letter] || 'from-indigo-400 via-indigo-500 to-violet-600';
+}
+
+const STATUS_CONFIG: Record<string, { icon: string; label: string }> = {
+  active: { icon: '\u2022', label: 'Active' },
+  inactive: { icon: '\u25CB', label: 'Inactive' },
+  churned: { icon: '\u2716', label: 'Churned' },
+};
 
 export function ContactsPage() {
   const [search, setSearch] = useState('');
@@ -69,20 +109,20 @@ export function ContactsPage() {
           <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">{data?.total || 0} total contacts</p>
         </div>
         <button onClick={() => { setEditingContact(null); setShowForm(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-          <Plus className="w-4 h-4" /> Add Contact
+          className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+          <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" /> Add Contact
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+        <div className="relative flex-1 group/search">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
           <input type="text" placeholder="Search contacts..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all duration-200" />
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10">
+          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
@@ -107,17 +147,48 @@ export function ContactsPage() {
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="border-b border-[var(--border-color)]">
-                  <td colSpan={6} className="px-6 py-4"><div className="skeleton h-6 w-full rounded-lg" /></td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="skeleton w-9 h-9 rounded-xl animate-skeletonPulse" />
+                      <div className="space-y-1.5">
+                        <div className="skeleton h-4 w-32 rounded-lg" />
+                        <div className="skeleton h-3 w-44 rounded-lg" style={{ animationDelay: '0.1s' }} />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4"><div className="skeleton h-4 w-24 rounded-lg" style={{ animationDelay: '0.15s' }} /></td>
+                  <td className="px-6 py-4"><div className="skeleton h-6 w-16 rounded-lg" style={{ animationDelay: '0.2s' }} /></td>
+                  <td className="px-6 py-4"><div className="skeleton h-4 w-12 rounded-lg" style={{ animationDelay: '0.25s' }} /></td>
+                  <td className="px-6 py-4"><div className="skeleton h-4 w-20 rounded-lg" style={{ animationDelay: '0.3s' }} /></td>
+                  <td className="px-6 py-4"><div className="skeleton h-4 w-16 rounded-lg ml-auto" style={{ animationDelay: '0.35s' }} /></td>
                 </tr>
               ))
             ) : data?.contacts?.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-16 text-center text-[var(--text-tertiary)] text-[13px]">No contacts found</td></tr>
+              <tr>
+                <td colSpan={6} className="px-6 py-20 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500/10 via-primary-500/5 to-violet-500/10 flex items-center justify-center border border-primary-500/10">
+                      <UserPlus className="w-6 h-6 text-primary-500/60" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-[var(--text-primary)]">No contacts found</p>
+                      <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">Try adjusting your search or add a new contact</p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
             ) : (
-              data?.contacts?.map((contact: any) => (
-                <tr key={contact.id} className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/40 transition-colors duration-150">
-                  <td className="px-6 py-3.5">
+              data?.contacts?.map((contact: any, index: number) => (
+                <tr key={contact.id}
+                  className="border-b border-[var(--border-color)] hover:bg-primary-500/[0.03] dark:hover:bg-primary-500/[0.04] transition-all duration-200 group/row animate-rowSlideIn relative"
+                  style={{ animationDelay: `${index * 35}ms` }}>
+                  <td className="px-6 py-3.5 relative">
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 bg-gradient-to-b from-primary-400 to-primary-600 rounded-r-full transition-all duration-300 group-hover/row:h-8 opacity-0 group-hover/row:opacity-100" />
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 flex items-center justify-center text-white text-[11px] font-bold shadow-sm shadow-indigo-500/20">
+                      <div className={cn(
+                        'w-9 h-9 rounded-xl bg-gradient-to-br flex items-center justify-center text-white text-[11px] font-bold shadow-sm transition-transform duration-200 group-hover/row:scale-105',
+                        getAvatarGradient(contact.firstName)
+                      )}>
                         {getInitials(contact.firstName, contact.lastName)}
                       </div>
                       <div>
@@ -129,29 +200,30 @@ export function ContactsPage() {
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2 text-[var(--text-secondary)] text-[13px]">
                       <Building2 className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
-                      <span>{contact.company || '—'}</span>
+                      <span>{contact.company || '\u2014'}</span>
                     </div>
                   </td>
                   <td className="px-6 py-3.5">
-                    <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(contact.status))}>
+                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(contact.status))}>
+                      <span className="text-[8px]">{STATUS_CONFIG[contact.status]?.icon || '\u2022'}</span>
                       {contact.status}
                     </span>
                   </td>
                   <td className="px-6 py-3.5">
                     <div className="flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5 text-amber-500" />
+                      <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-starGlow" />
                       <span className="text-[13px] font-medium text-[var(--text-primary)]">{contact.leadScore}</span>
                     </div>
                   </td>
                   <td className="px-6 py-3.5 text-[12px] text-[var(--text-secondary)]">{formatDate(contact.createdAt)}</td>
                   <td className="px-6 py-3.5 text-right">
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover/row:opacity-100 transition-all duration-200">
                       <button onClick={() => { setEditingContact(contact); setShowForm(true); }}
-                        className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)]/60 text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all duration-200">
+                        className="p-2 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                         <Edit className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => { if (confirm('Delete this contact?')) deleteMutation.mutate(contact.id); }}
-                        className="p-2 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 transition-all duration-200">
+                        className="p-2 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -165,11 +237,13 @@ export function ContactsPage() {
 
       {/* Create/Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-8 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl dark:shadow-black/40">
-            {/* Top accent */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
-            <h2 className="text-[18px] font-bold text-[var(--text-primary)] mb-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-md transition-all duration-300" onClick={() => { setShowForm(false); setEditingContact(null); }}>
+          <div className="relative bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-8 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl dark:shadow-black/40 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Top gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 via-primary-500 to-violet-500 rounded-t-2xl" />
+            {/* Subtle background glow */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+            <h2 className="text-[18px] font-bold text-[var(--text-primary)] mb-6 tracking-tight">
               {editingContact ? 'Edit Contact' : 'New Contact'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -177,41 +251,41 @@ export function ContactsPage() {
                 <div>
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">First Name *</label>
                   <input name="firstName" defaultValue={editingContact?.firstName} required
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10" />
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Last Name *</label>
                   <input name="lastName" defaultValue={editingContact?.lastName} required
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10" />
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
               </div>
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Email</label>
                 <input name="email" type="email" defaultValue={editingContact?.email}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10" />
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Phone</label>
                   <input name="phone" defaultValue={editingContact?.phone}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10" />
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Company</label>
                   <input name="company" defaultValue={editingContact?.company}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10" />
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
               </div>
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Job Title</label>
                 <input name="jobTitle" defaultValue={editingContact?.jobTitle}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10" />
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Status</label>
                   <select name="status" defaultValue={editingContact?.status || 'active'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10">
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                     <option value="churned">Churned</option>
@@ -220,7 +294,7 @@ export function ContactsPage() {
                 <div>
                   <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Source</label>
                   <select name="source" defaultValue={editingContact?.source || 'other'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10">
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     <option value="website">Website</option>
                     <option value="referral">Referral</option>
                     <option value="social">Social</option>
@@ -232,7 +306,7 @@ export function ContactsPage() {
               </div>
               <div className="flex gap-3 pt-3">
                 <button type="submit" disabled={createMutation.isPending}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all duration-300 disabled:opacity-50">
+                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
                   {createMutation.isPending ? 'Saving...' : editingContact ? 'Update' : 'Create'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingContact(null); }}

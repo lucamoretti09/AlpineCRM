@@ -88,6 +88,36 @@ function getStatusIcon(status: string) {
   }
 }
 
+function getStatusIconColor(status: string) {
+  switch (status) {
+    case 'open':
+      return 'text-amber-500';
+    case 'in_progress':
+      return 'text-blue-500';
+    case 'resolved':
+      return 'text-emerald-500';
+    case 'closed':
+      return 'text-gray-400';
+    default:
+      return 'text-amber-500';
+  }
+}
+
+function getStatusDetailColor(status: string) {
+  switch (status) {
+    case 'open':
+      return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/40';
+    case 'in_progress':
+      return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/40';
+    case 'resolved':
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/40';
+    case 'closed':
+      return 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-700/40';
+    default:
+      return 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/40';
+  }
+}
+
 function getCategoryLabel(category: string): string {
   const found = CATEGORY_OPTIONS.find((c) => c.value === category);
   return found ? found.label : category;
@@ -220,14 +250,15 @@ export function TicketsPage() {
         {/* Back navigation */}
         <button
           onClick={() => setSelectedTicket(null)}
-          className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+          className="group flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
           Back to tickets
         </button>
 
         {/* Ticket header card */}
-        <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 animate-fadeInUp">
+        <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 animate-fadeInUp overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
           {isDetailLoading ? (
             <div className="space-y-4">
               <div className="skeleton h-8 w-3/4 rounded-xl" />
@@ -242,8 +273,8 @@ export function TicketsPage() {
                     <span className="text-[12px] font-mono text-[var(--text-tertiary)]">
                       #{ticket.ticketNumber}
                     </span>
-                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(ticket.status))}>
-                      {getStatusIcon(ticket.status)}
+                    <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border', getStatusDetailColor(ticket.status))}>
+                      <span className={getStatusIconColor(ticket.status)}>{getStatusIcon(ticket.status)}</span>
                       {formatStatusLabel(ticket.status)}
                     </span>
                     <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold', getPriorityColor(ticket.priority))}>
@@ -258,7 +289,7 @@ export function TicketsPage() {
                       setEditingTicket(ticket);
                       setShowForm(true);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all"
+                    className="flex items-center gap-2 px-3 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] hover:border-[var(--text-tertiary)] transition-all"
                   >
                     <Edit className="w-4 h-4" />
                     Edit
@@ -298,7 +329,7 @@ export function TicketsPage() {
               {/* Description */}
               {ticket.description && (
                 <div className="mt-5 pt-5 border-t border-[var(--border-color)]">
-                  <h3 className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Description</h3>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-2">Description</h3>
                   <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
                     {ticket.description}
                   </p>
@@ -307,7 +338,7 @@ export function TicketsPage() {
 
               {/* Inline status update */}
               <div className="mt-5 pt-5 border-t border-[var(--border-color)]">
-                <label className="text-[12px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mr-3">Update Status:</label>
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mr-3">Update Status:</label>
                 <div className="inline-flex gap-2 mt-2">
                   {STATUS_OPTIONS.map((s) => (
                     <button
@@ -335,7 +366,8 @@ export function TicketsPage() {
         </div>
 
         {/* Comments section */}
-        <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl animate-fadeInUp" style={{ animationDelay: '60ms' }}>
+        <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl animate-fadeInUp overflow-hidden" style={{ animationDelay: '60ms' }}>
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
           <div className="px-6 py-4 border-b border-[var(--border-color)]">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[var(--text-secondary)]" />
@@ -362,20 +394,24 @@ export function TicketsPage() {
               ))
             ) : comments.length === 0 ? (
               <div className="px-6 py-12 text-center text-[var(--text-tertiary)]">
-                <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                <p className="text-[13px]">No comments yet. Start the conversation below.</p>
+                <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 opacity-50" />
+                </div>
+                <p className="text-[13px] font-medium text-[var(--text-secondary)]">No comments yet</p>
+                <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">Start the conversation below.</p>
               </div>
             ) : (
-              comments.map((comment: Comment) => (
+              comments.map((comment: Comment, index: number) => (
                 <div
                   key={comment.id}
                   className={cn(
-                    'px-6 py-4 hover:bg-[var(--bg-secondary)]/60 transition-colors',
-                    comment.isInternal && 'bg-yellow-50/50 dark:bg-yellow-900/10'
+                    'px-6 py-4 hover:bg-[var(--bg-secondary)]/40 transition-all duration-300 animate-fadeInUp',
+                    comment.isInternal && 'bg-amber-50/30 dark:bg-amber-900/[0.06] border-l-2 border-l-amber-400/40'
                   )}
+                  style={{ animationDelay: `${index * 40}ms` }}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0 mt-0.5 shadow-md shadow-indigo-500/20">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0 mt-0.5 shadow-md shadow-indigo-500/20 ring-2 ring-white/20">
                       {comment.author
                         ? `${comment.author.firstName.charAt(0)}${comment.author.lastName.charAt(0)}`
                         : '??'}
@@ -391,15 +427,20 @@ export function TicketsPage() {
                           {formatRelativeTime(comment.createdAt)}
                         </span>
                         {comment.isInternal && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-amber-100/80 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/30">
                             <Lock className="w-3 h-3" />
                             Internal
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+                      <div className={cn(
+                        'text-[13px] text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap rounded-xl px-3.5 py-2.5',
+                        comment.isInternal
+                          ? 'bg-amber-50/50 dark:bg-amber-900/[0.08] border border-amber-100/60 dark:border-amber-900/20'
+                          : 'bg-[var(--bg-secondary)]/30'
+                      )}>
                         {comment.content}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -408,14 +449,14 @@ export function TicketsPage() {
           </div>
 
           {/* Add comment form */}
-          <div className="px-6 py-4 border-t border-[var(--border-color)]">
+          <div className="px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/20">
             <form onSubmit={handleCommentSubmit} className="space-y-3">
               <textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Write a comment..."
                 rows={3}
-                className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 resize-none transition-all"
+                className="w-full px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
               />
               <div className="flex items-center justify-between">
                 <button
@@ -424,7 +465,7 @@ export function TicketsPage() {
                   className={cn(
                     'flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition-all',
                     isInternalComment
-                      ? 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/40 shadow-sm'
                       : 'bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] border-[var(--border-color)] hover:border-indigo-500'
                   )}
                 >
@@ -443,7 +484,7 @@ export function TicketsPage() {
                 <button
                   type="submit"
                   disabled={!commentText.trim() || commentMutation.isPending}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
                   {commentMutation.isPending ? 'Sending...' : 'Send'}
@@ -462,8 +503,8 @@ export function TicketsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Tickets</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-1">
+          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Tickets</h1>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
             {data?.total || 0} total tickets
           </p>
         </div>
@@ -472,7 +513,7 @@ export function TicketsPage() {
             setEditingTicket(null);
             setShowForm(true);
           }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" /> New Ticket
         </button>
@@ -481,19 +522,19 @@ export function TicketsPage() {
       {/* Search & Filters */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
           <input
             type="text"
             placeholder="Search tickets by subject or number..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
         >
           <option value="">All Status</option>
           {STATUS_OPTIONS.map((s) => (
@@ -505,7 +546,7 @@ export function TicketsPage() {
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
         >
           <option value="">All Priority</option>
           {PRIORITY_OPTIONS.map((p) => (
@@ -541,29 +582,39 @@ export function TicketsPage() {
             ) : data?.tickets?.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">
-                  <Ticket className="w-10 h-10 mx-auto mb-3 text-[var(--text-tertiary)] opacity-40" />
-                  <p className="text-[var(--text-tertiary)] text-[13px]">No tickets found</p>
-                  <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
-                    {search || statusFilter || priorityFilter
-                      ? 'Try adjusting your search or filters'
-                      : 'Create your first ticket to get started'}
-                  </p>
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                      <Ticket className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-medium text-[var(--text-secondary)]">No tickets found</p>
+                      <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
+                        {search || statusFilter || priorityFilter
+                          ? 'Try adjusting your search or filters'
+                          : 'Create your first ticket to get started'}
+                      </p>
+                    </div>
+                  </div>
                 </td>
               </tr>
             ) : (
-              data?.tickets?.map((ticket: TicketData) => (
+              data?.tickets?.map((ticket: TicketData, index: number) => (
                 <tr
                   key={ticket.id}
-                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-colors cursor-pointer group"
+                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 cursor-pointer group animate-fadeInUp"
+                  style={{ animationDelay: `${index * 30}ms` }}
                   onClick={() => setSelectedTicket(ticket)}
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-indigo-600/10 flex items-center justify-center flex-shrink-0">
+                      <div className={cn(
+                        'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
+                        'bg-indigo-600/10 group-hover:bg-indigo-600/15'
+                      )}>
                         <Ticket className="w-4 h-4 text-indigo-600" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-semibold text-[13px] text-[var(--text-primary)] truncate">{ticket.subject}</p>
+                        <p className="font-semibold text-[13px] text-[var(--text-primary)] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{ticket.subject}</p>
                         <p className="text-[11px] text-[var(--text-tertiary)] font-mono mt-0.5">
                           <Hash className="w-3 h-3 inline-block mr-0.5" />
                           {ticket.ticketNumber}
@@ -571,35 +622,35 @@ export function TicketsPage() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold', getStatusColor(ticket.status))}>
-                      {getStatusIcon(ticket.status)}
+                      <span className={getStatusIconColor(ticket.status)}>{getStatusIcon(ticket.status)}</span>
                       {formatStatusLabel(ticket.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <span className={cn('px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize', getPriorityColor(ticket.priority))}>
                       {ticket.priority}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <div className="flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
                       <Tag className="w-3.5 h-3.5" />
                       <span>{getCategoryLabel(ticket.category)}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-[13px] text-[var(--text-secondary)]">
+                  <td className="px-6 py-3.5 text-[13px] text-[var(--text-secondary)]">
                     {formatDate(ticket.createdAt)}
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <td className="px-6 py-3.5 text-right">
+                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingTicket(ticket);
                           setShowForm(true);
                         }}
-                        className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
+                        className="p-2 rounded-xl hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-indigo-600 transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
@@ -625,15 +676,19 @@ export function TicketsPage() {
 
       {/* Create / Edit Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fadeIn">
+          <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] overflow-y-auto">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
+            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1">
               {editingTicket ? 'Edit Ticket' : 'New Ticket'}
             </h2>
+            <p className="text-[13px] text-[var(--text-secondary)] mb-5">
+              {editingTicket ? `Editing ticket #${editingTicket.ticketNumber}` : 'Fill in the details below to create a new ticket'}
+            </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Subject */}
               <div>
-                <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                   Subject *
                 </label>
                 <input
@@ -641,13 +696,13 @@ export function TicketsPage() {
                   defaultValue={editingTicket?.subject}
                   required
                   placeholder="Brief summary of the issue"
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                   Description
                 </label>
                 <textarea
@@ -655,20 +710,20 @@ export function TicketsPage() {
                   rows={4}
                   defaultValue={editingTicket?.description}
                   placeholder="Detailed description of the ticket..."
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 resize-none transition-all"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
                 />
               </div>
 
               {/* Category & Priority */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Category
                   </label>
                   <select
                     name="category"
                     defaultValue={editingTicket?.category || 'support'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   >
                     {CATEGORY_OPTIONS.map((c) => (
                       <option key={c.value} value={c.value}>
@@ -678,13 +733,13 @@ export function TicketsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Priority
                   </label>
                   <select
                     name="priority"
                     defaultValue={editingTicket?.priority || 'medium'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   >
                     {PRIORITY_OPTIONS.map((p) => (
                       <option key={p.value} value={p.value}>
@@ -699,13 +754,13 @@ export function TicketsPage() {
               <div className="grid grid-cols-2 gap-4">
                 {editingTicket && (
                   <div>
-                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       Status
                     </label>
                     <select
                       name="status"
                       defaultValue={editingTicket.status}
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s.value} value={s.value}>
@@ -716,15 +771,15 @@ export function TicketsPage() {
                   </div>
                 )}
                 <div className={editingTicket ? '' : 'col-span-2'}>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Contact ID
-                    <span className="text-[var(--text-tertiary)] font-normal ml-1">(optional)</span>
+                    <span className="text-[var(--text-tertiary)] font-normal ml-1 normal-case tracking-normal">(optional)</span>
                   </label>
                   <input
                     name="contactId"
                     defaultValue={editingTicket?.contactId}
                     placeholder="Link to a contact"
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   />
                 </div>
               </div>
@@ -734,7 +789,7 @@ export function TicketsPage() {
                 <button
                   type="submit"
                   disabled={saveMutation.isPending}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
+                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
                 >
                   {saveMutation.isPending
                     ? 'Saving...'
@@ -748,7 +803,7 @@ export function TicketsPage() {
                     setShowForm(false);
                     setEditingTicket(null);
                   }}
-                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-secondary)] transition-all"
+                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-secondary)] transition-all"
                 >
                   Cancel
                 </button>

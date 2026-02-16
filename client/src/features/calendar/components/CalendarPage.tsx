@@ -55,30 +55,34 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
 const TYPE_CONFIG: Record<
   Appointment['type'],
-  { label: string; color: string; dotColor: string; icon: typeof CalendarIcon }
+  { label: string; color: string; dotColor: string; chipColor: string; icon: typeof CalendarIcon }
 > = {
   meeting: {
     label: 'Meeting',
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
     dotColor: 'bg-blue-500',
+    chipColor: 'bg-blue-100/80 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/30',
     icon: Users,
   },
   call: {
     label: 'Call',
     color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
     dotColor: 'bg-green-500',
+    chipColor: 'bg-green-100/80 text-green-700 dark:bg-green-900/40 dark:text-green-300 border border-green-200/50 dark:border-green-800/30',
     icon: Phone,
   },
   video_call: {
     label: 'Video Call',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
     dotColor: 'bg-purple-500',
+    chipColor: 'bg-purple-100/80 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 border border-purple-200/50 dark:border-purple-800/30',
     icon: Video,
   },
   other: {
     label: 'Other',
     color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
     dotColor: 'bg-gray-500',
+    chipColor: 'bg-gray-100/80 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300 border border-gray-200/50 dark:border-gray-800/30',
     icon: CalendarIcon,
   },
 };
@@ -252,14 +256,14 @@ export function CalendarPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Calendar</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-1">
+          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Calendar</h1>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
             {data?.total ?? 0} appointments this month
           </p>
         </div>
         <button
           onClick={() => openCreateForm(selectedDate || new Date())}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" /> New Appointment
         </button>
@@ -277,7 +281,7 @@ export function CalendarPage() {
               </h2>
               <button
                 onClick={handleToday}
-                className="px-3 py-1 text-[11px] font-semibold rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 transition-all"
+                className="px-3 py-1 text-[11px] font-semibold rounded-lg border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:border-indigo-500/30 transition-all"
               >
                 Today
               </button>
@@ -342,28 +346,32 @@ export function CalendarPage() {
                     type="button"
                     onClick={() => handleDayClick(day)}
                     className={cn(
-                      'min-h-[100px] p-2 border-b border-r border-[var(--border-color)] text-left transition-all relative group',
+                      'min-h-[100px] p-2 border-b border-r border-[var(--border-color)] text-left transition-all duration-200 relative group',
                       inCurrentMonth
                         ? 'bg-transparent'
                         : 'bg-[var(--bg-secondary)]/30',
-                      isSelected && 'ring-2 ring-inset ring-indigo-500',
-                      !isSelected && 'hover:bg-[var(--bg-secondary)]/60'
+                      isSelected && 'ring-2 ring-inset ring-indigo-500 bg-indigo-500/[0.03]',
+                      !isSelected && 'hover:bg-[var(--bg-secondary)]/40'
                     )}
                   >
                     {/* Day Number */}
                     <div className="flex items-center justify-between mb-1">
                       <span
                         className={cn(
-                          'inline-flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-medium transition-colors',
+                          'relative inline-flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-medium transition-colors',
                           today && 'bg-gradient-to-br from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20',
                           !today && inCurrentMonth && 'text-[var(--text-primary)]',
                           !today && !inCurrentMonth && 'text-[var(--text-tertiary)]'
                         )}
                       >
                         {format(day, 'd')}
+                        {/* Animated pulse ring for today */}
+                        {today && (
+                          <span className="absolute inset-0 rounded-full bg-indigo-500/30 animate-ping" style={{ animationDuration: '2s' }} />
+                        )}
                       </span>
                       {dayAppointments.length > 0 && (
-                        <span className="text-[10px] font-semibold text-[var(--text-tertiary)]">
+                        <span className="text-[10px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-secondary)]/60 px-1.5 py-0.5 rounded-md">
                           {dayAppointments.length}
                         </span>
                       )}
@@ -377,8 +385,8 @@ export function CalendarPage() {
                           <div
                             key={apt.id}
                             className={cn(
-                              'flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] leading-tight truncate',
-                              config.color
+                              'flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] leading-tight truncate',
+                              config.chipColor
                             )}
                             title={apt.title}
                           >
@@ -433,7 +441,7 @@ export function CalendarPage() {
               {selectedDate && (
                 <button
                   onClick={() => openCreateForm(selectedDate)}
-                  className="p-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-md shadow-indigo-500/20 transition-all"
+                  className="p-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95"
                   title="Add appointment"
                 >
                   <Plus className="w-4 h-4" />
@@ -445,27 +453,33 @@ export function CalendarPage() {
             <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
               {!selectedDate ? (
                 <div className="px-5 py-12 text-center">
-                  <CalendarIcon className="w-10 h-10 mx-auto text-[var(--text-tertiary)] mb-3 opacity-50" />
-                  <p className="text-[13px] text-[var(--text-tertiary)]">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                    <CalendarIcon className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                  </div>
+                  <p className="text-[13px] font-medium text-[var(--text-secondary)]">No day selected</p>
+                  <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
                     Select a day on the calendar to view its appointments
                   </p>
                 </div>
               ) : selectedDateAppointments.length === 0 ? (
                 <div className="px-5 py-12 text-center">
-                  <CalendarIcon className="w-10 h-10 mx-auto text-[var(--text-tertiary)] mb-3 opacity-50" />
-                  <p className="text-[13px] text-[var(--text-tertiary)] mb-3">
-                    No appointments scheduled
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
+                    <CalendarIcon className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
+                  </div>
+                  <p className="text-[13px] font-medium text-[var(--text-secondary)]">No appointments scheduled</p>
+                  <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5 mb-3">
+                    This day is free for new activities
                   </p>
                   <button
                     onClick={() => openCreateForm(selectedDate)}
-                    className="text-[13px] font-medium text-indigo-500 hover:text-indigo-400 transition-colors"
+                    className="text-[13px] font-semibold text-indigo-500 hover:text-indigo-400 transition-colors"
                   >
                     + Add one
                   </button>
                 </div>
               ) : (
                 <div className="divide-y divide-[var(--border-color)]">
-                  {selectedDateAppointments.map((apt) => {
+                  {selectedDateAppointments.map((apt, index) => {
                     const config = getTypeConfig(apt.type);
                     const TypeIcon = config.icon;
                     const isDeleting = showDeleteConfirm === apt.id;
@@ -473,11 +487,12 @@ export function CalendarPage() {
                     return (
                       <div
                         key={apt.id}
-                        className="px-5 py-4 hover:bg-[var(--bg-secondary)]/60 transition-all group relative"
+                        className="px-5 py-4 hover:bg-[var(--bg-secondary)]/40 transition-all duration-200 group relative animate-fadeInUp"
+                        style={{ animationDelay: `${index * 50}ms` }}
                       >
                         {/* Delete Confirmation Overlay */}
                         {isDeleting && (
-                          <div className="absolute inset-0 bg-white/90 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center gap-2 z-10 px-4 rounded-xl">
+                          <div className="absolute inset-0 bg-white/90 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center gap-2 z-10 px-4 rounded-xl animate-fadeIn">
                             <span className="text-[13px] text-[var(--text-secondary)]">Delete?</span>
                             <button
                               onClick={() => deleteMutation.mutate(apt.id)}
@@ -499,7 +514,7 @@ export function CalendarPage() {
                         <div className="flex items-start gap-3">
                           <div
                             className={cn(
-                              'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5',
+                              'w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 transition-transform group-hover:scale-105',
                               config.color
                             )}
                           >
@@ -510,7 +525,7 @@ export function CalendarPage() {
                               <h4 className="text-[13px] font-semibold text-[var(--text-primary)] leading-tight">
                                 {apt.title}
                               </h4>
-                              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-all duration-200 flex-shrink-0">
                                 <button
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -537,8 +552,8 @@ export function CalendarPage() {
                             {/* Type Badge */}
                             <span
                               className={cn(
-                                'inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-semibold mt-1',
-                                config.color
+                                'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold mt-1',
+                                config.chipColor
                               )}
                             >
                               {config.label}
@@ -594,13 +609,19 @@ export function CalendarPage() {
 
       {/* ── Create / Edit Modal ─────────────────────────────────────────────── */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fadeIn">
+          <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10 max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 pt-6 pb-4">
-              <h2 className="text-xl font-bold text-[var(--text-primary)]">
-                {editingAppointment ? 'Edit Appointment' : 'New Appointment'}
-              </h2>
+              <div>
+                <h2 className="text-xl font-bold text-[var(--text-primary)]">
+                  {editingAppointment ? 'Edit Appointment' : 'New Appointment'}
+                </h2>
+                <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
+                  {editingAppointment ? 'Update the appointment details' : 'Schedule a new appointment'}
+                </p>
+              </div>
               <button
                 onClick={() => {
                   setShowForm(false);
@@ -617,7 +638,7 @@ export function CalendarPage() {
               <div className="space-y-4">
                 {/* Title */}
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Title *
                   </label>
                   <input
@@ -625,13 +646,13 @@ export function CalendarPage() {
                     defaultValue={editingAppointment?.title}
                     required
                     placeholder="e.g., Client check-in call"
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                   />
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Description
                   </label>
                   <textarea
@@ -639,20 +660,20 @@ export function CalendarPage() {
                     rows={3}
                     defaultValue={editingAppointment?.description}
                     placeholder="Add notes or agenda items..."
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all resize-none"
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all resize-none"
                   />
                 </div>
 
                 {/* Type + All Day */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       Type
                     </label>
                     <select
                       name="type"
                       defaultValue={editingAppointment?.type || 'meeting'}
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     >
                       <option value="meeting">Meeting</option>
                       <option value="call">Call</option>
@@ -678,7 +699,7 @@ export function CalendarPage() {
                 {/* Start Date + Time */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       Start Date *
                     </label>
                     <input
@@ -692,11 +713,11 @@ export function CalendarPage() {
                           ? format(selectedDate, 'yyyy-MM-dd')
                           : format(new Date(), 'yyyy-MM-dd')
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       Start Time
                     </label>
                     <input
@@ -707,7 +728,7 @@ export function CalendarPage() {
                           ? format(parseISO(editingAppointment.startDate), 'HH:mm')
                           : '09:00'
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                 </div>
@@ -715,7 +736,7 @@ export function CalendarPage() {
                 {/* End Date + Time */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       End Date
                     </label>
                     <input
@@ -728,11 +749,11 @@ export function CalendarPage() {
                           ? format(selectedDate, 'yyyy-MM-dd')
                           : format(new Date(), 'yyyy-MM-dd')
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                       End Time
                     </label>
                     <input
@@ -743,39 +764,39 @@ export function CalendarPage() {
                           ? format(parseISO(editingAppointment.endDate), 'HH:mm')
                           : '10:00'
                       }
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Location */}
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Location
                   </label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
                     <input
                       name="location"
                       defaultValue={editingAppointment?.location}
                       placeholder="Office, Zoom link, address..."
-                      className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                 </div>
 
                 {/* Attendees */}
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                     Attendees
                   </label>
                   <div className="relative">
-                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                    <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
                     <input
                       name="attendees"
                       defaultValue={editingAppointment?.attendees?.join(', ')}
                       placeholder="Comma-separated names or emails"
-                      className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all"
+                      className="w-full pl-10 pr-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                   </div>
                   <p className="mt-1 text-[11px] text-[var(--text-tertiary)]">
@@ -788,7 +809,7 @@ export function CalendarPage() {
                   <button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
                   >
                     {createMutation.isPending ? (
                       <>
@@ -808,7 +829,7 @@ export function CalendarPage() {
                       setShowForm(false);
                       setEditingAppointment(null);
                     }}
-                    className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-secondary)] transition-all"
+                    className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-secondary)] transition-all"
                   >
                     Cancel
                   </button>

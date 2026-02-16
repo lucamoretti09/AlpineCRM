@@ -34,10 +34,10 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Mobile overlay */}
+      {/* Mobile overlay — enhanced blur + darken */}
       {!sidebarCollapsed && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden transition-opacity duration-300"
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-md backdrop-saturate-150 md:hidden transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
           onClick={toggleSidebar}
         />
       )}
@@ -45,7 +45,8 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
       {/* Main Content Area */}
       <div
         className={cn(
-          'flex flex-1 flex-col transition-all duration-300 ease-spring min-w-0',
+          'layout-mesh-bg flex flex-1 flex-col min-w-0',
+          'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
           sidebarCollapsed ? 'ml-[72px]' : 'ml-[260px]'
         )}
       >
@@ -53,7 +54,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
         <Navbar title={title} />
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden">
+        <main className="relative z-[1] flex-1 overflow-y-auto overflow-x-hidden">
           <div className="mx-auto w-full max-w-[1440px] px-6 py-6 animate-fadeIn">
             {children}
           </div>

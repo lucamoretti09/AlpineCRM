@@ -114,22 +114,22 @@ function StatCardSkeleton() {
 function TableRowSkeleton() {
   return (
     <tr className="border-b border-[var(--border-color)]">
-      <td className="px-6 py-4">
+      <td className="px-6 py-3.5">
         <div className="skeleton h-5 w-40 rounded" />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-3.5">
         <div className="skeleton h-5 w-56 rounded" />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-3.5">
         <div className="skeleton h-6 w-20 rounded-lg" />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-3.5">
         <div className="skeleton h-5 w-24 rounded" />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-3.5">
         <div className="skeleton h-5 w-16 rounded" />
       </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-3.5">
         <div className="skeleton h-5 w-8 rounded" />
       </td>
     </tr>
@@ -146,25 +146,40 @@ function StatCard({
   subtitle,
   icon,
   iconBg,
+  accentColor = 'indigo',
 }: {
   label: string;
   value: string | number;
   subtitle?: string;
   icon: React.ReactNode;
   iconBg: string;
+  accentColor?: string;
 }) {
   return (
-    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
-        <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center', iconBg)}>
-          {icon}
+    <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 overflow-hidden group">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-500/[0.02] group-hover:to-indigo-500/[0.05] transition-all duration-500 rounded-2xl" />
+      {/* Top accent line */}
+      <div className={cn(
+        'absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+        accentColor === 'blue' && 'bg-gradient-to-r from-transparent via-blue-500/50 to-transparent',
+        accentColor === 'green' && 'bg-gradient-to-r from-transparent via-green-500/50 to-transparent',
+        accentColor === 'purple' && 'bg-gradient-to-r from-transparent via-purple-500/50 to-transparent',
+        accentColor === 'orange' && 'bg-gradient-to-r from-transparent via-orange-500/50 to-transparent',
+        accentColor === 'indigo' && 'bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent',
+      )} />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
+          <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center', iconBg)}>
+            {icon}
+          </div>
         </div>
+        <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
+        {subtitle && (
+          <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
+        )}
       </div>
-      <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-      {subtitle && (
-        <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
-      )}
     </div>
   );
 }
@@ -212,15 +227,19 @@ function ComposeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeInScale shadow-2xl shadow-black/10 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fadeIn">
+      <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeInScale shadow-2xl shadow-black/10 overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-              <Send className="w-4 h-4 text-indigo-500" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+              <Send className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">Compose Email</h2>
+            <div>
+              <h2 className="text-lg font-bold text-[var(--text-primary)]">Compose Email</h2>
+              <p className="text-[11px] text-[var(--text-tertiary)]">Create and send a new email</p>
+            </div>
           </div>
           <button
             onClick={onClose}
@@ -235,15 +254,15 @@ function ComposeModal({
           {/* Template Selector */}
           {templates.length > 0 && (
             <div>
-              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                 Template
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
                 <select
                   value={selectedTemplateId}
                   onChange={(e) => handleTemplateChange(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 appearance-none transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 appearance-none transition-all"
                 >
                   <option value="">No template (compose from scratch)</option>
                   {templates.map((t) => (
@@ -260,36 +279,36 @@ function ComposeModal({
           {/* To & Contact ID */}
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                 To *
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
                 <input
                   name="to"
                   type="email"
                   required
                   placeholder="recipient@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                 Contact ID
               </label>
               <input
                 name="contactId"
                 type="text"
                 placeholder="Optional"
-                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
               />
             </div>
           </div>
 
           {/* Subject */}
           <div>
-            <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
               Subject *
             </label>
             <input
@@ -297,13 +316,13 @@ function ComposeModal({
               onChange={(e) => setSubject(e.target.value)}
               required
               placeholder="Email subject line"
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
             />
           </div>
 
           {/* Body */}
           <div>
-            <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+            <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
               Body *
             </label>
             <textarea
@@ -312,7 +331,7 @@ function ComposeModal({
               required
               rows={8}
               placeholder="Write your email content here..."
-              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all resize-none leading-relaxed"
+              className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all resize-none leading-relaxed"
             />
           </div>
 
@@ -321,7 +340,7 @@ function ComposeModal({
             <button
               type="submit"
               disabled={isSending}
-              className="flex items-center gap-2 flex-1 justify-center py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 flex-1 justify-center py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
             >
               {isSending ? (
                 <>
@@ -338,7 +357,7 @@ function ComposeModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-tertiary)] transition-colors"
+              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)] transition-colors"
             >
               Cancel
             </button>
@@ -370,9 +389,9 @@ function EmailDetailView({
       <div className="flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
+          className="group p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-0.5" />
         </button>
         <div className="flex-1 min-w-0">
           <h2 className="text-xl font-bold text-[var(--text-primary)] truncate">
@@ -400,7 +419,8 @@ function EmailDetailView({
       </div>
 
       {/* Status & Tracking Banner */}
-      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5">
+      <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         <div className="flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-2">
             <span className="text-[13px] font-medium text-[var(--text-secondary)]">Status:</span>
@@ -440,7 +460,8 @@ function EmailDetailView({
       </div>
 
       {/* Email Body */}
-      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
+      <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
           <h3 className="text-[13px] font-semibold text-[var(--text-primary)]">Email Content</h3>
         </div>
@@ -574,14 +595,14 @@ export function EmailsPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Emails</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-1">
+          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Emails</h1>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
             {emailsData?.total ?? 0} total emails
           </p>
         </div>
         <button
           onClick={() => setShowCompose(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" />
           Compose
@@ -600,6 +621,7 @@ export function EmailsPage() {
               subtitle="Emails in this view"
               icon={<Send className="w-4 h-4 text-blue-600" />}
               iconBg="bg-blue-100 dark:bg-blue-900/30"
+              accentColor="blue"
             />
             <StatCard
               label="Open Rate"
@@ -607,6 +629,7 @@ export function EmailsPage() {
               subtitle="Opened or clicked"
               icon={<Eye className="w-4 h-4 text-green-600" />}
               iconBg="bg-green-100 dark:bg-green-900/30"
+              accentColor="green"
             />
             <StatCard
               label="Click Rate"
@@ -614,6 +637,7 @@ export function EmailsPage() {
               subtitle="Links clicked"
               icon={<MousePointerClick className="w-4 h-4 text-purple-600" />}
               iconBg="bg-purple-100 dark:bg-purple-900/30"
+              accentColor="purple"
             />
             <StatCard
               label="Bounce Rate"
@@ -621,6 +645,7 @@ export function EmailsPage() {
               subtitle="Bounced or failed"
               icon={<AlertTriangle className="w-4 h-4 text-orange-600" />}
               iconBg="bg-orange-100 dark:bg-orange-900/30"
+              accentColor="orange"
             />
           </>
         )}
@@ -629,20 +654,20 @@ export function EmailsPage() {
       {/* Filters */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
           <input
             type="text"
             placeholder="Search by subject or recipient..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
           />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 pr-10 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 appearance-none transition-all"
+            className="px-4 py-2.5 pr-10 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 appearance-none transition-all"
           >
             {EMAIL_STATUSES.map((s) => (
               <option key={s.value} value={s.value}>
@@ -687,11 +712,11 @@ export function EmailsPage() {
                 <td colSpan={6} className="px-6 py-16 text-center">
                   <div className="flex flex-col items-center gap-3">
                     <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                      <Inbox className="w-6 h-6 text-[var(--text-tertiary)]" />
+                      <Inbox className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
                     </div>
                     <div>
                       <p className="text-[13px] text-[var(--text-secondary)] font-medium">No emails found</p>
-                      <p className="text-[12px] text-[var(--text-tertiary)] mt-1">
+                      <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">
                         {search || statusFilter
                           ? 'Try adjusting your search or filters'
                           : 'Send your first email to get started'}
@@ -700,7 +725,7 @@ export function EmailsPage() {
                     {!search && !statusFilter && (
                       <button
                         onClick={() => setShowCompose(true)}
-                        className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-medium shadow-md shadow-indigo-500/20 transition-all"
+                        className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all"
                       >
                         <Plus className="w-4 h-4" />
                         Compose Email
@@ -710,20 +735,21 @@ export function EmailsPage() {
                 </td>
               </tr>
             ) : (
-              emailsData.emails.map((email) => (
+              emailsData.emails.map((email, index) => (
                 <tr
                   key={email.id}
-                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-colors cursor-pointer group"
+                  className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 cursor-pointer group animate-fadeInUp"
+                  style={{ animationDelay: `${index * 30}ms` }}
                   onClick={() => setSelectedEmail(email)}
                 >
                   {/* Recipient */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-500/15 transition-colors">
                         <Mail className="w-4 h-4 text-indigo-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[13px] font-medium text-[var(--text-primary)] truncate">
+                        <p className="text-[13px] font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {email.to}
                         </p>
                         {email.contactName && (
@@ -736,14 +762,14 @@ export function EmailsPage() {
                   </td>
 
                   {/* Subject */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <p className="text-[13px] text-[var(--text-primary)] truncate max-w-xs">
                       {email.subject}
                     </p>
                   </td>
 
                   {/* Status */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <span
                       className={cn(
                         'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
@@ -756,12 +782,12 @@ export function EmailsPage() {
                   </td>
 
                   {/* Sent Date */}
-                  <td className="px-6 py-4 text-[12px] text-[var(--text-secondary)]">
+                  <td className="px-6 py-3.5 text-[12px] text-[var(--text-secondary)]">
                     {formatDate(email.sentAt)}
                   </td>
 
                   {/* Tracking */}
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5">
                     <div className="flex items-center gap-2">
                       {email.openedAt ? (
                         <span className="flex items-center gap-1 text-[11px] font-medium text-green-600 dark:text-green-400">
@@ -780,9 +806,9 @@ export function EmailsPage() {
                   </td>
 
                   {/* Actions */}
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-3.5 text-right">
                     <div
-                      className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button

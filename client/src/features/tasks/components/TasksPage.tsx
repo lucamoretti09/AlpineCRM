@@ -1,15 +1,24 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, CheckCircle2, Circle, Clock, AlertTriangle, Filter, Search, Trash2, Edit } from 'lucide-react';
+import { Plus, CheckCircle2, Circle, Clock, AlertTriangle, Filter, Search, Trash2, Edit, ClipboardList } from 'lucide-react';
 import api from '@/lib/api';
 import { cn, formatDate, getPriorityColor, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
+
+const PRIORITY_DOTS: Record<string, string> = {
+  low: 'bg-slate-400',
+  medium: 'bg-blue-400',
+  normal: 'bg-blue-400',
+  high: 'bg-orange-400',
+  urgent: 'bg-red-500',
+};
 
 export function TasksPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
+  const [completingId, setCompletingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -29,6 +38,7 @@ export function TasksPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       toast.success('Task completed!');
+      setTimeout(() => setCompletingId(null), 600);
     },
   });
 
@@ -59,33 +69,57 @@ export function TasksPage() {
     });
   };
 
-  const getTaskIcon = (status: string) => {
-    if (status === 'completed') return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-    if (status === 'in_progress') return <Clock className="w-5 h-5 text-blue-500" />;
-    return <Circle className="w-5 h-5 text-[var(--text-tertiary)]" />;
+  const handleComplete = (task: any) => {
+    if (task.status === 'completed') return;
+    setCompletingId(task.id);
+    completeMutation.mutate(task.id);
+  };
+
+  const isOverdue = (task: any) => {
+    return task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'completed';
+  };
+
+  const getTaskIcon = (task: any) => {
+    const isCompleting = completingId === task.id;
+
+    if (task.status === 'completed' || isCompleting) {
+      return (
+        <div className={cn('relative', isCompleting && 'animate-checkBounce')}>
+          <CheckCircle2 className={cn(
+            'w-5 h-5 text-green-500 transition-all duration-300',
+            isCompleting && 'animate-checkRipple'
+          )} />
+          {isCompleting && (
+            <div className="absolute inset-0 rounded-full animate-checkRipple" />
+          )}
+        </div>
+      );
+    }
+    if (task.status === 'in_progress') return <Clock className="w-5 h-5 text-blue-500" />;
+    return <Circle className="w-5 h-5 text-[var(--text-tertiary)] group-hover/check:text-primary-400 transition-colors duration-200" />;
   };
 
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Tasks</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-1">{data?.total || 0} tasks</p>
+          <h1 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight">Tasks</h1>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">{data?.total || 0} tasks</p>
         </div>
         <button onClick={() => { setEditingTask(null); setShowForm(true); }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all">
-          <Plus className="w-4 h-4" /> New Task
+          className="group flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+          <Plus className="w-4 h-4 transition-transform duration-300 group-hover:rotate-90" /> New Task
         </button>
       </div>
 
       <div className="flex gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+        <div className="relative flex-1 group/search">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
           <input type="text" placeholder="Search tasks..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
+          className="px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
           <option value="">All Status</option>
           <option value="pending">Pending</option>
           <option value="in_progress">In Progress</option>
@@ -94,37 +128,79 @@ export function TasksPage() {
         </select>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton h-16 rounded-2xl" />)
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-4 p-4 bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl">
+              <div className="skeleton w-5 h-5 rounded-full animate-skeletonPulse" />
+              <div className="flex-1 space-y-2">
+                <div className="skeleton h-4 w-3/5 rounded-lg" style={{ animationDelay: `${i * 60}ms` }} />
+                <div className="flex gap-2">
+                  <div className="skeleton h-5 w-16 rounded-lg" style={{ animationDelay: `${i * 60 + 30}ms` }} />
+                  <div className="skeleton h-5 w-20 rounded-lg" style={{ animationDelay: `${i * 60 + 60}ms` }} />
+                </div>
+              </div>
+            </div>
+          ))
         ) : data?.tasks?.length === 0 ? (
-          <div className="py-16 text-center text-[var(--text-tertiary)] text-[13px]">No tasks found</div>
+          <div className="py-20 flex flex-col items-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-500/10 via-primary-500/5 to-violet-500/10 flex items-center justify-center border border-primary-500/10">
+              <ClipboardList className="w-6 h-6 text-primary-500/60" />
+            </div>
+            <div className="text-center">
+              <p className="text-[13px] font-semibold text-[var(--text-primary)]">No tasks found</p>
+              <p className="text-[12px] text-[var(--text-tertiary)] mt-0.5">Create a task to start getting things done</p>
+            </div>
+          </div>
         ) : (
           data?.tasks?.map((task: any, index: number) => (
-            <div key={task.id} className="flex items-center gap-4 p-4 bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all group animate-fadeInUp" style={{ animationDelay: `${index * 30}ms` }}>
-              <button onClick={() => task.status !== 'completed' && completeMutation.mutate(task.id)}
-                className="flex-shrink-0 hover:scale-110 transition-transform">
-                {getTaskIcon(task.status)}
+            <div key={task.id}
+              className={cn(
+                'flex items-center gap-4 p-4 bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border rounded-2xl hover:border-primary-500/20 hover:shadow-lg hover:shadow-primary-500/5 transition-all duration-200 group animate-fadeInUp relative',
+                isOverdue(task)
+                  ? 'border-red-500/20 border-l-[3px] border-l-red-500'
+                  : 'border-[var(--border-color)]'
+              )}
+              style={{ animationDelay: `${index * 30}ms` }}>
+              <button onClick={() => handleComplete(task)}
+                className={cn(
+                  'flex-shrink-0 transition-all duration-200 group/check',
+                  task.status !== 'completed' && 'hover:scale-125 active:scale-95'
+                )}>
+                {getTaskIcon(task)}
               </button>
               <div className="flex-1 min-w-0">
-                <p className={cn('font-semibold text-[13px] text-[var(--text-primary)]', task.status === 'completed' && 'line-through opacity-60')}>
+                <p className={cn('font-semibold text-[13px] text-[var(--text-primary)] transition-all duration-300', task.status === 'completed' && 'line-through opacity-50')}>
                   {task.title}
                 </p>
                 <div className="flex items-center gap-3 mt-1.5">
-                  <span className={cn('px-2 py-0.5 rounded-lg text-[11px] font-semibold', getPriorityColor(task.priority))}>{task.priority}</span>
+                  <span className={cn('inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-[11px] font-semibold', getPriorityColor(task.priority))}>
+                    <span className={cn('w-1.5 h-1.5 rounded-full', PRIORITY_DOTS[task.priority] || 'bg-blue-400')} />
+                    {task.priority}
+                  </span>
                   <span className="text-[11px] text-[var(--text-tertiary)] capitalize">{task.type?.replace('_', ' ')}</span>
                   {task.dueDate && (
-                    <span className={cn('text-[11px]', new Date(task.dueDate) < new Date() && task.status !== 'completed' ? 'text-red-500' : 'text-[var(--text-tertiary)]')}>
+                    <span className={cn(
+                      'text-[11px] font-medium',
+                      isOverdue(task) ? 'text-red-500' : 'text-[var(--text-tertiary)]'
+                    )}>
+                      {isOverdue(task) && (
+                        <AlertTriangle className="w-3 h-3 inline mr-1 -mt-px" />
+                      )}
                       Due: {formatDate(task.dueDate)}
                     </span>
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                 <button onClick={() => { setEditingTask(task); setShowForm(true); }}
-                  className="p-2 rounded-xl hover:bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] transition-colors"><Edit className="w-4 h-4" /></button>
+                  className="p-2 rounded-xl hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
+                  <Edit className="w-4 h-4" />
+                </button>
                 <button onClick={() => { if (confirm('Delete?')) deleteMutation.mutate(task.id); }}
-                  className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                  className="p-2 rounded-xl hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))
@@ -132,50 +208,56 @@ export function TasksPage() {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl shadow-black/10">
-            <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">{editingTask ? 'Edit Task' : 'New Task'}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-md transition-all duration-300" onClick={() => { setShowForm(false); setEditingTask(null); }}>
+          <div className="relative bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-8 w-full max-w-lg mx-4 animate-fadeInScale shadow-2xl dark:shadow-black/40 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Top gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-primary-400 via-primary-500 to-violet-500 rounded-t-2xl" />
+            {/* Subtle background glow */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+            <h2 className="text-[18px] font-bold text-[var(--text-primary)] mb-6 tracking-tight">{editingTask ? 'Edit Task' : 'New Task'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">Title *</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Title *</label>
                 <input name="title" defaultValue={editingTask?.title} required
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
               </div>
               <div>
-                <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">Description</label>
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Description</label>
                 <textarea name="description" rows={3} defaultValue={editingTask?.description}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all resize-none" />
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300 resize-none" />
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">Type</label>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Type</label>
                   <select name="type" defaultValue={editingTask?.type || 'task'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     <option value="task">Task</option><option value="call">Call</option><option value="meeting">Meeting</option>
                     <option value="email">Email</option><option value="follow_up">Follow Up</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">Priority</label>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Priority</label>
                   <select name="priority" defaultValue={editingTask?.priority || 'medium'}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
                     <option value="low">Low</option><option value="medium">Medium</option>
                     <option value="high">High</option><option value="urgent">Urgent</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[12px] font-semibold text-[var(--text-secondary)] mb-1.5">Due Date</label>
+                  <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">Due Date</label>
                   <input name="dueDate" type="date" defaultValue={editingTask?.dueDate?.split('T')[0]}
-                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                    className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
                 </div>
               </div>
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-3">
                 <button type="submit" disabled={createMutation.isPending}
-                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 disabled:opacity-50 transition-all">
+                  className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300 disabled:opacity-50 disabled:hover:shadow-md">
                   {createMutation.isPending ? 'Saving...' : editingTask ? 'Update' : 'Create'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setEditingTask(null); }}
-                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-secondary)] transition-all">Cancel</button>
+                  className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200">
+                  Cancel
+                </button>
               </div>
             </form>
           </div>

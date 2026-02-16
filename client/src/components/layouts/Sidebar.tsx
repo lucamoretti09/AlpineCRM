@@ -54,33 +54,53 @@ export default function Sidebar() {
       className={cn(
         'sidebar-glow fixed left-0 top-0 z-40 flex h-screen flex-col',
         'bg-[var(--bg-sidebar)]',
-        'border-r border-[var(--border-color)]',
-        'transition-all duration-300 ease-spring',
+        'border-r border-[var(--border-color)]/50',
+        'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
         sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'
       )}
     >
       {/* Logo Section */}
       <div
         className={cn(
-          'flex h-[68px] items-center border-b border-[var(--border-color)]',
+          'flex h-[68px] items-center border-b border-[var(--border-color)]/50',
           'px-4 shrink-0',
           sidebarCollapsed ? 'justify-center' : 'gap-3'
         )}
       >
-        <div className="relative group">
-          <div className="absolute inset-0 bg-indigo-500/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/20">
-            <Mountain className="h-5 w-5 text-white" />
+        <div className="relative group cursor-pointer">
+          {/* Outer glow that pulses on hover */}
+          <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-br from-indigo-500/20 via-violet-500/15 to-purple-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out" />
+          {/* Logo icon with richer gradient + hover pulse-glow */}
+          <div
+            className={cn(
+              'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
+              'bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-700',
+              'shadow-lg shadow-indigo-500/25',
+              'transition-all duration-500 ease-out',
+              'group-hover:shadow-indigo-500/40 group-hover:shadow-xl',
+              'group-hover:scale-[1.04]'
+            )}
+            style={{
+              animation: 'none',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.animation = 'logo-pulse-glow 2s ease-in-out infinite';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.animation = 'none';
+            }}
+          >
+            <Mountain className="h-5 w-5 text-white drop-shadow-sm" />
           </div>
         </div>
         <div
           className={cn(
-            'transition-all duration-300 overflow-hidden whitespace-nowrap',
+            'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden whitespace-nowrap',
             sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
           )}
         >
           <span className="text-lg font-bold tracking-tight text-[var(--text-primary)]">
-            Alpine<span className="text-primary-500">CRM</span>
+            Alpine<span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">CRM</span>
           </span>
         </div>
       </div>
@@ -101,37 +121,56 @@ export default function Sidebar() {
                   onMouseLeave={() => setHoveredItem(null)}
                   className={cn(
                     'group relative flex items-center gap-3 rounded-xl px-3 py-2.5',
-                    'transition-all duration-200 ease-spring',
+                    'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
                     'text-[13.5px] font-medium',
                     sidebarCollapsed && 'justify-center px-0',
                     active
                       ? 'bg-primary-500/[0.08] text-primary-500 dark:bg-primary-500/[0.12]'
-                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   )}
                 >
-                  {/* Active indicator bar */}
+                  {/* Hover background fill that slides in from left */}
+                  {!active && (
+                    <span
+                      className={cn(
+                        'absolute inset-0 rounded-xl bg-[var(--bg-tertiary)]/50',
+                        'origin-left transition-all duration-[300ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                        hovered
+                          ? 'scale-x-100 opacity-100'
+                          : 'scale-x-0 opacity-0'
+                      )}
+                    />
+                  )}
+
+                  {/* Active indicator bar with animated glow */}
                   {active && (
-                    <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-primary-400 to-primary-600 shadow-sm shadow-primary-500/30 transition-all duration-300" />
+                    <span
+                      className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-gradient-to-b from-primary-400 via-primary-500 to-primary-600"
+                      style={{
+                        animation: 'active-bar-glow 2.5s ease-in-out infinite',
+                      }}
+                    />
                   )}
 
                   <Icon
                     className={cn(
-                      'h-[18px] w-[18px] shrink-0 transition-all duration-200',
+                      'relative h-[18px] w-[18px] shrink-0 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
                       active && 'drop-shadow-sm',
-                      (active || hovered) && 'scale-105'
+                      hovered && !active && 'scale-110',
+                      active && 'scale-105'
                     )}
                   />
 
                   <span
                     className={cn(
-                      'truncate transition-all duration-300 overflow-hidden whitespace-nowrap',
+                      'relative truncate transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden whitespace-nowrap',
                       sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
                     )}
                   >
                     {item.label}
                   </span>
 
-                  {/* Tooltip for collapsed state */}
+                  {/* Tooltip for collapsed state with arrow indicator */}
                   {sidebarCollapsed && (
                     <span
                       className={cn(
@@ -139,11 +178,15 @@ export default function Sidebar() {
                         'rounded-lg bg-[var(--bg-card)] px-3 py-2',
                         'text-xs font-medium text-[var(--text-primary)]',
                         'border border-[var(--border-color)]',
-                        'shadow-xl opacity-0 transition-all duration-200 scale-95',
-                        'group-hover:opacity-100 group-hover:scale-100 whitespace-nowrap'
+                        'shadow-xl shadow-black/8 dark:shadow-black/25',
+                        'opacity-0 scale-95',
+                        'group-hover:animate-tooltip-enter',
+                        'whitespace-nowrap'
                       )}
                     >
-                      {item.label}
+                      {/* Arrow indicator */}
+                      <span className="absolute -left-[5px] top-1/2 -translate-y-1/2 h-2.5 w-2.5 rotate-45 border-l border-b border-[var(--border-color)] bg-[var(--bg-card)]" />
+                      <span className="relative">{item.label}</span>
                     </span>
                   )}
                 </a>
@@ -159,33 +202,37 @@ export default function Sidebar() {
           onClick={toggleSidebar}
           className={cn(
             'flex w-full items-center gap-3 rounded-xl px-3 py-2',
-            'text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-secondary)]',
-            'transition-all duration-200 ease-spring text-[13px]',
+            'text-[var(--text-tertiary)] hover:bg-[var(--bg-tertiary)]/50 hover:text-[var(--text-secondary)]',
+            'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)] text-[13px]',
             sidebarCollapsed && 'justify-center px-0'
           )}
         >
           {sidebarCollapsed ? (
-            <ChevronsRight className="h-[18px] w-[18px] shrink-0" />
+            <ChevronsRight className="h-[18px] w-[18px] shrink-0 transition-transform duration-300" />
           ) : (
             <>
-              <ChevronsLeft className="h-[18px] w-[18px] shrink-0" />
+              <ChevronsLeft className="h-[18px] w-[18px] shrink-0 transition-transform duration-300" />
               <span className="truncate">Collapse</span>
             </>
           )}
         </button>
       </div>
 
-      {/* User Section */}
+      {/* User Section — with gradient fade separator */}
       <div
         className={cn(
-          'border-t border-[var(--border-color)] p-3 shrink-0',
+          'relative p-3 shrink-0',
           sidebarCollapsed ? 'flex justify-center' : ''
         )}
       >
+        {/* Gradient fade separator replacing hard border */}
+        <div className="absolute top-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-[var(--border-color)] to-transparent" />
+
         <div
           className={cn(
             'flex items-center gap-3 rounded-xl p-2',
-            'transition-all duration-200',
+            'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+            'hover:bg-[var(--bg-tertiary)]/30',
             sidebarCollapsed ? 'justify-center' : ''
           )}
         >
@@ -194,10 +241,10 @@ export default function Sidebar() {
             <img
               src={user.avatarUrl}
               alt={`${user.firstName} ${user.lastName}`}
-              className="h-9 w-9 shrink-0 rounded-xl object-cover ring-2 ring-primary-500/15"
+              className="h-9 w-9 shrink-0 rounded-xl object-cover ring-2 ring-primary-500/15 transition-all duration-300 hover:ring-primary-500/30"
             />
           ) : (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-primary-500/15 shadow-sm shadow-indigo-500/20">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-primary-500/15 shadow-md shadow-indigo-500/20 transition-all duration-300 hover:ring-primary-500/30 hover:shadow-lg hover:shadow-indigo-500/25">
               {user ? getInitials(user.firstName, user.lastName) : '??'}
             </div>
           )}

@@ -110,13 +110,13 @@ function StatCardSkeleton() {
 function TableRowSkeleton() {
   return (
     <tr className="border-b border-[var(--border-color)]">
-      <td className="px-6 py-4"><div className="skeleton h-5 w-28 rounded" /></td>
-      <td className="px-6 py-4"><div className="skeleton h-5 w-36 rounded" /></td>
-      <td className="px-6 py-4"><div className="skeleton h-5 w-20 rounded" /></td>
-      <td className="px-6 py-4"><div className="skeleton h-5 w-16 rounded-lg" /></td>
-      <td className="px-6 py-4"><div className="skeleton h-5 w-24 rounded" /></td>
-      <td className="px-6 py-4"><div className="skeleton h-5 w-24 rounded" /></td>
-      <td className="px-6 py-4"><div className="skeleton h-5 w-16 rounded" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-28 rounded" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-36 rounded" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-20 rounded" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-16 rounded-lg" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-24 rounded" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-24 rounded" /></td>
+      <td className="px-6 py-3.5"><div className="skeleton h-5 w-16 rounded" /></td>
     </tr>
   );
 }
@@ -131,19 +131,32 @@ interface StatCardProps {
   subtitle: string;
   icon: React.ReactNode;
   iconBg: string;
+  accentColor?: string;
 }
 
-function StatCard({ label, value, subtitle, icon, iconBg }: StatCardProps) {
+function StatCard({ label, value, subtitle, icon, iconBg, accentColor = 'indigo' }: StatCardProps) {
   return (
-    <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
-        <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', iconBg)}>
-          {icon}
+    <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl p-5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 overflow-hidden group">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-indigo-500/[0.02] group-hover:to-indigo-500/[0.05] transition-all duration-500 rounded-2xl" />
+      {/* Top accent line */}
+      <div className={cn(
+        'absolute top-0 left-0 right-0 h-[2px] rounded-t-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+        accentColor === 'green' && 'bg-gradient-to-r from-transparent via-green-500/50 to-transparent',
+        accentColor === 'emerald' && 'bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent',
+        accentColor === 'red' && 'bg-gradient-to-r from-transparent via-red-500/50 to-transparent',
+        accentColor === 'indigo' && 'bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent',
+      )} />
+      <div className="relative">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[13px] font-medium text-[var(--text-secondary)]">{label}</span>
+          <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center', iconBg)}>
+            {icon}
+          </div>
         </div>
+        <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
+        <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
       </div>
-      <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-      <p className="text-[11px] text-[var(--text-tertiary)] mt-1">{subtitle}</p>
     </div>
   );
 }
@@ -213,8 +226,9 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeInScale max-h-[90vh] flex flex-col shadow-2xl shadow-black/10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fadeIn">
+      <div className="relative bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl w-full max-w-2xl mx-4 animate-fadeInScale max-h-[90vh] flex flex-col shadow-2xl shadow-black/10 overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-500/50 to-transparent rounded-t-2xl" />
         {/* Modal Header */}
         <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
           <div>
@@ -241,18 +255,18 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
             {/* Top fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                   Contact ID
                 </label>
                 <input
                   name="contactId"
                   defaultValue={editingInvoice?.contactId || ''}
                   placeholder="Optional"
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                   Due Date *
                 </label>
                 <input
@@ -260,7 +274,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                   type="date"
                   required
                   defaultValue={editingInvoice?.dueDate?.split('T')[0] || ''}
-                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                 />
               </div>
             </div>
@@ -268,7 +282,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
             {/* Line Items */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-[13px] font-medium text-[var(--text-secondary)]">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
                   Line Items *
                 </label>
                 <button
@@ -305,7 +319,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       value={item.description}
                       onChange={(e) => updateLineItem(item.id, 'description', e.target.value)}
                       placeholder="Item description"
-                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                      className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                     <input
                       type="number"
@@ -315,7 +329,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       onChange={(e) =>
                         updateLineItem(item.id, 'quantity', Math.max(1, parseInt(e.target.value) || 1))
                       }
-                      className="w-full px-3 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                      className="w-full px-3 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                     <input
                       type="number"
@@ -325,7 +339,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       onChange={(e) =>
                         updateLineItem(item.id, 'unitPrice', Math.max(0, parseFloat(e.target.value) || 0))
                       }
-                      className="w-full px-3 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                      className="w-full px-3 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
                     />
                     <button
                       type="button"
@@ -366,7 +380,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                       onChange={(e) =>
                         setTaxRate(Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))
                       }
-                      className="w-16 px-2 py-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[11px] text-[var(--text-primary)] text-center focus:outline-none focus:border-indigo-500 transition-colors"
+                      className="w-16 px-2 py-1 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[11px] text-[var(--text-primary)] text-center focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-colors"
                     />
                     <span className="text-[11px] text-[var(--text-tertiary)]">%</span>
                   </div>
@@ -385,7 +399,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
 
             {/* Notes */}
             <div>
-              <label className="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
                 Notes
               </label>
               <textarea
@@ -393,7 +407,7 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
                 rows={3}
                 defaultValue={editingInvoice?.notes || ''}
                 placeholder="Additional notes or payment instructions..."
-                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 resize-none transition-all"
+                className="w-full px-3.5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 resize-none transition-all"
               />
             </div>
           </div>
@@ -403,14 +417,14 @@ function InvoiceFormModal({ editingInvoice, isPending, onSubmit, onClose }: Invo
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
+              className="flex-1 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
             >
               {isPending ? 'Saving...' : editingInvoice ? 'Update Invoice' : 'Create Invoice'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl font-medium hover:bg-[var(--bg-tertiary)] transition-colors"
+              className="px-6 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-primary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)] transition-colors"
             >
               Cancel
             </button>
@@ -519,14 +533,14 @@ export function InvoicesPage() {
       {/* ====== Header ====== */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Invoices</h1>
-          <p className="text-[13px] text-[var(--text-secondary)] mt-1">
+          <h1 className="text-[22px] font-bold tracking-tight text-[var(--text-primary)]">Invoices</h1>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
             Manage and track your invoices
           </p>
         </div>
         <button
           onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20 transition-all"
+          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" />
           New Invoice
@@ -545,6 +559,7 @@ export function InvoicesPage() {
               subtitle={`${invoices.length} shown`}
               icon={<Receipt className="w-4.5 h-4.5 text-indigo-500" />}
               iconBg="bg-indigo-500/10"
+              accentColor="indigo"
             />
             <StatCard
               label="Total Revenue"
@@ -552,6 +567,7 @@ export function InvoicesPage() {
               subtitle="From paid invoices"
               icon={<TrendingUp className="w-4.5 h-4.5 text-green-600" />}
               iconBg="bg-green-600/10"
+              accentColor="green"
             />
             <StatCard
               label="Paid"
@@ -559,6 +575,7 @@ export function InvoicesPage() {
               subtitle={`${total > 0 ? Math.round((stats.paidCount / total) * 100) : 0}% of total`}
               icon={<CheckCircle2 className="w-4.5 h-4.5 text-emerald-600" />}
               iconBg="bg-emerald-600/10"
+              accentColor="emerald"
             />
             <StatCard
               label="Overdue"
@@ -566,6 +583,7 @@ export function InvoicesPage() {
               subtitle={stats.overdueCount > 0 ? 'Needs attention' : 'All clear'}
               icon={<AlertTriangle className="w-4.5 h-4.5 text-red-600" />}
               iconBg="bg-red-600/10"
+              accentColor="red"
             />
           </>
         )}
@@ -574,20 +592,20 @@ export function InvoicesPage() {
       {/* ====== Filters ====== */}
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
           <input
             type="text"
             placeholder="Search by invoice number, contact..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all"
           />
         </div>
         <div className="relative">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="appearance-none pl-4 pr-10 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all cursor-pointer"
+            className="appearance-none pl-4 pr-10 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[13px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 transition-all cursor-pointer"
           >
             <option value="">All Statuses</option>
             {STATUSES.map((s) => (
@@ -637,7 +655,7 @@ export function InvoicesPage() {
                   <td colSpan={7} className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center gap-3">
                       <div className="w-12 h-12 rounded-2xl bg-[var(--bg-secondary)] flex items-center justify-center">
-                        <FileText className="w-6 h-6 text-[var(--text-tertiary)]" />
+                        <FileText className="w-6 h-6 text-[var(--text-tertiary)] opacity-50" />
                       </div>
                       <div>
                         <p className="text-[13px] font-medium text-[var(--text-secondary)]">
@@ -652,7 +670,7 @@ export function InvoicesPage() {
                       {!search && !statusFilter && (
                         <button
                           onClick={handleCreate}
-                          className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-medium shadow-md shadow-indigo-500/20 transition-all"
+                          className="mt-2 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all"
                         >
                           <Plus className="w-4 h-4" />
                           Create Invoice
@@ -662,7 +680,7 @@ export function InvoicesPage() {
                   </td>
                 </tr>
               ) : (
-                invoices.map((invoice) => {
+                invoices.map((invoice, index) => {
                   const isOverdue =
                     invoice.status !== 'paid' &&
                     invoice.status !== 'cancelled' &&
@@ -671,13 +689,20 @@ export function InvoicesPage() {
                   return (
                     <tr
                       key={invoice.id}
-                      className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-colors group"
+                      className={cn(
+                        'border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 group animate-fadeInUp',
+                        isOverdue && 'bg-red-50/30 dark:bg-red-900/[0.04]'
+                      )}
+                      style={{ animationDelay: `${index * 30}ms` }}
                     >
                       {/* Invoice Number */}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
-                            <FileText className="w-4 h-4 text-indigo-500" />
+                          <div className={cn(
+                            'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
+                            isOverdue ? 'bg-red-500/10' : 'bg-indigo-500/10 group-hover:bg-indigo-500/15'
+                          )}>
+                            <FileText className={cn('w-4 h-4', isOverdue ? 'text-red-500' : 'text-indigo-500')} />
                           </div>
                           <span className="text-[13px] font-semibold text-[var(--text-primary)]">
                             {invoice.invoiceNumber}
@@ -686,21 +711,21 @@ export function InvoicesPage() {
                       </td>
 
                       {/* Contact */}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span className="text-[13px] text-[var(--text-secondary)]">
                           {invoice.contactName || '--'}
                         </span>
                       </td>
 
                       {/* Amount */}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span className="text-[13px] font-semibold text-[var(--text-primary)]">
                           {formatCurrency(invoice.amount)}
                         </span>
                       </td>
 
                       {/* Status Badge */}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span
                           className={cn(
                             'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold',
@@ -713,25 +738,31 @@ export function InvoicesPage() {
                       </td>
 
                       {/* Issued Date */}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span className="text-[12px] text-[var(--text-secondary)]">
                           {invoice.issuedDate ? formatDate(invoice.issuedDate) : '--'}
                         </span>
                       </td>
 
                       {/* Due Date */}
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-3.5">
                         <span
                           className={cn(
-                            'text-[12px]',
+                            'text-[12px] inline-flex items-center gap-1.5',
                             isOverdue
                               ? 'text-red-500 font-medium'
                               : 'text-[var(--text-secondary)]',
                           )}
                         >
+                          {isOverdue && (
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                            </span>
+                          )}
                           {invoice.dueDate ? formatDate(invoice.dueDate) : '--'}
                           {isOverdue && (
-                            <span className="ml-1.5 text-[10px] font-semibold uppercase text-red-500">
+                            <span className="text-[10px] font-semibold uppercase text-red-500">
                               overdue
                             </span>
                           )}
@@ -739,8 +770,8 @@ export function InvoicesPage() {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <td className="px-6 py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
                           <button
                             onClick={() => handleEdit(invoice)}
                             className="p-2 rounded-xl hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-indigo-500 transition-colors"

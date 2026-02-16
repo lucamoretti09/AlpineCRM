@@ -22,6 +22,8 @@ export default function Navbar({ title }: NavbarProps) {
   const { user } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [themeBounce, setThemeBounce] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
 
@@ -40,8 +42,14 @@ export default function Navbar({ title }: NavbarProps) {
 
   const unreadCount = 3;
 
+  const handleThemeToggle = () => {
+    setThemeBounce(true);
+    toggleTheme();
+    setTimeout(() => setThemeBounce(false), 400);
+  };
+
   return (
-    <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-[var(--border-color)] bg-[var(--bg-primary)]/70 px-6 backdrop-blur-xl backdrop-saturate-150">
+    <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-6 backdrop-blur-xl backdrop-saturate-150">
       {/* Left: Page Title */}
       <div>
         <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
@@ -53,16 +61,24 @@ export default function Navbar({ title }: NavbarProps) {
       <div className="flex items-center gap-1.5">
         {/* Search */}
         <div className="relative hidden md:block">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-tertiary)]" />
+          <Search
+            className={cn(
+              'absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors duration-300',
+              searchFocused ? 'text-primary-500' : 'text-[var(--text-tertiary)]'
+            )}
+          />
           <input
             type="text"
             placeholder="Search..."
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
             className={cn(
               'h-10 w-60 rounded-xl border border-[var(--border-color)]',
               'bg-[var(--bg-secondary)]/60 pl-10 pr-4 text-[13px]',
               'text-[var(--text-primary)] placeholder-[var(--text-tertiary)]',
-              'outline-none transition-all duration-300 ease-spring',
-              'focus:w-80 focus:border-primary-500/40 focus:ring-2 focus:ring-primary-500/10 focus:bg-[var(--bg-secondary)]'
+              'outline-none transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+              'focus:w-80 focus:border-primary-500/40 focus:bg-[var(--bg-secondary)]',
+              'focus:shadow-[0_0_0_3px_rgba(99,102,241,0.1),0_0_20px_rgba(99,102,241,0.06)]'
             )}
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[var(--text-tertiary)]">
@@ -72,26 +88,27 @@ export default function Navbar({ title }: NavbarProps) {
           </div>
         </div>
 
-        {/* Theme Toggle */}
+        {/* Theme Toggle with rotation + scale bounce */}
         <button
-          onClick={toggleTheme}
+          onClick={handleThemeToggle}
           className={cn(
             'relative flex h-10 w-10 items-center justify-center rounded-xl',
             'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]',
-            'transition-all duration-200 ease-spring'
+            'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+            themeBounce && 'animate-theme-bounce'
           )}
           title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           <Sun
             className={cn(
-              'h-[18px] w-[18px] transition-all duration-400',
-              isDark ? 'rotate-0 scale-100' : 'rotate-90 scale-0'
+              'h-[18px] w-[18px] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+              isDark ? 'rotate-0 scale-100 opacity-100' : 'rotate-90 scale-0 opacity-0'
             )}
           />
           <Moon
             className={cn(
-              'absolute h-[18px] w-[18px] transition-all duration-400',
-              isDark ? '-rotate-90 scale-0' : 'rotate-0 scale-100'
+              'absolute h-[18px] w-[18px] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+              isDark ? '-rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
             )}
           />
         </button>
@@ -106,12 +123,17 @@ export default function Navbar({ title }: NavbarProps) {
             className={cn(
               'relative flex h-10 w-10 items-center justify-center rounded-xl',
               'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]',
-              'transition-all duration-200 ease-spring'
+              'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
             )}
           >
-            <Bell className="h-[18px] w-[18px]" />
+            <Bell
+              className={cn(
+                'h-[18px] w-[18px]',
+                unreadCount > 0 && !notificationsOpen && 'animate-bell-wiggle'
+              )}
+            />
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-1 text-[10px] font-bold text-white shadow-sm shadow-red-500/30">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-r from-red-500 to-rose-500 px-1 text-[10px] font-bold text-white shadow-md shadow-red-500/30 animate-notification-pulse">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -123,11 +145,12 @@ export default function Navbar({ title }: NavbarProps) {
               className={cn(
                 'absolute right-0 top-full mt-2 w-80 rounded-2xl',
                 'border border-[var(--border-color)] bg-[var(--bg-card)]',
-                'shadow-xl shadow-black/10 dark:shadow-black/30 animate-fadeInScale',
+                'shadow-2xl shadow-black/12 dark:shadow-black/40',
+                'animate-dropdown-enter',
                 'overflow-hidden'
               )}
             >
-              <div className="flex items-center justify-between border-b border-[var(--border-color)] px-4 py-3.5">
+              <div className="flex items-center justify-between border-b border-[var(--border-color)]/50 px-4 py-3.5">
                 <h3 className="text-[13px] font-bold text-[var(--text-primary)]">
                   Notifications
                 </h3>
@@ -136,7 +159,7 @@ export default function Navbar({ title }: NavbarProps) {
                 </span>
               </div>
               <div className="max-h-80 overflow-y-auto">
-                <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-colors duration-150 border-l-2 border-primary-500">
+                <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-primary-500">
                   <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary-500/10">
                     <Bell className="h-3.5 w-3.5 text-primary-500" />
                   </div>
@@ -145,7 +168,7 @@ export default function Navbar({ title }: NavbarProps) {
                     <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">2 minutes ago</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-colors duration-150 border-l-2 border-emerald-500">
+                <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-emerald-500">
                   <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
                     <Bell className="h-3.5 w-3.5 text-emerald-500" />
                   </div>
@@ -154,7 +177,7 @@ export default function Navbar({ title }: NavbarProps) {
                     <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">15 minutes ago</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-colors duration-150 border-l-2 border-transparent">
+                <div className="flex items-start gap-3 px-4 py-3.5 hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 ease-out border-l-2 border-transparent">
                   <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10">
                     <Bell className="h-3.5 w-3.5 text-amber-500" />
                   </div>
@@ -164,10 +187,10 @@ export default function Navbar({ title }: NavbarProps) {
                   </div>
                 </div>
               </div>
-              <div className="border-t border-[var(--border-color)] px-4 py-3">
+              <div className="border-t border-[var(--border-color)]/50 px-4 py-3">
                 <a
                   href="/notifications"
-                  className="block text-center text-[12px] font-semibold text-primary-500 hover:text-primary-400 transition-colors duration-150"
+                  className="block text-center text-[12px] font-semibold text-primary-500 hover:text-primary-400 transition-colors duration-200"
                 >
                   View all notifications
                 </a>
@@ -176,8 +199,8 @@ export default function Navbar({ title }: NavbarProps) {
           )}
         </div>
 
-        {/* Divider */}
-        <div className="mx-1.5 h-6 w-px bg-[var(--border-color)]" />
+        {/* Divider — gradient fade instead of solid line */}
+        <div className="mx-1.5 h-6 w-px bg-gradient-to-b from-transparent via-[var(--border-color)] to-transparent" />
 
         {/* User Dropdown */}
         <div ref={dropdownRef} className="relative">
@@ -188,17 +211,17 @@ export default function Navbar({ title }: NavbarProps) {
             }}
             className={cn(
               'flex items-center gap-2.5 rounded-xl px-2.5 py-1.5',
-              'hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200'
+              'hover:bg-[var(--bg-tertiary)]/60 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
             )}
           >
             {user?.avatarUrl ? (
               <img
                 src={user.avatarUrl}
                 alt={`${user.firstName} ${user.lastName}`}
-                className="h-8 w-8 rounded-xl object-cover ring-2 ring-[var(--border-color)]"
+                className="h-8 w-8 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
               />
             ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-[var(--border-color)]">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[11px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
                 {user ? getInitials(user.firstName, user.lastName) : '??'}
               </div>
             )}
@@ -212,23 +235,24 @@ export default function Navbar({ title }: NavbarProps) {
             </div>
             <ChevronDown
               className={cn(
-                'hidden h-3.5 w-3.5 text-[var(--text-tertiary)] transition-transform duration-200 md:block',
+                'hidden h-3.5 w-3.5 text-[var(--text-tertiary)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:block',
                 dropdownOpen && 'rotate-180'
               )}
             />
           </button>
 
-          {/* User Dropdown Menu */}
+          {/* User Dropdown Menu — with slide down + fade + scale animation */}
           {dropdownOpen && (
             <div
               className={cn(
                 'absolute right-0 top-full mt-2 w-56 rounded-2xl',
                 'border border-[var(--border-color)] bg-[var(--bg-card)]',
-                'shadow-xl shadow-black/10 dark:shadow-black/30 animate-fadeInScale',
+                'shadow-2xl shadow-black/12 dark:shadow-black/40',
+                'animate-dropdown-enter',
                 'overflow-hidden'
               )}
             >
-              <div className="border-b border-[var(--border-color)] px-4 py-3.5">
+              <div className="border-b border-[var(--border-color)]/50 px-4 py-3.5">
                 <p className="text-[13px] font-bold text-[var(--text-primary)]">
                   {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
                 </p>
@@ -240,14 +264,14 @@ export default function Navbar({ title }: NavbarProps) {
               <div className="py-1.5">
                 <a
                   href="/settings/profile"
-                  className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-colors duration-150"
+                  className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
                   <User className="h-4 w-4" />
                   Profile
                 </a>
                 <a
                   href="/settings"
-                  className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-colors duration-150"
+                  className="flex items-center gap-3 px-4 py-2.5 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
                   <Settings className="h-4 w-4" />
                   Settings
