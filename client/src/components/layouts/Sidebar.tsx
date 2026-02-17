@@ -36,7 +36,7 @@ const navItems: NavItem[] = [
 ];
 
 export default function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar } = useThemeStore();
+  const { sidebarCollapsed, toggleSidebar, mobileMenuOpen, closeMobileMenu } = useThemeStore();
   const { user } = useAuthStore();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
@@ -56,7 +56,12 @@ export default function Sidebar() {
         'bg-[var(--bg-sidebar)]',
         'border-r border-[var(--border-color)]/50',
         'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-        sidebarCollapsed ? 'w-[90px]' : 'w-[340px]'
+        // Desktop: collapse/expand
+        'md:translate-x-0',
+        sidebarCollapsed ? 'md:w-[90px]' : 'md:w-[340px]',
+        // Mobile: slide in/out, always full width when visible
+        'w-[300px]',
+        mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
       )}
     >
       {/* Logo Section */}
@@ -117,10 +122,11 @@ export default function Sidebar() {
               <li key={item.path}>
                 <a
                   href={item.path}
+                  onClick={() => closeMobileMenu()}
                   onMouseEnter={() => setHoveredItem(item.path)}
                   onMouseLeave={() => setHoveredItem(null)}
                   className={cn(
-                    'group relative flex items-center gap-4 rounded-2xl px-4 py-4',
+                    'group relative flex items-center gap-4 rounded-2xl px-4 py-4 min-h-[48px]',
                     'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
                     'text-[18px] font-medium',
                     sidebarCollapsed && 'justify-center px-0',

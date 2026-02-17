@@ -274,24 +274,24 @@ export function CalendarPage() {
   return (
     <div className="space-y-7 animate-fadeIn">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-[14px] text-[var(--text-secondary)]">
           <span className="font-semibold text-[var(--text-primary)]">{data?.total ?? 0}</span> programări luna aceasta
         </p>
         <button
           onClick={() => openCreateForm(selectedDate || new Date())}
-          className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          className="flex items-center gap-2 md:gap-2.5 px-3.5 md:px-5 py-2.5 md:py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[14px] md:text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" /> Programare Nouă
         </button>
       </div>
 
       {/* Calendar + Side Panel */}
-      <div className="flex gap-6 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Calendar Grid */}
         <div className="flex-1 bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between px-7 py-5 border-b border-[var(--border-color)]">
+          <div className="flex items-center justify-between px-4 md:px-7 py-4 md:py-5 border-b border-[var(--border-color)]">
             <div className="flex items-center gap-4">
               <h2 className="text-[17px] font-semibold text-[var(--text-primary)]">
                 {getMonthYearLabel(currentMonth)}

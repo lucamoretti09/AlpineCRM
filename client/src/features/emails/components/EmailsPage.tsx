@@ -630,13 +630,13 @@ export function EmailsPage() {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-[14px] text-[var(--text-secondary)]">
           <span className="font-semibold text-[var(--text-primary)]">{emailsData?.total ?? 0}</span> email-uri în total
         </p>
         <button
           onClick={() => setShowCompose(true)}
-          className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          className="flex items-center gap-2 px-3 md:px-4 py-2.5 md:py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[14px] md:text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           Compune
@@ -686,7 +686,7 @@ export function EmailsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)]" />
           <input
@@ -715,7 +715,8 @@ export function EmailsPage() {
 
       {/* Email Table */}
       <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[700px]">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
               <th className="text-left px-6 py-4 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
@@ -866,21 +867,22 @@ export function EmailsPage() {
             )}
           </tbody>
         </table>
+        </div>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border-color)]">
             <p className="text-[14px] text-[var(--text-tertiary)]">
               Se afișează {((page - 1) * limit) + 1}
               {' '}-{' '}
               {Math.min(page * limit, emailsData?.total ?? 0)} din{' '}
               {emailsData?.total ?? 0} email-uri
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 text-[14px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-3 md:px-4 py-2 text-[13px] md:text-[14px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Anterior
               </button>
@@ -913,7 +915,7 @@ export function EmailsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 text-[14px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="px-3 md:px-4 py-2 text-[13px] md:text-[14px] font-medium rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 Următor
               </button>

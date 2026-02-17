@@ -10,6 +10,7 @@ import {
   Command,
   LogOut,
   X,
+  Menu,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -50,16 +51,23 @@ export default function Navbar({ title }: NavbarProps) {
   };
 
   return (
-    <header role="banner" aria-label="Bară de navigare" className="sticky top-0 z-30 flex h-[90px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-8 backdrop-blur-xl backdrop-saturate-150">
-      {/* Left: Page Title */}
-      <div>
-        <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+    <header role="banner" aria-label="Bară de navigare" className="sticky top-0 z-30 flex h-[70px] md:h-[90px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-3 md:px-8 backdrop-blur-xl backdrop-saturate-150 gap-2 md:gap-3 max-w-full">
+      {/* Left: Hamburger + Page Title */}
+      <div className="flex items-center gap-3 min-w-0">
+        <button
+          onClick={() => useThemeStore.getState().toggleMobileMenu()}
+          className="flex md:hidden h-11 w-11 items-center justify-center rounded-xl text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] transition-all shrink-0"
+          aria-label="Deschide meniul"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
+        <h1 className="text-xl md:text-3xl font-bold text-[var(--text-primary)] tracking-tight truncate">
           {title}
         </h1>
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
         {/* Search - triggers Command Palette */}
         <button
           onClick={() => {
@@ -67,7 +75,7 @@ export default function Navbar({ title }: NavbarProps) {
             window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
           }}
           className={cn(
-            'hidden md:flex items-center gap-3 h-12 w-72 rounded-xl border border-[var(--border-color)]',
+            'hidden lg:flex items-center gap-3 h-12 w-72 rounded-xl border border-[var(--border-color)]',
             'bg-[var(--bg-secondary)]/60 px-4 text-[15px]',
             'text-[var(--text-tertiary)]',
             'outline-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
@@ -86,7 +94,7 @@ export default function Navbar({ title }: NavbarProps) {
         <button
           onClick={handleThemeToggle}
           className={cn(
-            'relative flex h-12 w-12 items-center justify-center rounded-xl',
+            'relative flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl',
             'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]',
             'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
             themeBounce && 'animate-theme-bounce'
@@ -115,7 +123,7 @@ export default function Navbar({ title }: NavbarProps) {
               setDropdownOpen(false);
             }}
             className={cn(
-              'relative flex h-12 w-12 items-center justify-center rounded-xl',
+              'relative flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl',
               'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)]',
               'transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
             )}
@@ -137,7 +145,7 @@ export default function Navbar({ title }: NavbarProps) {
           {notificationsOpen && (
             <div
               className={cn(
-                'absolute right-0 top-full mt-2 w-96 rounded-2xl',
+                'absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] md:w-96 max-w-96 rounded-2xl',
                 'border border-[var(--border-color)] bg-[var(--bg-card)]',
                 'shadow-2xl shadow-black/12 dark:shadow-black/40',
                 'animate-dropdown-enter',
@@ -194,7 +202,7 @@ export default function Navbar({ title }: NavbarProps) {
         </div>
 
         {/* Divider — gradient fade instead of solid line */}
-        <div className="mx-2 h-8 w-px bg-gradient-to-b from-transparent via-[var(--border-color)] to-transparent" />
+        <div className="hidden lg:block mx-2 h-8 w-px bg-gradient-to-b from-transparent via-[var(--border-color)] to-transparent" />
 
         {/* User Dropdown */}
         <div ref={dropdownRef} className="relative">
@@ -204,7 +212,7 @@ export default function Navbar({ title }: NavbarProps) {
               setNotificationsOpen(false);
             }}
             className={cn(
-              'flex items-center gap-2.5 rounded-xl px-2.5 py-1.5',
+              'flex items-center gap-2.5 rounded-xl px-1 md:px-2.5 py-1.5',
               'hover:bg-[var(--bg-tertiary)]/60 transition-all duration-[250ms] ease-[cubic-bezier(0.16,1,0.3,1)]'
             )}
           >
@@ -212,14 +220,14 @@ export default function Navbar({ title }: NavbarProps) {
               <img
                 src={user.avatarUrl}
                 alt={`${user.firstName} ${user.lastName}`}
-                className="h-12 w-12 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
+                className="h-10 w-10 md:h-12 md:w-12 rounded-xl object-cover ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30"
               />
             ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[15px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
+              <div className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 via-indigo-500 to-violet-600 text-[13px] md:text-[15px] font-bold text-white ring-2 ring-[var(--border-color)] transition-all duration-300 hover:ring-primary-500/30">
                 {user ? getInitials(user.firstName, user.lastName) : '??'}
               </div>
             )}
-            <div className="hidden text-left md:block">
+            <div className="hidden text-left lg:block">
               <p className="text-[17px] font-semibold text-[var(--text-primary)] leading-tight">
                 {user ? `${user.firstName} ${user.lastName}` : 'Vizitator'}
               </p>
@@ -229,7 +237,7 @@ export default function Navbar({ title }: NavbarProps) {
             </div>
             <ChevronDown
               className={cn(
-                'hidden h-3.5 w-3.5 text-[var(--text-tertiary)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] md:block',
+                'hidden h-3.5 w-3.5 text-[var(--text-tertiary)] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] lg:block',
                 dropdownOpen && 'rotate-180'
               )}
             />

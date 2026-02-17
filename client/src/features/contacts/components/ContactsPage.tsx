@@ -210,26 +210,26 @@ export function ContactsPage() {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-[14px] text-[var(--text-secondary)]">
           Se afișează <span className="font-semibold text-[var(--text-primary)]">{paginatedContacts.length}</span> din {data?.total || 0} contacte
         </p>
         <div className="flex items-center gap-2.5">
           <button onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] transition-all duration-200"
+            className="flex items-center gap-2 px-3 md:px-4 py-2.5 md:py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl text-[14px] md:text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] transition-all duration-200"
             title="Exportă CSV"
           >
-            <Download className="w-4.5 h-4.5" /> Export
+            <Download className="w-4.5 h-4.5" /> <span className="hidden sm:inline">Export</span>
           </button>
           <button onClick={() => { setEditingContact(null); setShowForm(true); }}
-            className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-            <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Adaugă Contact
+            className="group flex items-center gap-2 md:gap-2.5 px-3.5 md:px-5 py-2.5 md:py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[14px] md:text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+            <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> <span className="hidden sm:inline">Adaugă Contact</span><span className="sm:hidden">Adaugă</span>
           </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 group/search">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
           <input type="text" placeholder="Caută contacte..." value={search} onChange={(e) => setSearch(e.target.value)}
@@ -251,7 +251,8 @@ export function ContactsPage() {
 
       {/* Contact Table */}
       <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-sm dark:shadow-black/20">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[700px]">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
               <th className="text-left px-6 py-4.5"><SortableHeader field="name">Contact</SortableHeader></th>
@@ -353,21 +354,22 @@ export function ContactsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[13px] text-[var(--text-tertiary)]">
             Pagina {currentPage} din {totalPages}
           </p>
-          <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-medium border border-[var(--border-color)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 md:px-3.5 py-2 rounded-lg text-[13px] font-medium border border-[var(--border-color)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             >
-              <ChevronLeft className="w-4 h-4" /> Anterior
+              <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Anterior</span>
             </button>
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let page: number;
@@ -393,9 +395,9 @@ export function ContactsPage() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-medium border border-[var(--border-color)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+              className="flex items-center gap-1.5 px-2.5 md:px-3.5 py-2 rounded-lg text-[13px] font-medium border border-[var(--border-color)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
             >
-              Următor <ChevronRight className="w-4 h-4" />
+              <span className="hidden sm:inline">Următor</span> <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>

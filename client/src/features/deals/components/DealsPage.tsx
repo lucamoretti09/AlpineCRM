@@ -182,7 +182,7 @@ export function DealsPage() {
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-[14px] text-[var(--text-secondary)]">
           Gestionează pipeline-ul de vânzări
         </p>
@@ -205,13 +205,13 @@ export function DealsPage() {
           </div>
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all"
+            className="flex items-center gap-2 px-3 md:px-4 py-2.5 md:py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[14px] md:text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all"
           >
             <Download className="w-5 h-5" />
             Export CSV
           </button>
           <button onClick={() => { setEditingDeal(null); setShowForm(true); }}
-            className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+            className="group flex items-center gap-2.5 px-3 md:px-4 py-2.5 md:py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[14px] md:text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
             <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Tranzacție Nouă
           </button>
         </div>
@@ -327,7 +327,8 @@ export function DealsPage() {
       {/* List View */}
       {view === 'list' && (
         <div className="bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border border-[var(--border-color)] rounded-2xl overflow-hidden shadow-sm dark:shadow-black/20">
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-[var(--border-color)]">
                 {([['name', 'Tranzacție'], ['value', 'Valoare'], ['stage', 'Etapă'], ['probability', 'Probabilitate'], ['expectedCloseDate', 'Data Închidere']] as [SortField, string][]).map(([field, label]) => (
@@ -394,13 +395,14 @@ export function DealsPage() {
               )}
             </tbody>
           </table>
+          </div>
           {/* Pagination */}
           {dealTotalPages > 1 && (
-            <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
               <p className="text-[13px] text-[var(--text-tertiary)]">
                 Se afișează {((currentPage - 1) * PAGE_SIZE) + 1}-{Math.min(currentPage * PAGE_SIZE, sortedDeals.length)} din {sortedDeals.length}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
                   className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
                   <ChevronLeft className="w-5 h-5" />

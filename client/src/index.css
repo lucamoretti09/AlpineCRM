@@ -1184,7 +1184,7 @@ tr {
    ------------------------------------------------------------------- */
 
 .sidebar-glow {
-  position: relative;
+  /* position: fixed is set via Tailwind utility */
 }
 
 .sidebar-glow::after {

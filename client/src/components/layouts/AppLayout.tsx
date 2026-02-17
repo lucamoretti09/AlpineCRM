@@ -17,7 +17,7 @@ function Breadcrumbs() {
   if (isDashboard) return null;
 
   return (
-    <nav className="flex items-center gap-1.5 px-6 pt-5 pb-1 text-[13px] animate-fadeIn">
+    <nav className="flex items-center gap-1.5 px-4 md:px-6 pt-4 md:pt-5 pb-1 text-[13px] animate-fadeIn">
       <a
         href="/dashboard"
         className="flex items-center gap-1 text-[var(--text-tertiary)] hover:text-primary-500 transition-colors duration-200"
@@ -48,24 +48,16 @@ function getBreadcrumbLabel(path: string): string {
 }
 
 export default function AppLayout({ children, title }: AppLayoutProps) {
-  const { sidebarCollapsed, toggleSidebar } = useThemeStore();
+  const { sidebarCollapsed, mobileMenuOpen, closeMobileMenu } = useThemeStore();
 
+  // Close mobile menu on resize to desktop
   useEffect(() => {
     function handleResize() {
-      const isSmall = window.innerWidth < 768;
-      if (isSmall && !sidebarCollapsed) {
-        toggleSidebar();
-      }
+      if (window.innerWidth >= 768) closeMobileMenu();
     }
-
-    if (window.innerWidth < 768 && !sidebarCollapsed) {
-      toggleSidebar();
-    }
-
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [closeMobileMenu]);
 
   return (
     <div className="noise-overlay flex h-screen overflow-hidden bg-[var(--bg-primary)]">
@@ -81,14 +73,14 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
       <Sidebar />
 
       {/* Mobile overlay — enhanced blur + darken */}
-      {!sidebarCollapsed && (
+      {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 backdrop-blur-md backdrop-saturate-150 md:hidden transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-          onClick={toggleSidebar}
+          onClick={closeMobileMenu}
           role="button"
           aria-label="Închide meniul"
           tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') toggleSidebar(); }}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeMobileMenu(); }}
         />
       )}
 
@@ -97,7 +89,9 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
         className={cn(
           'layout-mesh-bg flex flex-1 flex-col min-w-0',
           'transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-          sidebarCollapsed ? 'ml-[90px]' : 'ml-[340px]'
+          // Mobile: no margin (sidebar is overlay). Desktop: sidebar offset
+          'ml-0',
+          sidebarCollapsed ? 'md:ml-[90px]' : 'md:ml-[340px]'
         )}
       >
         {/* Top Navbar */}
@@ -105,7 +99,7 @@ export default function AppLayout({ children, title }: AppLayoutProps) {
 
         {/* Scrollable Content */}
         <main id="main-content" role="main" className="relative z-[1] flex-1 overflow-y-auto overflow-x-hidden">
-          <div className="mx-auto w-full max-w-[1440px] px-6 py-6 animate-fadeIn">
+          <div className="mx-auto w-full max-w-[1440px] px-4 py-4 md:px-6 md:py-6 animate-fadeIn">
             <Breadcrumbs />
             {children}
           </div>

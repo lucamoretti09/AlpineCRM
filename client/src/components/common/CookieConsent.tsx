@@ -31,7 +31,7 @@ export default function CookieConsent() {
   return (
     <div
       className={cn(
-        'fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] w-full max-w-lg mx-auto px-4',
+        'fixed bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-[70] w-full max-w-lg mx-auto px-4',
         'animate-slideUp',
       )}
     >
@@ -65,13 +65,13 @@ export default function CookieConsent() {
             <div className="flex items-center gap-2.5">
               <button
                 onClick={handleAccept}
-                className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all duration-200"
+                className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[13px] font-semibold shadow-md shadow-indigo-500/20 transition-all duration-200 min-h-[44px]"
               >
                 Accept toate
               </button>
               <button
                 onClick={handleDecline}
-                className="px-5 py-2 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200"
+                className="px-5 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl text-[13px] font-semibold hover:bg-[var(--bg-tertiary)]/60 transition-all duration-200 min-h-[44px]"
               >
                 Doar esențiale
               </button>

@@ -204,7 +204,7 @@ export function TasksPage() {
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p className="text-[14px] text-[var(--text-secondary)]">
           Se afișează <span className="font-semibold text-[var(--text-primary)]">{paginatedTasks.length}</span> din {sortedTasks.length} sarcini
         </p>
@@ -212,19 +212,19 @@ export function TasksPage() {
           <button
             onClick={handleExportCSV}
             disabled={!sortedTasks.length}
-            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-40"
+            className="flex items-center gap-2 px-3 md:px-4 py-2.5 md:py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[14px] md:text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-40"
           >
             <Download className="w-5 h-5" />
             Export CSV
           </button>
           <button onClick={() => { setEditingTask(null); setShowForm(true); }}
-            className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+            className="group flex items-center gap-2.5 px-3 md:px-4 py-2.5 md:py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[14px] md:text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
             <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Sarcină Nouă
           </button>
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 group/search">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
           <input type="text" placeholder="Caută sarcini..." value={search} onChange={(e) => setSearch(e.target.value)}
@@ -326,11 +326,11 @@ export function TasksPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2">
           <p className="text-[13px] text-[var(--text-tertiary)]">
             Pagina {currentPage} din {totalPages}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
               className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
               <ChevronLeft className="w-5 h-5" />
