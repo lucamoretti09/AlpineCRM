@@ -799,17 +799,9 @@ export function SettingsPage() {
     <div className="space-y-6 animate-fadeIn">
       {/* Page Header */}
       <div>
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center">
-            <Settings className="w-6 h-6 text-indigo-500" />
-          </div>
-          <div>
-            <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Setări</h1>
-            <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
-              Gestionează contul, preferințele și notificările
-            </p>
-          </div>
-        </div>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Gestionează contul, preferințele și notificările
+        </p>
       </div>
 
       {/* Layout: sidebar tabs + content */}

@@ -1467,6 +1467,118 @@ tr {
 }
 
 /* -------------------------------------------------------------------
+   AI CHAT WIDGET ANIMATIONS
+   ------------------------------------------------------------------- */
+
+@keyframes aiTypingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+@keyframes chatSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes chatFabPulse {
+  0%, 100% { box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35); }
+  50% { box-shadow: 0 4px 24px rgba(99, 102, 241, 0.55), 0 0 40px rgba(99, 102, 241, 0.15); }
+}
+
+.animate-chatSlideUp { animation: chatSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-chatFabPulse { animation: chatFabPulse 3s ease-in-out infinite; }
+
+/* -------------------------------------------------------------------
+   DRAG-AND-DROP ANIMATIONS
+   ------------------------------------------------------------------- */
+
+@keyframes kanbanDropGlow {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 20px 4px rgba(99, 102, 241, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+.animate-kanbanDropGlow { animation: kanbanDropGlow 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* -------------------------------------------------------------------
+   CONFETTI ANIMATION
+   ------------------------------------------------------------------- */
+
+@keyframes confettiFall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* -------------------------------------------------------------------
+   MICRO-INTERACTION ANIMATIONS
+   ------------------------------------------------------------------- */
+
+@keyframes checkboxFill {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes slideInActions {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* -------------------------------------------------------------------
+   REDUCED MOTION -- Respect user preference
+   ------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------
+   PROGRESS BAR -- Animated fill for deal probability
+   ------------------------------------------------------------------- */
+
+@keyframes progressFill {
+  from { width: 0; }
+}
+
+.animate-progressFill {
+  animation: progressFill 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* -------------------------------------------------------------------
+   BREADCRUMB STYLES
+   ------------------------------------------------------------------- */
+
+.breadcrumb-link {
+  transition: color 0.2s ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-primary-500);
+}
+
+/* -------------------------------------------------------------------
+   TABLE ROW HIGHLIGHT -- Subtle left-border on hover
+   ------------------------------------------------------------------- */
+
+.table-row-highlight {
+  position: relative;
+}
+
+.table-row-highlight::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background: linear-gradient(to bottom, var(--color-primary-400), var(--color-primary-600));
+  border-radius: 0 4px 4px 0;
+  transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  opacity: 0;
+}
+
+.table-row-highlight:hover::before {
+  height: 32px;
+  opacity: 1;
+}
+
+/* -------------------------------------------------------------------
    REDUCED MOTION -- Respect user preference
    ------------------------------------------------------------------- */
 

@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import api from '@/lib/api';
-import { cn, formatCurrency, formatCompactCurrency, formatRelativeTime } from '@/lib/utils';
+import { cn, formatCurrency, formatCompactCurrency, formatRelativeTime, formatLongDate } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import StatsCard from '@/components/common/StatsCard';
 import ActivityFeed, { type Activity } from '@/components/common/ActivityFeed';
@@ -316,11 +316,14 @@ export default function Dashboard() {
         />
 
         <div className="relative">
+          <p className="text-[14px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] mb-1.5">
+            {formatLongDate(new Date())}
+          </p>
           <h1 className="text-4xl font-bold tracking-tight text-[var(--text-primary)]">
             {greeting}, <span className="gradient-text">{firstName}</span>
           </h1>
-          <p className="mt-2 text-[18px] text-[var(--text-secondary)]">
-            Iată ce se întâmplă astăzi.
+          <p className="mt-2 text-[16px] text-[var(--text-secondary)]">
+            Iată un rezumat al activității tale.
           </p>
         </div>
 
@@ -405,13 +408,23 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Sales Pipeline Chart */}
         <GlassCard className="col-span-1 lg:col-span-2 animate-fadeInUp stagger-6">
-          <div className="border-b border-[var(--border-color)] px-8 py-6">
-            <h2 className="text-[22px] font-bold text-[var(--text-primary)]">
-              Pipeline Vânzări
-            </h2>
-            <p className="text-[16px] text-[var(--text-secondary)] mt-0.5">
-              Distribuția tranzacțiilor pe etape
-            </p>
+          <div className="flex items-center justify-between border-b border-[var(--border-color)] px-8 py-6">
+            <div>
+              <h2 className="text-[20px] font-bold text-[var(--text-primary)]">
+                Pipeline Vânzări
+              </h2>
+              <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">
+                Distribuția tranzacțiilor pe etape
+              </p>
+            </div>
+            {pipeline && pipeline.length > 0 && (
+              <div className="text-right">
+                <p className="text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Total Pipeline</p>
+                <p className="text-[24px] font-bold gradient-text mt-0.5">
+                  {formatCompactCurrency(pipeline.reduce((sum, s) => sum + s.totalValue, 0))}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="p-7">
@@ -492,10 +505,10 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <GlassCard className="col-span-1 flex flex-col animate-fadeInUp stagger-7">
           <div className="border-b border-[var(--border-color)] px-8 py-6">
-            <h2 className="text-[22px] font-bold text-[var(--text-primary)]">
+            <h2 className="text-[20px] font-bold text-[var(--text-primary)]">
               Activitate Recentă
             </h2>
-            <p className="text-[16px] text-[var(--text-secondary)] mt-0.5">
+            <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">
               Ultimele actualizări din CRM
             </p>
           </div>
@@ -516,17 +529,17 @@ export default function Dashboard() {
       <GlassCard className="animate-fadeInUp stagger-8">
         <div className="flex items-center justify-between border-b border-[var(--border-color)] px-8 py-6">
           <div>
-            <h2 className="text-[22px] font-bold text-[var(--text-primary)]">
+            <h2 className="text-[20px] font-bold text-[var(--text-primary)]">
               Sarcini Viitoare
             </h2>
-            <p className="text-[16px] text-[var(--text-secondary)] mt-0.5">
+            <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">
               Sarcinile tale scadente în curând
             </p>
           </div>
           <a
             href="/tasks"
             className={cn(
-              'flex items-center gap-1.5 text-[16px] font-semibold',
+              'flex items-center gap-1.5 text-[14px] font-semibold',
               'text-primary-500 hover:text-primary-400',
               'transition-colors duration-200',
             )}

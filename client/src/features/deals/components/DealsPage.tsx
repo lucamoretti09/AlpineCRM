@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Calendar as CalIcon, LayoutGrid, List, Trash2, Edit, TrendingUp, FolderOpen } from 'lucide-react';
+import { Plus, Calendar as CalIcon, LayoutGrid, List, Trash2, Edit, TrendingUp, FolderOpen, Download, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/lib/api';
 import { cn, formatCurrency, formatDate, getStageColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 const STAGES = [
   { id: 'prospecting', label: 'Prospectare', color: 'bg-indigo-500' },
@@ -27,7 +28,28 @@ export function DealsPage() {
   const [view, setView] = useState<'kanban' | 'list'>('kanban');
   const [showForm, setShowForm] = useState(false);
   const [editingDeal, setEditingDeal] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+
+  // ── Sorting & Pagination (list view)
+  type SortField = 'name' | 'value' | 'stage' | 'probability' | 'expectedCloseDate';
+  const [sortField, setSortField] = useState<SortField>('value');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 15;
+
   const queryClient = useQueryClient();
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showForm) {
+        setShowForm(false);
+        setEditingDeal(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showForm]);
 
   const { data: kanbanData, isLoading, isError } = useQuery({
     queryKey: ['deals-kanban'],
@@ -85,6 +107,65 @@ export function DealsPage() {
     onError: () => toast.error('Eroare la ștergerea tranzacției'),
   });
 
+  const toggleSort = useCallback((field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setCurrentPage(1);
+  }, [sortField]);
+
+  const STAGE_ORDER: Record<string, number> = { prospecting: 0, qualification: 1, proposal: 2, negotiation: 3, closed_won: 4, closed_lost: 5 };
+
+  const sortedDeals = useMemo(() => {
+    const deals = [...(listData?.deals || [])];
+    deals.sort((a: any, b: any) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'name': cmp = (a.name || '').localeCompare(b.name || '', 'ro'); break;
+        case 'value': cmp = (a.value || 0) - (b.value || 0); break;
+        case 'stage': cmp = (STAGE_ORDER[a.stage] ?? 99) - (STAGE_ORDER[b.stage] ?? 99); break;
+        case 'probability': cmp = (a.probability || 0) - (b.probability || 0); break;
+        case 'expectedCloseDate': {
+          const da = a.expectedCloseDate ? new Date(a.expectedCloseDate).getTime() : Infinity;
+          const db = b.expectedCloseDate ? new Date(b.expectedCloseDate).getTime() : Infinity;
+          cmp = da - db;
+          break;
+        }
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+    return deals;
+  }, [listData?.deals, sortField, sortDir]);
+
+  const paginatedDeals = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedDeals.slice(start, start + PAGE_SIZE);
+  }, [sortedDeals, currentPage]);
+
+  const dealTotalPages = Math.ceil(sortedDeals.length / PAGE_SIZE);
+
+  const handleExportCSV = useCallback(() => {
+    const deals = view === 'list' ? sortedDeals : (kanbanData || []).flatMap((s: any) => s.deals || []);
+    const headers = ['Nume', 'Companie', 'Valoare', 'Etapă', 'Probabilitate', 'Data Închidere'];
+    const rows = deals.map((d: any) => [
+      d.name, d.company || '', formatCurrency(d.value),
+      STAGE_LABELS[d.stage] || d.stage, `${d.probability || 0}%`,
+      d.expectedCloseDate ? formatDate(d.expectedCloseDate) : '',
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tranzactii_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Export CSV descărcat');
+  }, [sortedDeals, kanbanData, view]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -102,10 +183,9 @@ export function DealsPage() {
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Tranzacții</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Gestionează pipeline-ul de vânzări</p>
-        </div>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Gestionează pipeline-ul de vânzări
+        </p>
         <div className="flex items-center gap-3">
           {/* View Toggle */}
           <div className="relative flex bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl p-0.5">
@@ -123,6 +203,13 @@ export function DealsPage() {
               <List className="w-5 h-5" />
             </button>
           </div>
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all"
+          >
+            <Download className="w-5 h-5" />
+            Export CSV
+          </button>
           <button onClick={() => { setEditingDeal(null); setShowForm(true); }}
             className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
             <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Tranzacție Nouă
@@ -182,7 +269,7 @@ export function DealsPage() {
                               className="p-2 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                               <Edit className="w-4 h-4" />
                             </button>
-                            <button onClick={() => { if (confirm('Ștergi?')) deleteMutation.mutate(deal.id); }}
+                            <button onClick={() => setDeleteTarget(deal)}
                               className="p-2 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -192,8 +279,21 @@ export function DealsPage() {
                           <p className="text-[13px] text-[var(--text-tertiary)] mt-2">{deal.company}</p>
                         )}
                         <div className="flex items-center justify-between mt-3.5">
-                          <span className="text-[16px] font-bold bg-gradient-to-r from-primary-500 to-violet-500 bg-clip-text text-transparent">{formatCurrency(deal.value)}</span>
-                          <span className="text-[13px] font-semibold text-[var(--text-tertiary)] bg-[var(--bg-tertiary)]/60 px-2 py-1 rounded-md">{deal.probability}%</span>
+                          <span className="text-[15px] font-bold bg-gradient-to-r from-primary-500 to-violet-500 bg-clip-text text-transparent">{formatCurrency(deal.value)}</span>
+                          <span className="text-[12px] font-semibold text-[var(--text-tertiary)]">{deal.probability}%</span>
+                        </div>
+                        {/* Probability progress bar */}
+                        <div className="mt-2.5 h-1.5 w-full rounded-full bg-[var(--bg-tertiary)]/80 overflow-hidden">
+                          <div
+                            className={cn(
+                              'h-full rounded-full transition-all duration-500 ease-out',
+                              deal.probability >= 80 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' :
+                              deal.probability >= 50 ? 'bg-gradient-to-r from-blue-400 to-indigo-500' :
+                              deal.probability >= 25 ? 'bg-gradient-to-r from-amber-400 to-orange-500' :
+                              'bg-gradient-to-r from-slate-400 to-slate-500'
+                            )}
+                            style={{ width: `${Math.min(deal.probability, 100)}%` }}
+                          />
                         </div>
                         {deal.expectedCloseDate && (
                           <div className="flex items-center gap-1.5 mt-3 text-[13px] text-[var(--text-tertiary)]">
@@ -230,16 +330,19 @@ export function DealsPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--border-color)]">
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Tranzacție</th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Valoare</th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Etapă</th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Probabilitate</th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Data Închidere</th>
+                {([['name', 'Tranzacție'], ['value', 'Valoare'], ['stage', 'Etapă'], ['probability', 'Probabilitate'], ['expectedCloseDate', 'Data Închidere']] as [SortField, string][]).map(([field, label]) => (
+                  <th key={field} className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+                    <button onClick={() => toggleSort(field)} className="inline-flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors">
+                      {label}
+                      {sortField === field ? (sortDir === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />) : <ChevronsUpDown className="w-4 h-4 opacity-40" />}
+                    </button>
+                  </th>
+                ))}
                 <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Acțiuni</th>
               </tr>
             </thead>
             <tbody>
-              {listData?.deals?.length === 0 ? (
+              {sortedDeals.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-24 text-center">
                     <div className="flex flex-col items-center gap-4">
@@ -254,7 +357,7 @@ export function DealsPage() {
                   </td>
                 </tr>
               ) : (
-                listData?.deals?.map((deal: any, index: number) => (
+                paginatedDeals.map((deal: any, index: number) => (
                   <tr key={deal.id}
                     className="border-b border-[var(--border-color)] hover:bg-primary-500/[0.03] dark:hover:bg-primary-500/[0.04] transition-all duration-200 group/row animate-rowSlideIn relative"
                     style={{ animationDelay: `${index * 35}ms` }}>
@@ -280,7 +383,7 @@ export function DealsPage() {
                           className="p-2.5 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                           <Edit className="w-4.5 h-4.5" />
                         </button>
-                        <button onClick={() => { if (confirm('Ștergi?')) deleteMutation.mutate(deal.id); }}
+                        <button onClick={() => setDeleteTarget(deal)}
                           className="p-2.5 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                           <Trash2 className="w-4.5 h-4.5" />
                         </button>
@@ -291,8 +394,57 @@ export function DealsPage() {
               )}
             </tbody>
           </table>
+          {/* Pagination */}
+          {dealTotalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+              <p className="text-[13px] text-[var(--text-tertiary)]">
+                Se afișează {((currentPage - 1) * PAGE_SIZE) + 1}-{Math.min(currentPage * PAGE_SIZE, sortedDeals.length)} din {sortedDeals.length}
+              </p>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                  className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                {Array.from({ length: Math.min(dealTotalPages, 5) }).map((_, i) => {
+                  let pageNum: number;
+                  if (dealTotalPages <= 5) pageNum = i + 1;
+                  else if (currentPage <= 3) pageNum = i + 1;
+                  else if (currentPage >= dealTotalPages - 2) pageNum = dealTotalPages - 4 + i;
+                  else pageNum = currentPage - 2 + i;
+                  return (
+                    <button key={pageNum} onClick={() => setCurrentPage(pageNum)}
+                      className={cn('w-9 h-9 text-[14px] font-medium rounded-xl transition-colors',
+                        currentPage === pageNum
+                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                          : 'bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                      )}>
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button onClick={() => setCurrentPage(p => Math.min(dealTotalPages, p + 1))} disabled={currentPage === dealTotalPages}
+                  className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Șterge tranzacție"
+        description={`Ești sigur că vrei să ștergi tranzacția "${deleteTarget?.name}"? Această acțiune nu poate fi anulată.`}
+        confirmLabel="Șterge"
+        cancelLabel="Anulează"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {/* Form Modal */}
       {showForm && (

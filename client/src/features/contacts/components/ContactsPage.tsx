@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Plus, Search, Building2, Star, Trash2, Edit, UserPlus, Sparkles } from 'lucide-react';
+import { Users, Plus, Search, Building2, Star, Trash2, Edit, UserPlus, Sparkles, X, Download, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/lib/api';
 import { cn, formatDate, getStatusColor, getInitials } from '@/lib/utils';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import toast from 'react-hot-toast';
 
 const AVATAR_GRADIENTS: Record<string, string> = {
@@ -51,12 +52,33 @@ const STATUS_LABELS: Record<string, string> = {
   churned: 'pierdut',
 };
 
+type SortField = 'name' | 'company' | 'status' | 'leadScore' | 'createdAt';
+type SortDir = 'asc' | 'desc';
+
+const PAGE_SIZE = 15;
+
 export function ContactsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingContact, setEditingContact] = useState<any>(null);
+  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const queryClient = useQueryClient();
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showForm) {
+        setShowForm(false);
+        setEditingContact(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showForm]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['contacts', search, statusFilter],
@@ -76,9 +98,86 @@ export function ContactsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       toast.success('Contact șters');
+      setDeleteTarget(null);
     },
-    onError: () => toast.error('Nu s-a putut șterge contactul'),
+    onError: () => { toast.error('Nu s-a putut șterge contactul'); setDeleteTarget(null); },
   });
+
+  // Reset page when filters change
+  useEffect(() => { setCurrentPage(1); }, [search, statusFilter]);
+
+  // Sorting logic
+  const toggleSort = useCallback((field: SortField) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  }, [sortField]);
+
+  const sortedContacts = useMemo(() => {
+    const contacts = data?.contacts || [];
+    return [...contacts].sort((a: any, b: any) => {
+      let aVal: any, bVal: any;
+      switch (sortField) {
+        case 'name': aVal = `${a.firstName} ${a.lastName}`.toLowerCase(); bVal = `${b.firstName} ${b.lastName}`.toLowerCase(); break;
+        case 'company': aVal = (a.company || '').toLowerCase(); bVal = (b.company || '').toLowerCase(); break;
+        case 'status': aVal = a.status; bVal = b.status; break;
+        case 'leadScore': aVal = a.leadScore || 0; bVal = b.leadScore || 0; break;
+        case 'createdAt': aVal = new Date(a.createdAt).getTime(); bVal = new Date(b.createdAt).getTime(); break;
+        default: return 0;
+      }
+      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [data?.contacts, sortField, sortDir]);
+
+  // Pagination
+  const totalItems = sortedContacts.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const paginatedContacts = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedContacts.slice(start, start + PAGE_SIZE);
+  }, [sortedContacts, currentPage]);
+
+  // CSV Export
+  const handleExportCSV = useCallback(() => {
+    const contacts = sortedContacts;
+    if (!contacts.length) { toast.error('Nu există date de exportat'); return; }
+    const headers = ['Prenume', 'Nume', 'Email', 'Telefon', 'Companie', 'Funcție', 'Status', 'Scor Lead', 'Creat'];
+    const rows = contacts.map((c: any) => [
+      c.firstName, c.lastName, c.email || '', c.phone || '', c.company || '',
+      c.jobTitle || '', c.status, c.leadScore || 0, formatDate(c.createdAt),
+    ]);
+    const csvContent = [headers, ...rows].map((r) => r.map((v: any) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `contacte_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${contacts.length} contacte exportate`);
+  }, [sortedContacts]);
+
+  function SortableHeader({ field, children }: { field: SortField; children: React.ReactNode }) {
+    const isActive = sortField === field;
+    return (
+      <button
+        onClick={() => toggleSort(field)}
+        className="flex items-center gap-1 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors group/sort"
+      >
+        {children}
+        {isActive ? (
+          sortDir === 'asc' ? <ChevronUp className="w-3.5 h-3.5 text-primary-500" /> : <ChevronDown className="w-3.5 h-3.5 text-primary-500" />
+        ) : (
+          <ChevronsUpDown className="w-3.5 h-3.5 opacity-0 group-hover/sort:opacity-50 transition-opacity" />
+        )}
+      </button>
+    );
+  }
 
   const createMutation = useMutation({
     mutationFn: (contact: any) => editingContact
@@ -112,22 +211,34 @@ export function ContactsPage() {
     <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Contacte</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afișează {data?.contacts?.length || 0} din {data?.total || 0} contacte</p>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Se afișează <span className="font-semibold text-[var(--text-primary)]">{paginatedContacts.length}</span> din {data?.total || 0} contacte
+        </p>
+        <div className="flex items-center gap-2.5">
+          <button onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] rounded-xl text-[15px] font-semibold hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] transition-all duration-200"
+            title="Exportă CSV"
+          >
+            <Download className="w-4.5 h-4.5" /> Export
+          </button>
+          <button onClick={() => { setEditingContact(null); setShowForm(true); }}
+            className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+            <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Adaugă Contact
+          </button>
         </div>
-        <button onClick={() => { setEditingContact(null); setShowForm(true); }}
-          className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Adaugă Contact
-        </button>
       </div>
 
       {/* Filters */}
       <div className="flex gap-3">
         <div className="relative flex-1 group/search">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
           <input type="text" placeholder="Caută contacte..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+            className="w-full pl-11 pr-10 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all duration-200">
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           className="px-5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
@@ -143,11 +254,11 @@ export function ContactsPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Contact</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Companie</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Scor Lead</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Creat</th>
+              <th className="text-left px-6 py-4.5"><SortableHeader field="name">Contact</SortableHeader></th>
+              <th className="text-left px-6 py-4.5"><SortableHeader field="company">Companie</SortableHeader></th>
+              <th className="text-left px-6 py-4.5"><SortableHeader field="status">Status</SortableHeader></th>
+              <th className="text-left px-6 py-4.5"><SortableHeader field="leadScore">Scor Lead</SortableHeader></th>
+              <th className="text-left px-6 py-4.5"><SortableHeader field="createdAt">Creat</SortableHeader></th>
               <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Acțiuni</th>
             </tr>
           </thead>
@@ -186,7 +297,7 @@ export function ContactsPage() {
                 </td>
               </tr>
             ) : (
-              data?.contacts?.map((contact: any, index: number) => (
+              paginatedContacts.map((contact: any, index: number) => (
                 <tr key={contact.id}
                   className="border-b border-[var(--border-color)] hover:bg-primary-500/[0.03] dark:hover:bg-primary-500/[0.04] transition-all duration-200 group/row animate-rowSlideIn relative"
                   style={{ animationDelay: `${index * 35}ms` }}>
@@ -230,8 +341,9 @@ export function ContactsPage() {
                         className="p-2.5 rounded-lg hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                         <Edit className="w-4.5 h-4.5" />
                       </button>
-                      <button onClick={() => { if (confirm('Ștergi acest contact?')) deleteMutation.mutate(contact.id); }}
-                        className="p-2.5 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
+                      <button onClick={() => setDeleteTarget(contact)}
+                        className="p-2.5 rounded-lg hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200"
+                        aria-label="Șterge contact">
                         <Trash2 className="w-4.5 h-4.5" />
                       </button>
                     </div>
@@ -242,6 +354,62 @@ export function ContactsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-[13px] text-[var(--text-tertiary)]">
+            Pagina {currentPage} din {totalPages}
+          </p>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-medium border border-[var(--border-color)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              <ChevronLeft className="w-4 h-4" /> Anterior
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let page: number;
+              if (totalPages <= 5) { page = i + 1; }
+              else if (currentPage <= 3) { page = i + 1; }
+              else if (currentPage >= totalPages - 2) { page = totalPages - 4 + i; }
+              else { page = currentPage - 2 + i; }
+              return (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={cn(
+                    'w-9 h-9 rounded-lg text-[13px] font-semibold transition-all duration-200',
+                    currentPage === page
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60',
+                  )}
+                >
+                  {page}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-[13px] font-medium border border-[var(--border-color)] bg-[var(--bg-secondary)]/60 text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]/60 hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              Următor <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Șterge Contact"
+        description={deleteTarget ? `Ești sigur că vrei să ștergi contactul "${deleteTarget.firstName} ${deleteTarget.lastName}"? Această acțiune nu poate fi anulată.` : ''}
+        confirmLabel="Șterge"
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {/* Create/Edit Modal */}
       {showForm && (

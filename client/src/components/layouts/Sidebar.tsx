@@ -106,7 +106,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
+      <nav aria-label="Navigare principală" className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4">
         <ul className="flex flex-col gap-1.5">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -212,7 +212,7 @@ export default function Sidebar() {
           ) : (
             <>
               <ChevronsLeft className="h-6 w-6 shrink-0 transition-transform duration-300" />
-              <span className="truncate">Collapse</span>
+              <span className="truncate">Restrânge</span>
             </>
           )}
         </button>
@@ -253,10 +253,10 @@ export default function Sidebar() {
             <div className="flex flex-1 items-center overflow-hidden">
               <div className="min-w-0">
                 <p className="truncate text-[17px] font-semibold text-[var(--text-primary)]">
-                  {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
+                  {user ? `${user.firstName} ${user.lastName}` : 'Vizitator'}
                 </p>
                 <p className="truncate text-[15px] text-[var(--text-tertiary)] capitalize">
-                  {user?.role ?? 'Unknown'}
+                  {user?.role === 'admin' ? 'Administrator' : user?.role === 'manager' ? 'Manager' : user?.role ?? 'Necunoscut'}
                 </p>
               </div>
             </div>

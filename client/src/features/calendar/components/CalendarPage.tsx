@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
@@ -103,6 +103,15 @@ export function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showForm, setShowForm] = useState(false);
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showForm) { setShowForm(false); }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showForm]);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const queryClient = useQueryClient();
@@ -266,12 +275,9 @@ export function CalendarPage() {
     <div className="space-y-7 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Calendar</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
-            {data?.total ?? 0} programări luna aceasta
-          </p>
-        </div>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          <span className="font-semibold text-[var(--text-primary)]">{data?.total ?? 0}</span> programări luna aceasta
+        </p>
         <button
           onClick={() => openCreateForm(selectedDate || new Date())}
           className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"

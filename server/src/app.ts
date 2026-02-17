@@ -16,6 +16,7 @@ import invoiceRoutes from './routes/invoiceRoutes';
 import emailRoutes from './routes/emailRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import aiRoutes from './routes/aiRoutes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -84,6 +85,7 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/emails', emailRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 handler
 app.use((req, res) => {

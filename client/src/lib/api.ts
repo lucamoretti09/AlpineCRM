@@ -24,7 +24,8 @@ api.interceptors.response.use(
     // If backend is unreachable, serve mock data
     const url = error.config?.url || '';
     const method = (error.config?.method || 'get').toUpperCase();
-    const mockData = getMockResponse(url, method);
+    const body = error.config?.data;
+    const mockData = getMockResponse(url, method, body);
 
     if (mockData) {
       return Promise.resolve({ data: mockData, status: 200, statusText: 'OK (Demo)', headers: {}, config: error.config });
@@ -32,7 +33,7 @@ api.interceptors.response.use(
 
     // If no mock data and it's a 401, don't redirect in demo mode
     if (error.response?.status === 401) {
-      const mockFallback = getMockResponse(url, method);
+      const mockFallback = getMockResponse(url, method, body);
       if (mockFallback) {
         return Promise.resolve({ data: mockFallback, status: 200, statusText: 'OK (Demo)', headers: {}, config: error.config });
       }

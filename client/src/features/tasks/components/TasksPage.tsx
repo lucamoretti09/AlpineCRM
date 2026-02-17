@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, CheckCircle2, Circle, Clock, AlertTriangle, Filter, Search, Trash2, Edit, ClipboardList } from 'lucide-react';
+import { Plus, CheckCircle2, Circle, Clock, AlertTriangle, Filter, Search, Trash2, Edit, ClipboardList, X, Download, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '@/lib/api';
 import { cn, formatDate, getPriorityColor, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 const PRIORITY_DOTS: Record<string, string> = {
   low: 'bg-slate-400',
@@ -35,7 +36,21 @@ export function TasksPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState<any>(null);
   const [completingId, setCompletingId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
+
   const queryClient = useQueryClient();
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showForm) {
+        setShowForm(false);
+        setEditingTask(null);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showForm]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['tasks', search, statusFilter],
@@ -49,6 +64,74 @@ export function TasksPage() {
     },
     retry: 2,
   });
+
+  // ── Sorting & Pagination
+  type SortField = 'title' | 'priority' | 'status' | 'type' | 'dueDate';
+  const [sortField, setSortField] = useState<SortField>('dueDate');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 15;
+
+  const toggleSort = useCallback((field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setCurrentPage(1);
+  }, [sortField]);
+
+  const PRIORITY_ORDER: Record<string, number> = { urgent: 0, high: 1, medium: 2, normal: 2, low: 3 };
+  const STATUS_ORDER: Record<string, number> = { pending: 0, in_progress: 1, completed: 2, cancelled: 3 };
+
+  const sortedTasks = useMemo(() => {
+    const tasks = [...(data?.tasks || [])];
+    tasks.sort((a: any, b: any) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'title': cmp = (a.title || '').localeCompare(b.title || '', 'ro'); break;
+        case 'priority': cmp = (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99); break;
+        case 'status': cmp = (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99); break;
+        case 'type': cmp = (a.type || '').localeCompare(b.type || '', 'ro'); break;
+        case 'dueDate': {
+          const da = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+          const db = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+          cmp = da - db;
+          break;
+        }
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+    return tasks;
+  }, [data?.tasks, sortField, sortDir]);
+
+  const paginatedTasks = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedTasks.slice(start, start + PAGE_SIZE);
+  }, [sortedTasks, currentPage]);
+
+  const totalPages = Math.ceil(sortedTasks.length / PAGE_SIZE);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = ['Titlu', 'Prioritate', 'Status', 'Tip', 'Data Scadenței'];
+    const rows = sortedTasks.map((t: any) => [
+      t.title,
+      PRIORITY_LABELS[t.priority] || t.priority,
+      t.status === 'pending' ? 'În așteptare' : t.status === 'in_progress' ? 'În progres' : t.status === 'completed' ? 'Finalizat' : 'Anulat',
+      TYPE_LABELS[t.type] || t.type,
+      t.dueDate ? formatDate(t.dueDate) : '',
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `sarcini_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Export CSV descărcat');
+  }, [sortedTasks]);
 
   const completeMutation = useMutation({
     mutationFn: (id: string) => api.patch(`/tasks/${id}/complete`),
@@ -122,21 +205,35 @@ export function TasksPage() {
   return (
     <div className="space-y-8 animate-fadeIn">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Sarcini</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">Se afișează {data?.tasks?.length || 0} din {data?.total || 0} sarcini</p>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Se afișează <span className="font-semibold text-[var(--text-primary)]">{paginatedTasks.length}</span> din {sortedTasks.length} sarcini
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            disabled={!sortedTasks.length}
+            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-40"
+          >
+            <Download className="w-5 h-5" />
+            Export CSV
+          </button>
+          <button onClick={() => { setEditingTask(null); setShowForm(true); }}
+            className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
+            <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Sarcină Nouă
+          </button>
         </div>
-        <button onClick={() => { setEditingTask(null); setShowForm(true); }}
-          className="group flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 transition-all duration-300 ease-spring">
-          <Plus className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" /> Sarcină Nouă
-        </button>
       </div>
 
       <div className="flex gap-3">
         <div className="relative flex-1 group/search">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-[var(--text-tertiary)] transition-colors duration-200 group-focus-within/search:text-primary-500" />
           <input type="text" placeholder="Caută sarcini..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+            className="w-full pl-11 pr-10 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300" />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-all duration-200">
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           className="px-5 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-primary)] focus:outline-none focus:border-primary-500/40 focus:ring-[3px] focus:ring-primary-500/[0.08] focus:bg-[var(--bg-card)] transition-all duration-300">
@@ -162,7 +259,7 @@ export function TasksPage() {
               </div>
             </div>
           ))
-        ) : data?.tasks?.length === 0 ? (
+        ) : sortedTasks.length === 0 ? (
           <div className="py-24 flex flex-col items-center gap-4">
             <div className="w-18 h-18 rounded-2xl bg-gradient-to-br from-primary-500/10 via-primary-500/5 to-violet-500/10 flex items-center justify-center border border-primary-500/10">
               <ClipboardList className="w-8 h-8 text-primary-500/60" />
@@ -173,7 +270,7 @@ export function TasksPage() {
             </div>
           </div>
         ) : (
-          data?.tasks?.map((task: any, index: number) => (
+          paginatedTasks.map((task: any, index: number) => (
             <div key={task.id}
               className={cn(
                 'flex items-center gap-5 p-5 bg-white/70 dark:bg-white/[0.025] backdrop-blur-xl backdrop-saturate-150 border rounded-2xl hover:border-primary-500/20 hover:shadow-lg hover:shadow-primary-500/5 transition-all duration-200 group animate-fadeInUp relative',
@@ -217,7 +314,7 @@ export function TasksPage() {
                   className="p-2.5 rounded-xl hover:bg-primary-500/10 text-[var(--text-tertiary)] hover:text-primary-500 hover:scale-110 transition-all duration-200">
                   <Edit className="w-5 h-5" />
                 </button>
-                <button onClick={() => { if (confirm('Ștergi?')) deleteMutation.mutate(task.id); }}
+                <button onClick={() => setDeleteTarget(task)}
                   className="p-2.5 rounded-xl hover:bg-red-500/10 text-[var(--text-tertiary)] hover:text-red-500 hover:scale-110 transition-all duration-200">
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -226,6 +323,56 @@ export function TasksPage() {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-2">
+          <p className="text-[13px] text-[var(--text-tertiary)]">
+            Pagina {currentPage} din {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+              className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+              let pageNum: number;
+              if (totalPages <= 5) pageNum = i + 1;
+              else if (currentPage <= 3) pageNum = i + 1;
+              else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+              else pageNum = currentPage - 2 + i;
+              return (
+                <button key={pageNum} onClick={() => setCurrentPage(pageNum)}
+                  className={cn('w-9 h-9 text-[14px] font-medium rounded-xl transition-colors',
+                    currentPage === pageNum
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                      : 'bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                  )}>
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+              className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Șterge sarcină"
+        description={`Ești sigur că vrei să ștergi sarcina "${deleteTarget?.title}"? Această acțiune nu poate fi anulată.`}
+        confirmLabel="Șterge"
+        cancelLabel="Anulează"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-md transition-all duration-300" onClick={() => { setShowForm(false); setEditingTask(null); }}>

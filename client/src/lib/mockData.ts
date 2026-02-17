@@ -524,7 +524,103 @@ function getAuthUser() {
  * URLs should be relative, e.g. '/dashboard/stats', '/contacts', '/deals'.
  * Query parameters are stripped before matching.
  */
-export function getMockResponse(url: string, method?: string): any {
+// ---------------------------------------------------------------------------
+// 13. AI Chat
+// ---------------------------------------------------------------------------
+
+function getMockAIChatResponse(body?: string): any {
+  let userMessage = '';
+  try {
+    const parsed = JSON.parse(body || '{}');
+    userMessage = (parsed.message || '').toLowerCase();
+  } catch { /* ignore */ }
+
+  if (/tranzac|deal|pipeline|vânz|vanz/.test(userMessage)) {
+    const deals = getDeals().data.deals.filter(d => d.status === 'open');
+    const totalValue = deals.reduce((s, d) => s + d.value, 0);
+    return {
+      data: {
+        content: `### Tranzacții Active\n\nAveți **${deals.length}** tranzacții deschise în pipeline.\n\n| Tranzacție | Companie | Valoare | Etapă |\n|---|---|---|---|\n${deals.slice(0, 7).map(d => `| ${d.name} | ${d.company} | $${d.value.toLocaleString()} | ${d.stage.replace('_', ' ')} |`).join('\n')}\n\n**Valoare totală pipeline:** $${totalValue.toLocaleString()}\n\nDoriți detalii despre o tranzacție anume?`,
+        sources: deals.slice(0, 5).map(d => ({ type: 'deal', id: d.id, label: d.name })),
+      },
+    };
+  }
+
+  if (/contact|client|persoana|persoană|compan/.test(userMessage)) {
+    const contacts = getContacts().data.contacts.filter(c => c.status === 'active');
+    return {
+      data: {
+        content: `### Contacte Principale\n\nAveți **${contacts.length}** contacte active.\n\n| Nume | Companie | Email | Scor Lead |\n|---|---|---|---|\n${contacts.slice(0, 8).map(c => `| ${c.firstName} ${c.lastName} | ${c.company} | ${c.email} | ${c.leadScore} |`).join('\n')}\n\n**Top contacte după scor:** ${contacts.sort((a, b) => b.leadScore - a.leadScore).slice(0, 3).map(c => `${c.firstName} ${c.lastName} (${c.leadScore})`).join(', ')}`,
+        sources: contacts.slice(0, 5).map(c => ({ type: 'contact', id: c.id, label: `${c.firstName} ${c.lastName}` })),
+      },
+    };
+  }
+
+  if (/sarcin|task|restant|overdue|todo/.test(userMessage)) {
+    const tasks = getTasks().data.tasks;
+    const pending = tasks.filter(t => t.status === 'pending');
+    const inProgress = tasks.filter(t => t.status === 'in_progress');
+    return {
+      data: {
+        content: `### Sarcini\n\n- **${pending.length}** sarcini în așteptare\n- **${inProgress.length}** sarcini în progres\n\n**Sarcini prioritare:**\n${tasks.filter(t => t.status !== 'completed' && (t.priority === 'high' || t.priority === 'urgent')).slice(0, 5).map(t => `- **[${t.priority.toUpperCase()}]** ${t.title}`).join('\n')}\n\nDoriți să vedeți detalii despre o sarcină specifică?`,
+        sources: pending.slice(0, 3).map(t => ({ type: 'task', id: t.id, label: t.title })),
+      },
+    };
+  }
+
+  if (/tichet|ticket|suport|problem/.test(userMessage)) {
+    const tickets = getTickets().data.tickets;
+    const open = tickets.filter(t => t.status === 'open' || t.status === 'in_progress');
+    return {
+      data: {
+        content: `### Tichete de Suport\n\nAveți **${open.length}** tichete deschise.\n\n${open.slice(0, 5).map(t => `- **${t.ticketNumber}** - ${t.subject} *(${t.priority})*`).join('\n')}\n\nDoriți detalii despre un tichet anume?`,
+        sources: open.slice(0, 3).map(t => ({ type: 'ticket', id: t.id, label: t.ticketNumber })),
+      },
+    };
+  }
+
+  if (/factur|invoice|plat|plată/.test(userMessage)) {
+    const invoices = getInvoices().data.invoices;
+    const overdue = invoices.filter(i => i.status === 'overdue');
+    const sent = invoices.filter(i => i.status === 'sent');
+    const totalPaid = invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.amount, 0);
+    return {
+      data: {
+        content: `### Facturi\n\n- **${overdue.length}** facturi restante\n- **${sent.length}** facturi trimise (în așteptare)\n- **$${totalPaid.toLocaleString()}** încasați total\n\n${overdue.length > 0 ? `**Facturi restante:**\n${overdue.map(i => `- **${i.invoiceNumber}** - ${i.contactName} - $${i.amount.toLocaleString()}`).join('\n')}` : 'Nu aveți facturi restante!'}\n\nDoriți detalii despre o factură anume?`,
+        sources: [...overdue, ...sent].slice(0, 3).map(i => ({ type: 'invoice', id: i.id, label: i.invoiceNumber })),
+      },
+    };
+  }
+
+  if (/statistic|rezumat|raport|dashboard|venituri|revenue/.test(userMessage)) {
+    const stats = getDashboardStats().data;
+    return {
+      data: {
+        content: `### Rezumat General CRM\n\n| Metric | Valoare |\n|---|---|\n| Contacte active | **${stats.contacts.active}** din ${stats.contacts.total} |\n| Tranzacții deschise | **${stats.deals.open}** |\n| Valoare pipeline | **$${stats.deals.pipelineValue.toLocaleString()}** |\n| Tranzacții câștigate | **${stats.deals.won}** (rata: ${stats.deals.winRate}%) |\n| Venituri totale | **$${stats.invoices.totalRevenue.toLocaleString()}** |\n| Sarcini restante | **${stats.tasks.overdue}** din ${stats.tasks.pending} în așteptare |\n| Tichete deschise | **${stats.tickets.open}** |\n\nDoriți detalii despre o categorie specifică?`,
+        sources: [],
+      },
+    };
+  }
+
+  if (/bună|salut|hello|ajut|ajută|help|ce poți/.test(userMessage)) {
+    return {
+      data: {
+        content: `Bună! Sunt asistentul tău AI AlpineCRM. Pot să te ajut cu:\n\n- **Tranzacții** — "Care sunt tranzacțiile active?"\n- **Contacte** — "Arată-mi contactele principale"\n- **Sarcini** — "Ce sarcini am restante?"\n- **Tichete** — "Tichete de suport deschise"\n- **Facturi** — "Facturi neplătite"\n- **Statistici** — "Rezumat general CRM"\n\nÎntreabă-mă orice despre datele tale CRM!`,
+        sources: [],
+      },
+    };
+  }
+
+  // Default
+  return {
+    data: {
+      content: `Am înțeles întrebarea ta. Pot să te ajut cu informații despre:\n\n- **Contacte** — căutare și detalii clienți\n- **Tranzacții** — status pipeline și valori\n- **Sarcini** — sarcini restante și prioritare\n- **Tichete** — tichete de suport deschise\n- **Facturi** — status plăți\n- **Statistici** — rezumat general CRM\n\nÎncearcă să mă întrebi ceva mai specific!`,
+      sources: [],
+    },
+  };
+}
+
+export function getMockResponse(url: string, method?: string, body?: string): any {
   // Strip query params and trailing slashes for matching
   const cleanUrl = url.split('?')[0].replace(/\/+$/, '');
   const httpMethod = (method || 'GET').toUpperCase();
@@ -658,6 +754,9 @@ export function getMockResponse(url: string, method?: string): any {
     if (httpMethod === 'GET') return getAuthUser();
     if (httpMethod === 'PUT' || httpMethod === 'PATCH') return { data: { message: 'Setări actualizate (mod demo)' } };
   }
+
+  // --- AI Chat ---
+  if (cleanUrl === '/ai/chat' && httpMethod === 'POST') return getMockAIChatResponse(body);
 
   // No match - return null so callers can fall through to real API
   return null;

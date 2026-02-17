@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
@@ -8,6 +8,11 @@ import {
   Ticket,
   MessageSquare,
   ChevronLeft,
+  Download,
+  ChevronUp,
+  ChevronDown as ChevronDownIcon,
+  ChevronsUpDown,
+  ChevronRight,
   Send,
   Clock,
   AlertCircle,
@@ -23,6 +28,7 @@ import {
 import api from '@/lib/api';
 import { cn, formatDate, formatDateTime, formatRelativeTime, getStatusColor, getPriorityColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 interface Comment {
   id: string;
@@ -141,10 +147,38 @@ export function TicketsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [showForm, setShowForm] = useState(false);
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showForm) { setShowForm(false); }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showForm]);
   const [editingTicket, setEditingTicket] = useState<TicketData | null>(null);
   const [selectedTicket, setSelectedTicket] = useState<TicketData | null>(null);
   const [commentText, setCommentText] = useState('');
   const [isInternalComment, setIsInternalComment] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<TicketData | null>(null);
+
+  // ── Sorting & Pagination ──────────────────────────────────────────
+  type SortField = 'subject' | 'status' | 'priority' | 'category' | 'createdAt';
+  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 15;
+
+  const toggleSort = useCallback((field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setCurrentPage(1);
+  }, [sortField]);
+
   const queryClient = useQueryClient();
 
   // ── Fetch tickets list ──────────────────────────────────────────────
@@ -161,6 +195,49 @@ export function TicketsPage() {
     },
     retry: 2,
   });
+
+  const PRIORITY_ORDER: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
+  const STATUS_ORDER: Record<string, number> = { open: 0, in_progress: 1, resolved: 2, closed: 3 };
+
+  const sortedTickets = useMemo(() => {
+    const tickets = [...(data?.tickets || [])];
+    tickets.sort((a: TicketData, b: TicketData) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'subject': cmp = a.subject.localeCompare(b.subject, 'ro'); break;
+        case 'status': cmp = (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99); break;
+        case 'priority': cmp = (PRIORITY_ORDER[a.priority] ?? 99) - (PRIORITY_ORDER[b.priority] ?? 99); break;
+        case 'category': cmp = a.category.localeCompare(b.category, 'ro'); break;
+        case 'createdAt': cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(); break;
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+    return tickets;
+  }, [data?.tickets, sortField, sortDir]);
+
+  const paginatedTickets = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedTickets.slice(start, start + PAGE_SIZE);
+  }, [sortedTickets, currentPage]);
+
+  const totalPages = Math.ceil(sortedTickets.length / PAGE_SIZE);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = ['Nr. Tichet', 'Subiect', 'Status', 'Prioritate', 'Categorie', 'Data Creării'];
+    const rows = sortedTickets.map((t: TicketData) => [
+      t.ticketNumber, t.subject, formatStatusLabel(t.status),
+      formatPriorityLabel(t.priority), getCategoryLabel(t.category), formatDate(t.createdAt),
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tichete_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Export CSV descărcat');
+  }, [sortedTickets]);
 
   // ── Fetch single ticket detail (with comments) ─────────────────────
   const { data: ticketDetail, isLoading: isDetailLoading, isError: isDetailError } = useQuery({
@@ -303,11 +380,7 @@ export function TicketsPage() {
                     Editează
                   </button>
                   <button
-                    onClick={() => {
-                      if (confirm('Ești sigur că vrei să ștergi acest tichet? Această acțiune nu poate fi anulată.')) {
-                        deleteMutation.mutate(ticket.id);
-                      }
-                    }}
+                    onClick={() => setDeleteTarget(ticket)}
                     className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] text-[var(--text-secondary)] hover:text-red-600 hover:border-red-300 dark:hover:border-red-800 transition-all"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -501,6 +574,20 @@ export function TicketsPage() {
             </form>
           </div>
         </div>
+
+        <ConfirmDialog
+          open={!!deleteTarget}
+          title="Șterge tichet"
+          description={`Ești sigur că vrei să ștergi tichetul "${deleteTarget?.subject}"? Această acțiune nu poate fi anulată.`}
+          confirmLabel="Șterge"
+          cancelLabel="Anulează"
+          variant="danger"
+          onConfirm={() => {
+            if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+            setDeleteTarget(null);
+          }}
+          onCancel={() => setDeleteTarget(null)}
+        />
       </div>
     );
   }
@@ -510,21 +597,28 @@ export function TicketsPage() {
     <div className="space-y-7 animate-fadeIn">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Tichete</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
-            {data?.total || 0} total tichete
-          </p>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          <span className="font-semibold text-[var(--text-primary)]">{data?.total || 0}</span> tichete în total
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            disabled={!sortedTickets.length}
+            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-40"
+          >
+            <Download className="w-5 h-5" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => {
+              setEditingTicket(null);
+              setShowForm(true);
+            }}
+            className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          >
+            <Plus className="w-5 h-5" /> Tichet Nou
+          </button>
         </div>
-        <button
-          onClick={() => {
-            setEditingTicket(null);
-            setShowForm(true);
-          }}
-          className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
-        >
-          <Plus className="w-5 h-5" /> Tichet Nou
-        </button>
       </div>
 
       {/* Search & Filters */}
@@ -570,11 +664,14 @@ export function TicketsPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--border-color)]">
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Tichet</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Status</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Prioritate</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Categorie</th>
-              <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Creat</th>
+              {([['subject', 'Tichet'], ['status', 'Status'], ['priority', 'Prioritate'], ['category', 'Categorie'], ['createdAt', 'Creat']] as [SortField, string][]).map(([field, label]) => (
+                <th key={field} className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+                  <button onClick={() => toggleSort(field)} className="inline-flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors">
+                    {label}
+                    {sortField === field ? (sortDir === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />) : <ChevronsUpDown className="w-4 h-4 opacity-40" />}
+                  </button>
+                </th>
+              ))}
               <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Acțiuni</th>
             </tr>
           </thead>
@@ -587,7 +684,7 @@ export function TicketsPage() {
                   </td>
                 </tr>
               ))
-            ) : data?.tickets?.length === 0 ? (
+            ) : sortedTickets.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-20 text-center">
                   <div className="flex flex-col items-center gap-3">
@@ -606,7 +703,7 @@ export function TicketsPage() {
                 </td>
               </tr>
             ) : (
-              data?.tickets?.map((ticket: TicketData, index: number) => (
+              paginatedTickets.map((ticket: TicketData, index: number) => (
                 <tr
                   key={ticket.id}
                   className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]/60 transition-all duration-200 cursor-pointer group animate-fadeInUp"
@@ -665,9 +762,7 @@ export function TicketsPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm('Ești sigur că vrei să ștergi acest tichet?')) {
-                            deleteMutation.mutate(ticket.id);
-                          }
+                          setDeleteTarget(ticket);
                         }}
                         className="p-2.5 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
                       >
@@ -680,7 +775,56 @@ export function TicketsPage() {
             )}
           </tbody>
         </table>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
+            <p className="text-[13px] text-[var(--text-tertiary)]">
+              Se afișează {((currentPage - 1) * PAGE_SIZE) + 1}-{Math.min(currentPage * PAGE_SIZE, sortedTickets.length)} din {sortedTickets.length}
+            </p>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+                let pageNum: number;
+                if (totalPages <= 5) pageNum = i + 1;
+                else if (currentPage <= 3) pageNum = i + 1;
+                else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                else pageNum = currentPage - 2 + i;
+                return (
+                  <button key={pageNum} onClick={() => setCurrentPage(pageNum)}
+                    className={cn('w-9 h-9 text-[14px] font-medium rounded-xl transition-colors',
+                      currentPage === pageNum
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                        : 'bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                    )}>
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Șterge tichet"
+        description={`Ești sigur că vrei să ștergi tichetul "${deleteTarget?.subject}"? Această acțiune nu poate fi anulată.`}
+        confirmLabel="Șterge"
+        cancelLabel="Anulează"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {/* Create / Edit Modal */}
       {showForm && (

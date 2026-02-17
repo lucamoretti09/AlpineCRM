@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
 import { useThemeStore } from '@/stores/themeStore';
 import AppLayout from '@/components/layouts/AppLayout';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import { useRealtime } from '@/hooks/useRealtime';
 
 // Lazy-load all feature pages for code-splitting
@@ -16,7 +17,10 @@ const CalendarPage = lazy(() => import('@/features/calendar/components/CalendarP
 const InvoicesPage = lazy(() => import('@/features/invoices/components/InvoicesPage').then(m => ({ default: m.InvoicesPage })));
 const EmailsPage = lazy(() => import('@/features/emails/components/EmailsPage').then(m => ({ default: m.EmailsPage })));
 const SettingsPage = lazy(() => import('@/features/settings/components/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const NotFoundPage = lazy(() => import('@/components/common/NotFoundPage'));
 const CommandPalette = lazy(() => import('@/components/common/CommandPalette'));
+const AIChatWidget = lazy(() => import('@/components/ai/AIChatWidget'));
+const CookieConsent = lazy(() => import('@/components/common/CookieConsent'));
 
 function Router() {
   const [path, setPath] = useState(window.location.pathname);
@@ -26,6 +30,12 @@ function Router() {
     window.addEventListener('popstate', handleNav);
     return () => window.removeEventListener('popstate', handleNav);
   }, []);
+
+  // Scroll to top on route change
+  useEffect(() => {
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [path]);
 
   // Simple client-side navigation helper
   useEffect(() => {
@@ -84,7 +94,7 @@ function Router() {
       case '/settings':
         return <SettingsPage />;
       default:
-        return <Dashboard />;
+        return <NotFoundPage />;
     }
   };
 
@@ -107,6 +117,9 @@ function Router() {
       <Suspense fallback={null}>
         <CommandPalette />
       </Suspense>
+      <Suspense fallback={null}>
+        <AIChatWidget />
+      </Suspense>
     </>
   );
 }
@@ -124,7 +137,12 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
+      <ErrorBoundary>
+        <Router />
+      </ErrorBoundary>
+      <Suspense fallback={null}>
+        <CookieConsent />
+      </Suspense>
       <Toaster
         position="top-right"
         toastOptions={{

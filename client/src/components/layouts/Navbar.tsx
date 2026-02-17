@@ -8,6 +8,8 @@ import {
   User,
   Settings,
   Command,
+  LogOut,
+  X,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/themeStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -23,7 +25,6 @@ export default function Navbar({ title }: NavbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [themeBounce, setThemeBounce] = useState(false);
-  const [searchFocused, setSearchFocused] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
 
@@ -49,7 +50,7 @@ export default function Navbar({ title }: NavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-[90px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-8 backdrop-blur-xl backdrop-saturate-150">
+    <header role="banner" aria-label="Bară de navigare" className="sticky top-0 z-30 flex h-[90px] items-center justify-between border-b border-[var(--border-color)]/50 bg-[var(--bg-primary)]/70 px-8 backdrop-blur-xl backdrop-saturate-150">
       {/* Left: Page Title */}
       <div>
         <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
@@ -59,34 +60,27 @@ export default function Navbar({ title }: NavbarProps) {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
-        {/* Search */}
-        <div className="relative hidden md:block">
-          <Search
-            className={cn(
-              'absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transition-colors duration-300',
-              searchFocused ? 'text-primary-500' : 'text-[var(--text-tertiary)]'
-            )}
-          />
-          <input
-            type="text"
-            placeholder="Căutare..."
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
-            className={cn(
-              'h-14 w-80 rounded-2xl border border-[var(--border-color)]',
-              'bg-[var(--bg-secondary)]/60 pl-12 pr-4 text-[17px]',
-              'text-[var(--text-primary)] placeholder-[var(--text-tertiary)]',
-              'outline-none transition-all duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
-              'focus:w-[28rem] focus:border-primary-500/40 focus:bg-[var(--bg-secondary)]',
-              'focus:shadow-[0_0_0_3px_rgba(99,102,241,0.1),0_0_20px_rgba(99,102,241,0.06)]'
-            )}
-          />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[var(--text-tertiary)]">
-            <kbd className="hidden lg:flex items-center gap-1 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)]/50 px-2 py-1 text-[13px] font-medium">
-              <Command className="h-3.5 w-3.5" />K
-            </kbd>
-          </div>
-        </div>
+        {/* Search - triggers Command Palette */}
+        <button
+          onClick={() => {
+            // Dispatch Ctrl+K to open command palette
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+          }}
+          className={cn(
+            'hidden md:flex items-center gap-3 h-12 w-72 rounded-xl border border-[var(--border-color)]',
+            'bg-[var(--bg-secondary)]/60 px-4 text-[15px]',
+            'text-[var(--text-tertiary)]',
+            'outline-none transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+            'hover:border-primary-500/30 hover:bg-[var(--bg-secondary)]',
+            'hover:shadow-[0_0_0_3px_rgba(99,102,241,0.06)]',
+          )}
+        >
+          <Search className="h-4.5 w-4.5 shrink-0" />
+          <span className="flex-1 text-left">Căutare...</span>
+          <kbd className="hidden lg:flex items-center gap-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-tertiary)]/50 px-1.5 py-0.5 text-[12px] font-medium">
+            <Command className="h-3 w-3" />K
+          </kbd>
+        </button>
 
         {/* Theme Toggle with rotation + scale bounce */}
         <button
@@ -227,7 +221,7 @@ export default function Navbar({ title }: NavbarProps) {
             )}
             <div className="hidden text-left md:block">
               <p className="text-[17px] font-semibold text-[var(--text-primary)] leading-tight">
-                {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
+                {user ? `${user.firstName} ${user.lastName}` : 'Vizitator'}
               </p>
               <p className="text-[15px] text-[var(--text-tertiary)] leading-tight">
                 {user?.email ?? ''}
@@ -254,7 +248,7 @@ export default function Navbar({ title }: NavbarProps) {
             >
               <div className="border-b border-[var(--border-color)]/50 px-4 py-3.5">
                 <p className="text-[17px] font-bold text-[var(--text-primary)]">
-                  {user ? `${user.firstName} ${user.lastName}` : 'Guest'}
+                  {user ? `${user.firstName} ${user.lastName}` : 'Vizitator'}
                 </p>
                 <p className="text-[15px] text-[var(--text-tertiary)] mt-0.5">
                   {user?.email ?? ''}
@@ -264,20 +258,32 @@ export default function Navbar({ title }: NavbarProps) {
               <div className="py-1.5">
                 <a
                   href="/settings/profile"
-                  className="flex items-center gap-3 px-4 py-3 text-[17px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
-                  <User className="h-5 w-5" />
+                  <User className="h-4.5 w-4.5" />
                   Profil
                 </a>
                 <a
                   href="/settings"
-                  className="flex items-center gap-3 px-4 py-3 text-[17px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
+                  className="flex items-center gap-3 px-4 py-3 text-[15px] font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]/60 hover:text-[var(--text-primary)] transition-all duration-200 ease-out"
                 >
-                  <Settings className="h-5 w-5" />
+                  <Settings className="h-4.5 w-4.5" />
                   Setări
                 </a>
               </div>
 
+              <div className="border-t border-[var(--border-color)]/50 py-1.5">
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('token');
+                    window.location.href = '/';
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-[15px] font-medium text-red-500 hover:bg-red-500/[0.06] transition-all duration-200 ease-out"
+                >
+                  <LogOut className="h-4.5 w-4.5" />
+                  Deconectare
+                </button>
+              </div>
             </div>
           )}
         </div>

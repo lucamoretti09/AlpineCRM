@@ -7,13 +7,13 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: number | string, currency = 'USD'): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(num);
+  return new Intl.NumberFormat('ro-RO', { style: 'currency', currency }).format(num);
 }
 
 export function formatCompactCurrency(amount: number | string, currency = 'USD'): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
   if (Math.abs(num) >= 1_000_000) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('ro-RO', {
       style: 'currency',
       currency,
       notation: 'compact',
@@ -21,21 +21,21 @@ export function formatCompactCurrency(amount: number | string, currency = 'USD')
     }).format(num);
   }
   if (Math.abs(num) >= 10_000) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('ro-RO', {
       style: 'currency',
       currency,
       maximumFractionDigits: 0,
     }).format(num);
   }
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(num);
+  return new Intl.NumberFormat('ro-RO', { style: 'currency', currency }).format(num);
 }
 
 export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(date).toLocaleDateString('ro-RO', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 export function formatDateTime(date: string | Date): string {
-  return new Date(date).toLocaleString('en-US', {
+  return new Date(date).toLocaleString('ro-RO', {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
@@ -45,16 +45,28 @@ export function formatRelativeTime(date: string | Date): string {
   const now = new Date();
   const d = new Date(date);
   const diffMs = now.getTime() - d.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
+  const absDiffMs = Math.abs(diffMs);
+  const diffSecs = Math.floor(absDiffMs / 1000);
   const diffMins = Math.floor(diffSecs / 60);
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffSecs < 60) return 'just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  const isFuture = diffMs < 0;
+
+  if (diffSecs < 60) return 'chiar acum';
+  if (diffMins < 60) return isFuture ? `în ${diffMins} min` : `acum ${diffMins} min`;
+  if (diffHours < 24) return isFuture ? `în ${diffHours} ore` : `acum ${diffHours} ore`;
+  if (diffDays < 7) return isFuture ? `în ${diffDays} zile` : `acum ${diffDays} zile`;
   return formatDate(date);
+}
+
+export function formatLongDate(date: string | Date): string {
+  return new Date(date).toLocaleDateString('ro-RO', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 
 export function getInitials(firstName: string, lastName: string): string {

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
@@ -14,6 +14,11 @@ import {
   Eye,
   X,
   ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Download,
   Receipt,
   TrendingUp,
   Ban,
@@ -21,6 +26,7 @@ import {
 import api from '@/lib/api';
 import { cn, formatCurrency, formatCompactCurrency, formatDate, getStatusColor } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -448,7 +454,35 @@ export function InvoicesPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showForm, setShowForm] = useState(false);
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showForm) { setShowForm(false); }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showForm]);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Invoice | null>(null);
+
+  // ── Sorting & Pagination
+  type SortField = 'invoiceNumber' | 'contactName' | 'amount' | 'status' | 'issuedDate' | 'dueDate';
+  const [sortField, setSortField] = useState<SortField>('issuedDate');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 15;
+
+  const toggleSort = useCallback((field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+    setCurrentPage(1);
+  }, [sortField]);
+
   const queryClient = useQueryClient();
 
   // ---- Data fetching ----
@@ -468,6 +502,55 @@ export function InvoicesPage() {
 
   const invoices: Invoice[] = data?.invoices ?? [];
   const total: number = data?.total ?? 0;
+
+  const STATUS_SORT_ORDER: Record<string, number> = { draft: 0, sent: 1, viewed: 2, overdue: 3, paid: 4, cancelled: 5 };
+
+  const sortedInvoices = useMemo(() => {
+    const items = [...invoices];
+    items.sort((a, b) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'invoiceNumber': cmp = a.invoiceNumber.localeCompare(b.invoiceNumber, 'ro'); break;
+        case 'contactName': cmp = (a.contactName || '').localeCompare(b.contactName || '', 'ro'); break;
+        case 'amount': {
+          const va = typeof a.amount === 'string' ? parseFloat(a.amount) : a.amount;
+          const vb = typeof b.amount === 'string' ? parseFloat(b.amount) : b.amount;
+          cmp = va - vb;
+          break;
+        }
+        case 'status': cmp = (STATUS_SORT_ORDER[a.status] ?? 99) - (STATUS_SORT_ORDER[b.status] ?? 99); break;
+        case 'issuedDate': cmp = new Date(a.issuedDate || 0).getTime() - new Date(b.issuedDate || 0).getTime(); break;
+        case 'dueDate': cmp = new Date(a.dueDate || 0).getTime() - new Date(b.dueDate || 0).getTime(); break;
+      }
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+    return items;
+  }, [invoices, sortField, sortDir]);
+
+  const paginatedInvoices = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedInvoices.slice(start, start + PAGE_SIZE);
+  }, [sortedInvoices, currentPage]);
+
+  const invoiceTotalPages = Math.ceil(sortedInvoices.length / PAGE_SIZE);
+
+  const handleExportCSV = useCallback(() => {
+    const headers = ['Nr. Factură', 'Contact', 'Sumă', 'Status', 'Emisă', 'Scadență'];
+    const rows = sortedInvoices.map((inv) => [
+      inv.invoiceNumber, inv.contactName || '', formatCurrency(inv.amount),
+      formatStatusLabel(inv.status), inv.issuedDate ? formatDate(inv.issuedDate) : '',
+      inv.dueDate ? formatDate(inv.dueDate) : '',
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `facturi_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success('Export CSV descărcat');
+  }, [sortedInvoices]);
 
   // ---- Derived stats ----
 
@@ -518,9 +601,7 @@ export function InvoicesPage() {
   };
 
   const handleDelete = (invoice: Invoice) => {
-    if (confirm(`Ștergi factura ${invoice.invoiceNumber}? Această acțiune nu poate fi anulată.`)) {
-      deleteMutation.mutate(invoice.id);
-    }
+    setDeleteTarget(invoice);
   };
 
   const handleFormSubmit = (formData: InvoiceFormData) => {
@@ -538,19 +619,26 @@ export function InvoicesPage() {
     <div className="space-y-7 animate-fadeIn">
       {/* ====== Header ====== */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Facturi</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
-            Gestionează și urmărește facturile
-          </p>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          Gestionează și urmărește facturile
+        </p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            disabled={!sortedInvoices.length}
+            className="flex items-center gap-2 px-4 py-3 bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] rounded-xl text-[15px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all disabled:opacity-40"
+          >
+            <Download className="w-5 h-5" />
+            Export CSV
+          </button>
+          <button
+            onClick={handleCreate}
+            className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
+          >
+            <Plus className="w-5 h-5" />
+            Factură Nouă
+          </button>
         </div>
-        <button
-          onClick={handleCreate}
-          className="flex items-center gap-2.5 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
-        >
-          <Plus className="w-5 h-5" />
-          Factură Nouă
-        </button>
       </div>
 
       {/* ====== Stats Summary ====== */}
@@ -630,24 +718,14 @@ export function InvoicesPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--border-color)]">
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Factură
-                </th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Contact
-                </th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Sumă
-                </th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Status
-                </th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Emisă
-                </th>
-                <th className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
-                  Scadență
-                </th>
+                {([['invoiceNumber', 'Factură'], ['contactName', 'Contact'], ['amount', 'Sumă'], ['status', 'Status'], ['issuedDate', 'Emisă'], ['dueDate', 'Scadență']] as [SortField, string][]).map(([field, label]) => (
+                  <th key={field} className="text-left px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
+                    <button onClick={() => toggleSort(field)} className="inline-flex items-center gap-1.5 hover:text-[var(--text-primary)] transition-colors">
+                      {label}
+                      {sortField === field ? (sortDir === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />) : <ChevronsUpDown className="w-4 h-4 opacity-40" />}
+                    </button>
+                  </th>
+                ))}
                 <th className="text-right px-6 py-4.5 text-[13px] font-semibold uppercase text-[var(--text-tertiary)] tracking-wider">
                   Acțiuni
                 </th>
@@ -656,7 +734,7 @@ export function InvoicesPage() {
             <tbody>
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => <TableRowSkeleton key={i} />)
-              ) : invoices.length === 0 ? (
+              ) : sortedInvoices.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-20 text-center">
                     <div className="flex flex-col items-center gap-3">
@@ -686,7 +764,7 @@ export function InvoicesPage() {
                   </td>
                 </tr>
               ) : (
-                invoices.map((invoice, index) => {
+                paginatedInvoices.map((invoice, index) => {
                   const isOverdue =
                     invoice.status !== 'paid' &&
                     invoice.status !== 'cancelled' &&
@@ -803,26 +881,61 @@ export function InvoicesPage() {
         </div>
 
         {/* Table Footer */}
-        {!isLoading && invoices.length > 0 && (
+        {!isLoading && sortedInvoices.length > 0 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]/30">
             <p className="text-[13px] text-[var(--text-tertiary)]">
-              Se afișează {invoices.length} din {total} factur{total !== 1 ? 'i' : 'ă'}
-            </p>
-            <p className="text-[13px] text-[var(--text-tertiary)]">
-              Valoare totală:{' '}
+              Se afișează {((currentPage - 1) * PAGE_SIZE) + 1}-{Math.min(currentPage * PAGE_SIZE, sortedInvoices.length)} din {sortedInvoices.length} facturi
+              {' · '}Valoare totală:{' '}
               <span className="font-semibold text-[var(--text-secondary)]">
-                {formatCurrency(
-                  invoices.reduce(
-                    (sum, inv) =>
-                      sum + (typeof inv.amount === 'string' ? parseFloat(inv.amount) : inv.amount),
-                    0,
-                  ),
-                )}
+                {formatCurrency(invoices.reduce((sum, inv) => sum + (typeof inv.amount === 'string' ? parseFloat(inv.amount) : inv.amount), 0))}
               </span>
             </p>
+            {invoiceTotalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+                  className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                {Array.from({ length: Math.min(invoiceTotalPages, 5) }).map((_, i) => {
+                  let pageNum: number;
+                  if (invoiceTotalPages <= 5) pageNum = i + 1;
+                  else if (currentPage <= 3) pageNum = i + 1;
+                  else if (currentPage >= invoiceTotalPages - 2) pageNum = invoiceTotalPages - 4 + i;
+                  else pageNum = currentPage - 2 + i;
+                  return (
+                    <button key={pageNum} onClick={() => setCurrentPage(pageNum)}
+                      className={cn('w-9 h-9 text-[14px] font-medium rounded-xl transition-colors',
+                        currentPage === pageNum
+                          ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/20'
+                          : 'bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                      )}>
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button onClick={() => setCurrentPage(p => Math.min(invoiceTotalPages, p + 1))} disabled={currentPage === invoiceTotalPages}
+                  className="p-2 rounded-xl bg-[var(--bg-secondary)]/60 border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] disabled:opacity-40 transition-colors">
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Șterge factură"
+        description={`Ești sigur că vrei să ștergi factura ${deleteTarget?.invoiceNumber}? Această acțiune nu poate fi anulată.`}
+        confirmLabel="Șterge"
+        cancelLabel="Anulează"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {/* ====== Create / Edit Modal ====== */}
       {showForm && (

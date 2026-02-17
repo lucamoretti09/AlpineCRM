@@ -23,6 +23,7 @@ import {
 import api from '@/lib/api';
 import { cn, formatDate, formatDateTime } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -418,11 +419,7 @@ function EmailDetailView({
           </p>
         </div>
         <button
-          onClick={() => {
-            if (confirm('Ești sigur că vrei să ștergi acest email?')) {
-              onDelete(email.id);
-            }
-          }}
+          onClick={() => onDelete(email.id)}
           disabled={isDeleting}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 dark:border-red-800/50 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 text-[15px] font-medium"
         >
@@ -496,7 +493,17 @@ export function EmailsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showCompose, setShowCompose] = useState(false);
+
+  // Close modal on Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showCompose) { setShowCompose(false); }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showCompose]);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Email | null>(null);
   const [page, setPage] = useState(1);
   const limit = 25;
   const queryClient = useQueryClient();
@@ -594,12 +601,27 @@ export function EmailsPage() {
 
   if (selectedEmail) {
     return (
-      <EmailDetailView
-        email={selectedEmail}
-        onBack={() => setSelectedEmail(null)}
-        onDelete={(id) => deleteMutation.mutate(id)}
-        isDeleting={deleteMutation.isPending}
-      />
+      <>
+        <EmailDetailView
+          email={selectedEmail}
+          onBack={() => setSelectedEmail(null)}
+          onDelete={() => setDeleteTarget(selectedEmail)}
+          isDeleting={deleteMutation.isPending}
+        />
+        <ConfirmDialog
+          open={!!deleteTarget}
+          title="Șterge email"
+          description={`Ești sigur că vrei să ștergi email-ul "${deleteTarget?.subject}"? Această acțiune nu poate fi anulată.`}
+          confirmLabel="Șterge"
+          cancelLabel="Anulează"
+          variant="danger"
+          onConfirm={() => {
+            if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+            setDeleteTarget(null);
+          }}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      </>
     );
   }
 
@@ -609,12 +631,9 @@ export function EmailsPage() {
     <div className="space-y-6 animate-fadeIn">
       {/* Page Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]">Email-uri</h1>
-          <p className="text-[15px] text-[var(--text-secondary)] mt-0.5">
-            {emailsData?.total ?? 0} email-uri în total
-          </p>
-        </div>
+        <p className="text-[14px] text-[var(--text-secondary)]">
+          <span className="font-semibold text-[var(--text-primary)]">{emailsData?.total ?? 0}</span> email-uri în total
+        </p>
         <button
           onClick={() => setShowCompose(true)}
           className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-[15px] font-semibold shadow-md shadow-indigo-500/20 transition-all hover:shadow-lg hover:shadow-indigo-500/25 active:scale-[0.98]"
@@ -834,11 +853,7 @@ export function EmailsPage() {
                         <Eye className="w-5 h-5" />
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm('Ești sigur că vrei să ștergi acest email?')) {
-                            deleteMutation.mutate(email.id);
-                          }
-                        }}
+                        onClick={() => setDeleteTarget(email)}
                         className="p-2 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--text-secondary)] hover:text-red-600 transition-colors"
                         title="Șterge email"
                       >
@@ -906,6 +921,20 @@ export function EmailsPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Șterge email"
+        description={`Ești sigur că vrei să ștergi email-ul "${deleteTarget?.subject}"? Această acțiune nu poate fi anulată.`}
+        confirmLabel="Șterge"
+        cancelLabel="Anulează"
+        variant="danger"
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
+          setDeleteTarget(null);
+        }}
+        onCancel={() => setDeleteTarget(null)}
+      />
 
       {/* Compose Modal */}
       {showCompose && (
