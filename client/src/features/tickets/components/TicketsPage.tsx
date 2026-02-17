@@ -228,7 +228,7 @@ export function TicketsPage() {
       t.ticketNumber, t.subject, formatStatusLabel(t.status),
       formatPriorityLabel(t.priority), getCategoryLabel(t.category), formatDate(t.createdAt),
     ]);
-    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const csvContent = [headers, ...rows].map((r: string[]) => r.map((v: string) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');

@@ -155,7 +155,7 @@ export function DealsPage() {
       STAGE_LABELS[d.stage] || d.stage, `${d.probability || 0}%`,
       d.expectedCloseDate ? formatDate(d.expectedCloseDate) : '',
     ]);
-    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const csvContent = [headers, ...rows].map((r: string[]) => r.map((v: string) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
